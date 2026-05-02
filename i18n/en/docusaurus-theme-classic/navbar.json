@@ -1,0 +1,22 @@
+{
+  "logo.alt": {
+    "message": "Layero",
+    "description": "The alt text of navbar logo"
+  },
+  "item.label.Документация": {
+    "message": "Documentation",
+    "description": "Navbar item with label Документация"
+  },
+  "item.label.Блог": {
+    "message": "Blog",
+    "description": "Navbar item with label Блог"
+  },
+  "item.label.Контакты": {
+    "message": "Contact",
+    "description": "Navbar item with label Контакты"
+  },
+  "item.label.layero.ru": {
+    "message": "layero.ru",
+    "description": "Navbar item with label layero.ru"
+  }
+}

@@ -1,0 +1,33 @@
+---
+title: Contact
+description: How to reach the Layero team.
+---
+
+# Contact
+
+Drop us a line about your project, report an issue, or just say hi. The team usually replies within a couple of business days.
+
+<form
+  className="layero-contact-form"
+  onSubmit={(e) => e.preventDefault()}
+  aria-label="Contact form (placeholder)"
+>
+  <label>
+    Name
+    <input type="text" name="name" placeholder="How should we address you" disabled />
+  </label>
+  <label>
+    Email
+    <input type="email" name="email" placeholder="you@example.com" disabled />
+  </label>
+  <label>
+    Message
+    <textarea name="message" placeholder="Tell us how we can help" disabled />
+  </label>
+  <button type="submit" disabled>Send</button>
+  <p className="layero-form-note">The form is coming soon. For now, use the contacts below.</p>
+</form>
+
+<div className="layero-contact-fallback">
+  Email: [hello@layero.ru](mailto:hello@layero.ru) · GitHub: [Layero-platform](https://github.com/Layero-platform)
+</div>

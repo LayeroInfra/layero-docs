@@ -1,0 +1,431 @@
+/**
+ * Layero Docs — vellum palette, в едином стиле с layero.ru / app.layero.ru.
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;430;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+:root {
+  /* Surfaces — Claude vellum palette */
+  --layero-bg:           #faf9f5;
+  --layero-bg-card:      #ffffff;
+  --layero-bg-soft:      #f3f1ea;
+  --layero-bg-mute:      #ecebe3;
+
+  /* Text */
+  --layero-ink:          #141413;
+  --layero-onyx:         #1f1e1d;
+  --layero-graphite:     #3d3d3a;
+  --layero-dusty:        #73726c;
+  --layero-stone:        #9c9a92;
+
+  /* Lines */
+  --layero-border:       #dedcd1;
+  --layero-border-soft:  #e9e7dd;
+  --layero-border-strong:#c9c6b6;
+
+  /* Accents */
+  --layero-terra:        #d97757;
+  --layero-terra-soft:   #f4dccd;
+  --layero-terra-deep:   #b85f3f;
+
+  /* Docusaurus tokens */
+  --ifm-color-primary: var(--layero-terra);
+  --ifm-color-primary-dark: var(--layero-terra-deep);
+  --ifm-color-primary-darker: #ad593a;
+  --ifm-color-primary-darkest: #8e4a31;
+  --ifm-color-primary-light: #df8a6f;
+  --ifm-color-primary-lighter: #e69987;
+  --ifm-color-primary-lightest: #f1bca9;
+
+  --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --ifm-font-family-monospace: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.65;
+
+  --ifm-background-color: var(--layero-bg);
+  --ifm-background-surface-color: var(--layero-bg-card);
+  --ifm-color-content: var(--layero-ink);
+  --ifm-color-content-secondary: var(--layero-graphite);
+
+  --ifm-heading-color: var(--layero-ink);
+  --ifm-heading-font-weight: 600;
+  --ifm-h1-font-size: 2.25rem;
+  --ifm-h2-font-size: 1.7rem;
+  --ifm-h3-font-size: 1.3rem;
+
+  --ifm-link-color: var(--layero-terra-deep);
+  --ifm-link-hover-color: var(--layero-terra);
+
+  --ifm-code-font-size: 0.88em;
+  --ifm-code-background: var(--layero-bg-soft);
+  --ifm-code-color: var(--layero-onyx);
+  --ifm-code-padding-horizontal: 0.35em;
+  --ifm-code-padding-vertical: 0.15em;
+  --ifm-code-border-radius: 4px;
+
+  --ifm-pre-background: var(--layero-onyx);
+  --ifm-pre-color: #f3f1ea;
+
+  --ifm-navbar-background-color: rgba(250, 249, 245, 0.82);
+  --ifm-navbar-shadow: none;
+  --ifm-navbar-height: 64px;
+  --ifm-navbar-link-color: var(--layero-graphite);
+  --ifm-navbar-link-hover-color: var(--layero-ink);
+
+  --ifm-footer-background-color: var(--layero-onyx);
+  --ifm-footer-color: #d8d6cc;
+  --ifm-footer-link-color: #d8d6cc;
+  --ifm-footer-title-color: #ffffff;
+
+  --ifm-toc-border-color: var(--layero-border-soft);
+  --ifm-table-border-color: var(--layero-border);
+  --ifm-hr-border-color: var(--layero-border-soft);
+
+  --ifm-menu-color: var(--layero-graphite);
+  --ifm-menu-color-active: var(--layero-ink);
+  --ifm-menu-color-background-active: var(--layero-bg-soft);
+  --ifm-menu-color-background-hover: var(--layero-bg-soft);
+
+  --docusaurus-highlighted-code-line-bg: rgba(217, 119, 87, 0.12);
+}
+
+[data-theme='dark'] {
+  --layero-bg:           #1a1a18;
+  --layero-bg-card:      #232220;
+  --layero-bg-soft:      #2a2926;
+  --layero-bg-mute:      #33312d;
+  --layero-ink:          #f3f1ea;
+  --layero-onyx:         #ecebe3;
+  --layero-graphite:     #c4c2b8;
+  --layero-dusty:        #9c9a92;
+  --layero-border:       #3a3834;
+  --layero-border-soft:  #2e2c29;
+
+  --ifm-color-primary: #e69987;
+  --ifm-color-primary-dark: var(--layero-terra);
+  --ifm-color-primary-darker: var(--layero-terra-deep);
+  --ifm-color-primary-darkest: #8e4a31;
+  --ifm-color-primary-light: #efb29f;
+  --ifm-color-primary-lighter: #f1bca9;
+  --ifm-color-primary-lightest: #f7d7c7;
+
+  --ifm-background-color: var(--layero-bg);
+  --ifm-background-surface-color: var(--layero-bg-card);
+  --ifm-color-content: var(--layero-ink);
+  --ifm-color-content-secondary: var(--layero-graphite);
+  --ifm-heading-color: var(--layero-ink);
+
+  --ifm-code-background: var(--layero-bg-soft);
+  --ifm-code-color: var(--layero-ink);
+  --ifm-pre-background: #0d0d0c;
+
+  --ifm-navbar-background-color: rgba(26, 26, 24, 0.82);
+  --ifm-footer-background-color: #0d0d0c;
+  --ifm-toc-border-color: var(--layero-border-soft);
+  --ifm-menu-color-background-active: var(--layero-bg-soft);
+  --ifm-menu-color-background-hover: var(--layero-bg-soft);
+
+  --docusaurus-highlighted-code-line-bg: rgba(230, 153, 135, 0.18);
+}
+
+html, body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--layero-bg);
+}
+
+::selection { background: var(--layero-terra-soft); color: var(--layero-ink); }
+[data-theme='dark'] ::selection { background: rgba(217, 119, 87, 0.35); color: #ffffff; }
+
+/* ——— Navbar ——— */
+.navbar {
+  backdrop-filter: saturate(180%) blur(12px);
+  -webkit-backdrop-filter: saturate(180%) blur(12px);
+  border-bottom: 1px solid var(--layero-border-soft);
+}
+.navbar__brand { gap: 0.55rem; }
+.navbar__title {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  font-size: 0.98rem;
+}
+.navbar__logo { height: 18px; display: flex; align-items: center; }
+.navbar__logo img { height: 18px; width: auto; }
+.navbar__link {
+  font-size: 0.92rem;
+  font-weight: 500;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  transition: color 0.15s, background 0.15s;
+}
+.navbar__link:hover { background: rgba(31, 30, 29, 0.04); }
+[data-theme='dark'] .navbar__link:hover { background: rgba(255, 255, 255, 0.05); }
+
+/* ——— Sidebar ——— */
+.theme-doc-sidebar-container {
+  border-right: 1px solid var(--layero-border-soft) !important;
+}
+.menu {
+  padding: 1.2rem 0.75rem;
+  font-size: 0.9rem;
+}
+.menu__link {
+  border-radius: 6px;
+  font-weight: 430;
+  color: var(--layero-graphite);
+  padding: 0.45rem 0.65rem;
+  line-height: 1.4;
+}
+.menu__link--active {
+  font-weight: 500;
+  color: var(--layero-ink);
+}
+.menu__link--active:not(.menu__link--sublist) {
+  background: var(--layero-bg-soft);
+}
+
+/* ——— Главный контент ——— */
+.main-wrapper { background: var(--layero-bg); }
+
+article { font-size: 0.98rem; }
+article h1 {
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-bottom: 1.25rem;
+}
+article h2 {
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  border-top: 1px solid var(--layero-border-soft);
+  padding-top: 2rem;
+  margin-top: 2.5rem;
+}
+article h2:first-of-type { border-top: none; padding-top: 0; margin-top: 2rem; }
+article h3 { font-weight: 600; letter-spacing: -0.01em; }
+article p { color: var(--layero-graphite); }
+article a {
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+article strong { color: var(--layero-ink); font-weight: 600; }
+
+/* Inline-код */
+:not(pre) > code {
+  font-weight: 500;
+  border: 1px solid var(--layero-border-soft);
+  background: var(--layero-bg-soft);
+}
+
+/* Блоки кода */
+pre, .prism-code, div[class^='codeBlockContainer_'] {
+  border-radius: 10px !important;
+  border: 1px solid var(--layero-border-soft);
+}
+
+/* Таблицы */
+table {
+  display: table;
+  width: 100%;
+  border: 1px solid var(--layero-border-soft);
+  border-radius: 8px;
+  overflow: hidden;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+table thead { background: var(--layero-bg-soft); }
+table th, table td {
+  border: none;
+  border-bottom: 1px solid var(--layero-border-soft);
+  padding: 0.6rem 0.85rem;
+  font-size: 0.92rem;
+}
+table tr:last-child td { border-bottom: none; }
+table th { font-weight: 500; color: var(--layero-graphite); text-align: left; }
+
+/* Admonitions */
+.theme-admonition {
+  border-radius: 10px;
+  border: 1px solid var(--layero-border-soft);
+  font-size: 0.94rem;
+}
+
+/* Кнопки */
+.button--primary {
+  background: var(--layero-ink);
+  border-color: var(--layero-ink);
+  color: #fff;
+  font-weight: 500;
+  border-radius: 10px;
+}
+.button--primary:hover {
+  background: #2a2927;
+  border-color: #2a2927;
+  color: #fff;
+}
+.button--secondary {
+  background: transparent;
+  border: 1px solid var(--layero-border-strong);
+  color: var(--layero-ink);
+  font-weight: 500;
+  border-radius: 10px;
+}
+
+/* TOC */
+.table-of-contents {
+  font-size: 0.85rem;
+  border-left-color: var(--layero-border-soft);
+}
+.table-of-contents__link {
+  color: var(--layero-dusty);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+.table-of-contents__link--active,
+.table-of-contents__link:hover {
+  color: var(--layero-ink);
+}
+
+/* Pagination */
+.pagination-nav__link {
+  border-radius: 10px;
+  border-color: var(--layero-border-soft);
+  background: var(--layero-bg-card);
+}
+.pagination-nav__link:hover {
+  border-color: var(--layero-border-strong);
+}
+.pagination-nav__sublabel { color: var(--layero-dusty); font-size: 0.8rem; }
+.pagination-nav__label { color: var(--layero-ink); font-weight: 500; }
+
+/* ——— Блог ——— */
+/* Заголовок поста и список постов — чёрные, не терракотовые */
+.markdown > h1:first-child,
+[class*='blogPostTitle'] > a,
+[class*='blogPostTitle'] {
+  color: var(--layero-ink) !important;
+}
+[class*='blogPostTitle'] a:hover {
+  color: var(--layero-ink) !important;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+/* Автор поста — ink, не terra */
+[class*='authorName'],
+[class*='authorName'] a {
+  color: var(--layero-ink) !important;
+  font-weight: 500;
+}
+[class*='authorTitle'] { color: var(--layero-dusty); }
+
+/* Обложка над постом — округлая, тонкая граница */
+[class*='blogPostContainer'] article > header img,
+.markdown > p:first-child > img:only-child {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid var(--layero-border-soft);
+  margin: 0 0 1.75rem 0;
+}
+
+/* «Читать дальше» — приглушённая ссылка, не цветная плашка */
+[class*='readMore'] a {
+  color: var(--layero-graphite);
+  font-weight: 500;
+  border-bottom: 1px solid var(--layero-border);
+  padding-bottom: 1px;
+}
+[class*='readMore'] a:hover {
+  color: var(--layero-ink);
+  border-color: var(--layero-ink);
+}
+
+/* Тег-чипы — нейтральные */
+[class*='tag_'] {
+  border-color: var(--layero-border) !important;
+  color: var(--layero-graphite) !important;
+}
+[class*='tag_']:hover {
+  background: var(--layero-bg-soft) !important;
+  color: var(--layero-ink) !important;
+}
+
+/* ——— Контактная форма (заглушка) ——— */
+.layero-contact-form {
+  display: grid;
+  gap: 1rem;
+  max-width: 560px;
+  margin: 1.5rem 0 0;
+  padding: 1.75rem;
+  background: var(--layero-bg-card);
+  border: 1px solid var(--layero-border-soft);
+  border-radius: 14px;
+}
+.layero-contact-form label {
+  display: grid;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--layero-graphite);
+}
+.layero-contact-form input,
+.layero-contact-form textarea {
+  font: inherit;
+  font-size: 0.95rem;
+  color: var(--layero-ink);
+  background: var(--layero-bg);
+  border: 1px solid var(--layero-border);
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.layero-contact-form input:focus,
+.layero-contact-form textarea:focus {
+  border-color: var(--layero-terra);
+  box-shadow: 0 0 0 3px rgba(217, 119, 87, 0.15);
+}
+.layero-contact-form textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+.layero-contact-form button {
+  justify-self: start;
+  font: inherit;
+  font-weight: 500;
+  font-size: 0.95rem;
+  padding: 0.65rem 1.25rem;
+  background: var(--layero-ink);
+  color: #fff;
+  border: 1px solid var(--layero-ink);
+  border-radius: 10px;
+  cursor: not-allowed;
+  opacity: 0.85;
+}
+.layero-contact-form .layero-form-note {
+  font-size: 0.82rem;
+  color: var(--layero-dusty);
+  margin: 0;
+}
+.layero-contact-fallback {
+  margin-top: 1.75rem;
+  font-size: 0.95rem;
+  color: var(--layero-graphite);
+}
+.layero-contact-fallback a {
+  color: var(--layero-ink);
+  font-weight: 500;
+}
+
+/* Footer */
+.footer { border-top: 1px solid var(--layero-border-soft); }
+.footer__title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+.footer__link-item { font-size: 0.92rem; opacity: 0.85; }
+.footer__link-item:hover { opacity: 1; color: #fff; }
+.footer__copyright { color: rgba(255, 255, 255, 0.5); font-size: 0.85rem; }

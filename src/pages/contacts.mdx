@@ -1,0 +1,33 @@
+---
+title: Контакты
+description: Как связаться с командой Layero.
+---
+
+# Контакты
+
+Напишите нам, если хотите рассказать о своём проекте, сообщить о проблеме или просто поздороваться. Команда отвечает на сообщения в течение пары рабочих дней.
+
+<form
+  className="layero-contact-form"
+  onSubmit={(e) => e.preventDefault()}
+  aria-label="Форма обратной связи (заглушка)"
+>
+  <label>
+    Имя
+    <input type="text" name="name" placeholder="Как к вам обращаться" disabled />
+  </label>
+  <label>
+    Email
+    <input type="email" name="email" placeholder="you@example.com" disabled />
+  </label>
+  <label>
+    Сообщение
+    <textarea name="message" placeholder="Расскажите, чем мы можем помочь" disabled />
+  </label>
+  <button type="submit" disabled>Отправить</button>
+  <p className="layero-form-note">Форма скоро заработает. Пока используйте контакты ниже.</p>
+</form>
+
+<div className="layero-contact-fallback">
+  Email: [hello@layero.ru](mailto:hello@layero.ru) · GitHub: [Layero-platform](https://github.com/Layero-platform)
+</div>

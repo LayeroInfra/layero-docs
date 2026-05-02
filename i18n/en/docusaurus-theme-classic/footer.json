@@ -1,0 +1,38 @@
+{
+  "link.title.Документация": {
+    "message": "Documentation",
+    "description": "The title of the footer links column with title=Документация in the footer"
+  },
+  "link.title.Layero": {
+    "message": "Layero",
+    "description": "The title of the footer links column with title=Layero in the footer"
+  },
+  "link.title.Code": {
+    "message": "Code",
+    "description": "The title of the footer links column with title=Code in the footer"
+  },
+  "link.item.label.Введение": {
+    "message": "Introduction",
+    "description": "The label of footer link with label=Введение linking to /"
+  },
+  "link.item.label.Блог": {
+    "message": "Blog",
+    "description": "The label of footer link with label=Блог linking to /blog"
+  },
+  "link.item.label.layero.ru": {
+    "message": "layero.ru",
+    "description": "The label of footer link with label=layero.ru linking to https://layero.ru"
+  },
+  "link.item.label.app.layero.ru": {
+    "message": "app.layero.ru",
+    "description": "The label of footer link with label=app.layero.ru linking to https://app.layero.ru"
+  },
+  "link.item.label.GitHub": {
+    "message": "GitHub",
+    "description": "The label of footer link with label=GitHub linking to https://github.com/Layero-platform"
+  },
+  "copyright": {
+    "message": "© 2026 Layero. Built with Docusaurus.",
+    "description": "The footer copyright"
+  }
+}

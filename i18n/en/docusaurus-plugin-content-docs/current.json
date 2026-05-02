@@ -1,0 +1,38 @@
+{
+  "version.label": {
+    "message": "Next",
+    "description": "The label for version current"
+  },
+  "sidebar.docsSidebar.category.Быстрый старт": {
+    "message": "Getting started",
+    "description": "The label for category 'Быстрый старт' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Быстрый старт.link.generated-index.description": {
+    "message": "Deploy your first site on Layero and learn how the platform is structured.",
+    "description": "The generated-index page description for category 'Быстрый старт' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.CLI": {
+    "message": "CLI",
+    "description": "The label for category 'CLI' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.CLI.link.generated-index.description": {
+    "message": "The `layero` npm package — deploy and manage projects from the terminal.",
+    "description": "The generated-index page description for category 'CLI' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Деплой и окружения": {
+    "message": "Deploys & environments",
+    "description": "The label for category 'Деплой и окружения' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Деплой и окружения.link.generated-index.description": {
+    "message": "Deploying from GitHub, environments, preview URLs, env vars and custom domains.",
+    "description": "The generated-index page description for category 'Деплой и окружения' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Runtime-приложения": {
+    "message": "Runtime apps",
+    "description": "The label for category 'Runtime-приложения' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Runtime-приложения.link.generated-index.description": {
+    "message": "SSR Next.js, Streamlit, Gradio, Flask and any apps with a long-running process.",
+    "description": "The generated-index page description for category 'Runtime-приложения' in sidebar 'docsSidebar'"
+  }
+}

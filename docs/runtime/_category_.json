@@ -1,0 +1,8 @@
+{
+  "label": "Runtime-приложения",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "description": "SSR Next.js, Streamlit, Gradio, Flask и любые приложения с долгоживущим процессом."
+  }
+}

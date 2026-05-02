@@ -1,0 +1,75 @@
+name: Deploy docs
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'docs/**'
+      - 'blog/**'
+      - 'i18n/**'
+      - 'src/**'
+      - 'static/**'
+      - 'sidebars.ts'
+      - 'docusaurus.config.ts'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'deploy.sh'
+      - '.github/workflows/deploy-docs.yml'
+
+concurrency:
+  group: deploy-docs
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Build (ru + en)
+        run: npm run build
+
+      - name: Install yc CLI
+        run: |
+          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash -s -- -i "$HOME/yandex-cloud" -n
+          echo "$HOME/yandex-cloud/bin" >> "$GITHUB_PATH"
+
+      - name: Configure yc
+        env:
+          YC_CDN_SA_KEY: ${{ secrets.YC_CDN_SA_KEY }}
+        run: |
+          install -m 600 /dev/null "$HOME/yc-sa-key.json"
+          printf '%s' "$YC_CDN_SA_KEY" > "$HOME/yc-sa-key.json"
+          yc config profile create ci
+          yc config set service-account-key "$HOME/yc-sa-key.json"
+          yc config set cloud-id b1ger5mmajemr152soru
+          yc config set folder-id b1g5p8gs03eoj1fvu0qc
+          yc storage bucket get layero-docs >/dev/null
+          yc cdn resource get bc8r7guaub3kynogbziz >/dev/null
+
+      - name: Deploy docs
+        env:
+          CDN_RESOURCE_ID: bc8r7guaub3kynogbziz
+        run: bash deploy.sh
+
+      - name: Verify
+        run: |
+          for i in $(seq 1 36); do
+            if curl -sf https://docs.layero.ru/ | grep -q "Layero"; then
+              echo "OK: docs.layero.ru returns content"
+              exit 0
+            fi
+            sleep 5
+          done
+          echo "Timed out waiting for CDN propagation" >&2
+          exit 1

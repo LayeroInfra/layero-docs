@@ -1,0 +1,8 @@
+{
+  "label": "Деплой и окружения",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "description": "Деплой из GitHub, окружения, preview-URL, переменные окружения и кастомные домены."
+  }
+}

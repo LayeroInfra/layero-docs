@@ -1,0 +1,9 @@
+release:
+  label: Релиз
+  permalink: /release
+  description: Релизы и обновления платформы
+
+announcement:
+  label: Анонс
+  permalink: /announcement
+  description: Анонсы и новости
