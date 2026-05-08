@@ -32,15 +32,70 @@ layero deploy
 
 | Флаг | Описание |
 |---|---|
+| `--prod` | Задеплоить в production (apex-домен). Без флага — preview. |
+| `--branch <name>` | Задеплоить в конкретную ветку. Имеет приоритет над `--prod`. |
 | `--type <preset>` | Пресет фреймворка: `vite`, `next`, `astro`, `cra`, `sveltekit`, `nuxt`, `gatsby`, `static`. См. [Фреймворки](../getting-started/frameworks.md). |
 | `--name <name>` | Имя проекта. Только при первом деплое. |
 | `--project <id_or_slug>` | Деплоить в конкретный проект, игнорируя `./.layero/project.json`. Удобно для CI. |
-| `--yes`, `-y` | Не задавать интерактивных вопросов. |
+| `--config` | Прогнать setup из `./.layero/project.json` без браузера (CI-friendly). |
+| `--yes`, `-y` | Пропустить подтверждение `--prod` и интерактивные вопросы. |
+
+## Куда приземляется деплой
+
+CLI разделяет **preview** и **production** — по образцу Vercel:
+
+```bash
+# preview на CLI-pseudo-ветку, отдельный hostname
+# никогда не перетирает production
+layero deploy
+# → https://<org>-<project>-cli.layero.ru
+
+# preview на конкретную ветку (создаст environment если её нет)
+layero deploy --branch=staging
+# → https://<org>-<project>-staging.layero.ru
+
+# production: apex-домен, нужно подтверждение
+layero deploy --prod
+# → https://<org>-<project>.layero.ru
+# CLI спросит: deploy to production? [y/N]
+
+# CI-режим: без подтверждения
+layero deploy --prod --yes
+```
+
+**Зачем псевдо-ветка `cli`:** локальные эксперименты не должны случайно
+заменить production. По умолчанию `layero deploy` приземляется на
+изолированный hostname `<org>-<project>-cli.layero.ru`. Чтобы пропихнуть
+в production, нужно явное `--prod`.
+
+## Mixed-mode: GitHub + CLI на одном проекте
+
+Один и тот же проект может одновременно принимать:
+
+* **push в GitHub** → автоматический деплой (webhook)
+* **`layero deploy`** → CLI-загрузка тарбола
+
+Это удобно когда:
+
+* GitHub-build долгий или нестабильный, и нужен быстрый локальный hot-fix:
+  `layero deploy --prod --yes` поднимет ваш локальный код в production
+  за секунды без коммита.
+* В CI после успешного теста хочется явно зафиксировать релиз:
+  `layero deploy --prod --yes` после `git push`.
+
+Артефакты в дашборде помечаются источником:
+
+| Бейдж | Что значит |
+|---|---|
+| `push` | Webhook от GitHub push |
+| `cli` | Загружен через `layero deploy` |
+| `manual` | Запущен через дашборд (Redeploy) |
 
 Пример CI-сборки:
 
 ```bash
-LAYERO_TOKEN=$LAYERO_DEPLOY_TOKEN layero deploy --project alice-my-site --yes
+LAYERO_TOKEN=$LAYERO_DEPLOY_TOKEN layero deploy --prod --yes \
+  --project alice-my-site
 ```
 
 ## Правила игнорирования
@@ -81,7 +136,7 @@ CLI уважает:
 
 ## После деплоя
 
-После `ready` сайт доступен на `https://<owner>-<project>.layero.ru` и
+После `ready` сайт доступен на `https://<organization>-<project>.layero.ru` и
 preview-URL `https://<project>-<sha7>.preview.layero.ru` (см.
 [Окружения](../deploys/environments.md)). Для канонического hostname
 после **первого** деплоя нужно подождать ~30–60 секунд, пока CDN

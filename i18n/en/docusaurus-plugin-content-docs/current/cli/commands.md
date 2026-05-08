@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Команды
-description: Полный список команд layero — login, projects list, link, deploy, token.
+description: Полный список команд layero — login, projects, deploy, rollback, deploys list, link, token.
 ---
 
 # Команды CLI
@@ -13,7 +13,10 @@ description: Полный список команд layero — login, projects l
 | `layero whoami` | Показать текущий аккаунт. |
 | `layero projects list` | Список ваших проектов. |
 | `layero link <id_or_slug>` | Привязать cwd к существующему проекту. |
-| `layero deploy` | Упаковать cwd и задеплоить. |
+| `layero deploy` | Упаковать cwd и задеплоить (preview по умолчанию). |
+| `layero deploy --prod` | Задеплоить в production (с подтверждением). |
+| `layero deploys list` | Показать недавние деплои текущего проекта. |
+| `layero rollback` | Откатить активный деплой на предыдущий ready. |
 | `layero token set <jwt>` | Задать токен вручную (для CI). |
 
 Полный список флагов конкретной команды:
@@ -24,13 +27,7 @@ layero <cmd> --help
 
 ## `layero projects list`
 
-Показывает все проекты, к которым у вас есть доступ:
-
-```
-ID    SLUG               STATUS    SOURCE  HOSTNAME
-123   alice-my-site      active    cli     alice-my-site.layero.ru
-124   alice-blog         active    github  alice-blog.layero.ru
-```
+Показывает все проекты, к которым у вас есть доступ.
 
 ## `layero link`
 
@@ -48,3 +45,34 @@ layero link alice-blog   # по slug
 ## `layero deploy`
 
 Упаковать cwd и запустить деплой. Подробно — [`layero deploy`](./deploy.md).
+
+## `layero deploys list`
+
+Показать последние деплои проекта (по умолчанию — default-ветка):
+
+```bash
+layero deploys list                       # текущая default-ветка
+layero deploys list --branch=staging      # другая ветка
+layero deploys list --limit 50            # больше истории
+```
+
+Каждая строка содержит статус (`ready`/`building`/`failed`), commit SHA,
+время и **источник** деплоя:
+
+| Бейдж | Что значит |
+|---|---|
+| `(push)` | Пришёл от webhook'а GitHub после push |
+| `(cli)` | Загружен через `layero deploy` |
+| `(manual)` | Запущен вручную через дашборд (Redeploy) |
+
+## `layero rollback`
+
+Откатить активный деплой ветки на предыдущий successful — без пересборки.
+Подробно — [`layero rollback`](./rollback.md).
+
+```bash
+layero rollback                       # default-ветка → previous ready
+layero rollback --branch=staging      # конкретная ветка
+layero rollback --deploy=a3f9c2b      # на конкретный commit/deploy
+layero rollback --yes                 # без подтверждения (CI)
+```

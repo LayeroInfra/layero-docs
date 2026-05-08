@@ -48,8 +48,9 @@ CLI:
 ## 4. Откройте сайт
 
 После завершения сборки сайт будет доступен на
-`https://<owner>-<project>.layero.ru`. Например, для пользователя `vasya`
-и проекта `my-site` — `https://vasya-my-site.layero.ru`.
+`https://<organization>-<project>.layero.ru`. Например, для пользователя
+`vasya` (его персональная организация — `vasya`) и проекта `my-site` —
+`https://vasya-my-site.layero.ru`.
 
 :::tip Preview-URL за 30 секунд
 Полный канонический hostname на CDN прогревается 5–15 минут. Чтобы вы могли
