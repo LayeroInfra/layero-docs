@@ -11,10 +11,12 @@ description: Полный список команд layero — login, projects, 
 | `layero login` | Авторизоваться через браузер (OAuth). |
 | `layero logout` | Удалить сохранённый токен. |
 | `layero whoami` | Показать текущий аккаунт. |
+| `layero orgs list` | Список Layero-организаций (личная + команды). |
 | `layero projects list` | Список ваших проектов. |
 | `layero link <id_or_slug>` | Привязать cwd к существующему проекту. |
 | `layero deploy` | Упаковать cwd и задеплоить (preview по умолчанию). |
 | `layero deploy --prod` | Задеплоить в production (с подтверждением). |
+| `layero deploy --org <slug>` | Создать новый проект в указанной команде вместо личной. |
 | `layero deploys list` | Показать недавние деплои текущего проекта. |
 | `layero rollback` | Откатить активный деплой на предыдущий ready. |
 | `layero token set <jwt>` | Задать токен вручную (для CI). |
@@ -24,6 +26,21 @@ description: Полный список команд layero — login, projects, 
 ```bash
 layero <cmd> --help
 ```
+
+## `layero orgs list`
+
+Показывает Layero-организации, в которых вы состоите:
+
+```
+borisowvalia        personal  (admin)
+acme-team           team      (admin)
+client-x            team      (member)
+```
+
+* **personal** — ваш личный аккаунт, создаётся при регистрации
+* **team** — команда, создаётся вручную (на дашборде или при `layero deploy --org=...`)
+
+Slug используется как префикс в hostname'ах: `<org>-<project>.layero.ru`.
 
 ## `layero projects list`
 
