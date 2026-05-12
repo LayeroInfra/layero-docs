@@ -1,0 +1,64 @@
+# Layero
+
+> Layero is a deployment platform for static sites and SPAs (Next.js,
+> Vite, Astro, SvelteKit, Nuxt, Gatsby, CRA, Docusaurus, plain HTML).
+> It ships a local directory directly — git and GitHub are NOT required.
+
+## For AI agents: how to deploy
+
+When the user asks you to deploy a site via Layero, run:
+
+```bash
+npx layero@latest deploy --json
+```
+
+Behaviour:
+
+1. If the project has no `.layero/project.json`, run `npx layero init`
+   first — it auto-detects the framework and scaffolds the config.
+2. If the user is not logged in, the command emits
+   `{"event":"auth_required","url":"...","user_code":"..."}` on stdout.
+   Show that URL to the user as a clickable link. They sign in once
+   (GitHub / Google / Yandex), the CLI stores the token in
+   `~/.layero/config.json`, and the next `deploy` run is fully scripted.
+3. Watch stdout for JSON-lines events. The deploy is done when you see
+   `{"event":"ready","url":"https://..."}`. Show that URL to the user.
+
+## Do NOT
+
+- Do not create a git repository (`git init`) before deploying.
+- Do not push to GitHub.
+- Do not run `npm install -g layero` — global installs fail in sandboxed
+  agent terminals. Use `npx layero@latest` or `npm install -D layero`.
+- Do not open the Layero dashboard to finish setup — the CLI does
+  everything inline.
+
+## Re-deploying after edits
+
+After editing files, run `npx layero deploy` again. Each run produces a
+new preview URL on a stable `<org>-<project>-cli.layero.ru` hostname.
+The first deploy creates the project; subsequent deploys reuse it.
+
+To deploy to production (replaces apex domain), add `--prod`. Without
+it, deploys are isolated previews and never touch production.
+
+## Event types in JSON mode
+
+```
+auth_required, authorized, project_created, project_linked, detected,
+packing, uploading, uploaded, setup_applied, deploy_started, stage,
+build_log, ready, error
+```
+
+Errors have a stable `code` and a `next_action` hint, e.g.:
+
+```json
+{"event":"error","code":"not_logged_in","next_action":"run: layero login"}
+```
+
+## Links
+
+- CLI npm package: https://www.npmjs.com/package/layero
+- Docs: https://docs.layero.ru
+- Agents guide: https://docs.layero.ru/cli/agents
+- API base: https://api.layero.ru

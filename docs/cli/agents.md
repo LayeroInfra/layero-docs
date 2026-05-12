@@ -1,0 +1,150 @@
+---
+sidebar_position: 5
+title: Деплой из AI-агентов
+description: Как Cursor, Claude Code, Aider и другие AI-агенты могут задеплоить сайт через Layero без git-репозитория и без визарда в браузере.
+---
+
+# Деплой из AI-агентов
+
+Layero CLI задизайнен так, чтобы AI-агент (Cursor, Claude Code, Aider, Continue и т.д.) мог задеплоить сайт **за один разговор**, без git-инициализации, без push'а в GitHub и без визарда в дашборде. Единственное действие от пользователя — один клик по URL для логина.
+
+## Целевой сценарий
+
+```
+Пользователь: задеплой этот лендинг через layero
+Агент:        Сейчас. Открой https://app.layero.ru/cli?code=ABCD-1234 и подтверди.
+              (юзер открывает ссылку, кликает «Authorize», возвращается в чат)
+Агент:        ✓ Live at https://my-landing-abc123.layero.app
+```
+
+Никаких `git init`, никаких `gh repo create`, никаких походов в дашборд. После этого юзер может попросить агента «поменяй кнопку на красную» и снова «задеплой» — каждый раз новый preview-URL.
+
+## Чтобы агент знал что делать
+
+### Способ 1 — проектный файл (главный)
+
+В директории проекта запустите один раз:
+
+```bash
+npx layero init
+```
+
+Команда дописывает блок в существующие `AGENTS.md` / `CLAUDE.md` / `.cursorrules` (или создаёт `AGENTS.md`). Содержание блока:
+
+```markdown
+## Deploying with Layero
+
+This project ships to https://layero.ru. To deploy any local changes:
+
+\`\`\`bash
+npx layero deploy
+\`\`\`
+
+First-time setup:
+- The CLI prints an authorization URL on first run. Show it to the user as a clickable link; they sign in once, and the token is cached locally.
+- No git repository or GitHub connection is required.
+
+Re-deploy after edits: run `npx layero deploy` again. Each run produces a new preview URL.
+```
+
+Любой современный агент читает эти файлы в начале сессии и точно знает что делать без подсказок.
+
+### Способ 2 — cold-start (агент видит Layero впервые)
+
+Если в проекте нет `AGENTS.md`, агент догадывается из контекста запроса юзера. Когда пользователь говорит «задеплой через layero», агент:
+
+1. Делает WebFetch на `https://layero.ru/llms.txt` — каноническая страница для AI-агентов с готовым рецептом.
+2. Или WebSearch «layero deploy» — попадает в эту страницу документации.
+
+Оба пути ведут к одной команде: `npx layero deploy`.
+
+## JSON-режим
+
+Когда CLI запущен внутри AI-агента, он **автоматически** переключается в JSON-lines режим. Триггеры:
+
+- Не-TTY stdout (всегда так в Cursor / Claude Code / любом subprocess)
+- Env vars: `CURSOR_AGENT`, `CLAUDECODE`, `LAYERO_AGENT`, `LAYERO_JSON=1`
+- Явный флаг `--json`
+
+В этом режиме CLI:
+
+- Не задаёт никаких вопросов
+- Печатает на stdout строки вида `{"event":"...","..."}` — по одной на действие
+- Ошибки приходят со стабильным `code` и `next_action` — агент знает что делать без парсинга prose
+
+### Стрим событий
+
+```jsonl
+{"event":"auth_required","url":"https://app.layero.ru/cli?code=ABCD-1234","user_code":"ABCD-1234"}
+{"event":"authorized","user":"alice"}
+{"event":"detected","framework":"vite","build_cmd":"npm run build","output_dir":"dist","confident":true}
+{"event":"project_created","project_id":"...","slug":"my-site","organization":"alice"}
+{"event":"packing","files":124,"bytes":2401234,"sha256":"abc123..."}
+{"event":"uploading"}
+{"event":"uploaded","archive_key":"..."}
+{"event":"setup_applied"}
+{"event":"deploy_started","deploy_id":"..."}
+{"event":"stage","name":"install"}
+{"event":"build_log","line":"npm install ...","stream":"stdout"}
+{"event":"stage","name":"build"}
+{"event":"build_log","line":"vite v5.0.0 building...","stream":"stdout"}
+{"event":"ready","url":"https://my-site-abc123.layero.app","deploy_id":"..."}
+```
+
+### Коды ошибок
+
+| `code` | `next_action` (примерное) | Когда |
+|---|---|---|
+| `not_logged_in` | run: layero login | Токена нет в `~/.layero/config.json` |
+| `invalid_type` | valid types: vite, next, ... | `--type` с неизвестным значением |
+| `project_not_found` | run \`layero projects list\` | `--project` указывает на несуществующий проект |
+| `project_unlinked` | delete .layero/project.json and re-run | Linked project удалён на сервере |
+| `username_missing` | open https://app.layero.ru/onboarding | OAuth прошёл, но username не выбран |
+| `org_membership_missing` | available: foo, bar, ... | `--org` указывает на не вашу организацию |
+| `no_organization` | finish onboarding at ... | На аккаунте нет ни одной организации |
+| `cli_deploys_disabled` | enable in project settings | Админ выключил CLI-деплои в проекте |
+| `deploy_failed` / `deploy_error` / etc. | inspect logs at ... | Сборка упала |
+
+## Cold-start: что ваш агент должен делать
+
+Если вы пишете системный промпт для агента (Cursor rules, Claude Code skills, CLAUDE.md), включите примерно такое:
+
+```markdown
+## Deployment
+
+If the user asks to deploy a site to Layero:
+
+1. Do NOT create a git repository or push to GitHub. Layero deploys local
+   files directly.
+2. Run `npx layero deploy --json` from the project root.
+3. If output contains `{"event":"auth_required","url":"..."}` — render the
+   URL as a clickable link in chat and wait. The user will click it once.
+4. Continue waiting for additional JSON events. When you see
+   `{"event":"ready","url":"..."}` — show the URL to the user and stop.
+5. If you see `{"event":"error","code":"...","next_action":"..."}` —
+   follow next_action. Most common: `not_logged_in` → run `npx layero login`.
+```
+
+## Что НЕ делать
+
+- ❌ `git init` + `gh repo create` перед деплоем — это лишний путь, агент часто туда сваливается по аналогии с Vercel/Netlify
+- ❌ `npm install -g layero` — глобальная установка часто фейлится в песочнице агента. Используйте `npx layero` или `npm install -D layero`
+- ❌ Открывать дашборд для «дописать setup» — `layero deploy` сейчас полностью inline, никакой ручной настройки в браузере между «upload» и «build» нет
+- ❌ Спрашивать `--prod` без явной просьбы юзера — `layero deploy` по умолчанию идёт в preview, что безопасно
+
+## Полная цепочка для агента
+
+Самодостаточный рецепт, который работает с нуля (полностью cold-start, ничего не настроено):
+
+```bash
+# 1. Создать .layero/project.json + AGENTS.md (опционально, но удобно для будущих сессий)
+npx layero init
+
+# 2. Авторизоваться (один раз на машину; токен в ~/.layero/config.json)
+npx layero login
+
+# 3. Задеплоить
+npx layero deploy --json
+```
+
+После `ready` показать юзеру URL и закончить. Дальнейшие правки → снова `npx layero deploy` → новый URL.
