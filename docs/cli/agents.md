@@ -29,9 +29,7 @@ Layero CLI задизайнен так, чтобы AI-агент (Cursor, Claude
 npx layero init
 ```
 
-Команда дописывает блок в существующие `AGENTS.md` / `CLAUDE.md` / `.cursorrules` (или создаёт `AGENTS.md`). Содержание блока:
-
-См. актуальный шаблон в исходниках CLI: [`core/cli/src/commands/init.ts`](https://github.com/LayeroInfra/core/blob/main/cli/src/commands/init.ts) — функция `agentDocBlock()`. Блок содержит: device-flow рецепт логина (auth_required → клик → poll), список JSON-событий с пояснениями, таблицу кодов ошибок с remediation, правила для `--prod`.
+Команда дописывает блок в существующие `AGENTS.md` / `CLAUDE.md` / `.cursorrules` (или создаёт `AGENTS.md`). Блок содержит: device-flow рецепт логина (`auth_required` → клик → poll), таблицу JSON-событий с пояснениями (`detected` / `project_created` / `build_log` / `ready` / `error`), список кодов ошибок с remediation (`not_logged_in`, `auth_expired`, `cli_deploys_disabled`, ...), правила для `--prod`. Актуальный текст шаблона — в [`agentDocBlock()` в init.ts](https://github.com/LayeroInfra/core/blob/main/cli/src/commands/init.ts).
 
 Любой современный агент читает эти файлы в начале сессии и точно знает что делать без подсказок.
 
