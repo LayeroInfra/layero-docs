@@ -31,21 +31,7 @@ npx layero init
 
 Команда дописывает блок в существующие `AGENTS.md` / `CLAUDE.md` / `.cursorrules` (или создаёт `AGENTS.md`). Содержание блока:
 
-```markdown
-## Deploying with Layero
-
-This project ships to https://layero.ru. To deploy any local changes:
-
-\`\`\`bash
-npx layero deploy
-\`\`\`
-
-First-time setup:
-- The CLI prints an authorization URL on first run. Show it to the user as a clickable link; they sign in once, and the token is cached locally.
-- No git repository or GitHub connection is required.
-
-Re-deploy after edits: run `npx layero deploy` again. Each run produces a new preview URL.
-```
+См. актуальный шаблон в исходниках CLI: [`core/cli/src/commands/init.ts`](https://github.com/LayeroInfra/core/blob/main/cli/src/commands/init.ts) — функция `agentDocBlock()`. Блок содержит: device-flow рецепт логина (auth_required → клик → poll), список JSON-событий с пояснениями, таблицу кодов ошибок с remediation, правила для `--prod`.
 
 Любой современный агент читает эти файлы в начале сессии и точно знает что делать без подсказок.
 
@@ -88,22 +74,24 @@ Re-deploy after edits: run `npx layero deploy` again. Each run produces a new pr
 {"event":"build_log","line":"npm install ...","stream":"stdout"}
 {"event":"stage","name":"build"}
 {"event":"build_log","line":"vite v5.0.0 building...","stream":"stdout"}
-{"event":"ready","url":"https://my-site-abc123.layero.app","deploy_id":"..."}
+{"event":"ready","url":"https://alice-my-site-cli.layero.ru","preview_url":"https://my-site-abc1234.preview.layero.ru","deploy_id":"..."}
 ```
 
 ### Коды ошибок
 
-| `code` | `next_action` (примерное) | Когда |
+Полный канонический список — [JSON-events схема](./json-events.md). Кратко:
+
+| `code` | `next_action` | Когда |
 |---|---|---|
 | `not_logged_in` | run: layero login | Токена нет в `~/.layero/config.json` |
+| `auth_expired` / `auth_timeout` | run: layero login | Пользователь не подтвердил код за 15 минут |
 | `invalid_type` | valid types: vite, next, ... | `--type` с неизвестным значением |
-| `project_not_found` | run \`layero projects list\` | `--project` указывает на несуществующий проект |
+| `project_not_found` | run `layero projects list` | `--project` указывает на несуществующий проект |
 | `project_unlinked` | delete .layero/project.json and re-run | Linked project удалён на сервере |
 | `username_missing` | open https://app.layero.ru/onboarding | OAuth прошёл, но username не выбран |
-| `org_membership_missing` | available: foo, bar, ... | `--org` указывает на не вашу организацию |
-| `no_organization` | finish onboarding at ... | На аккаунте нет ни одной организации |
-| `cli_deploys_disabled` | enable in project settings | Админ выключил CLI-деплои в проекте |
-| `deploy_failed` / `deploy_error` / etc. | inspect logs at ... | Сборка упала |
+| `no_organization` / `org_membership_missing` | available: foo, bar, ... | На аккаунте нет нужной организации |
+| `cli_deploys_disabled` | enable in project settings | Админ выключил CLI-деплои |
+| `deploy_failed` / `deploy_error` / `deploy_timed_out` | inspect logs at ... | Сборка не дошла до `ready` |
 
 ## Cold-start: что ваш агент должен делать
 

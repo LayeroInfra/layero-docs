@@ -15,14 +15,17 @@ npx layero@latest deploy --json
 Behaviour:
 
 1. If the project has no `.layero/project.json`, run `npx layero init`
-   first — it auto-detects the framework and scaffolds the config.
+   first — it auto-detects the framework and scaffolds the config + writes
+   an AGENTS.md block so future sessions know how to deploy.
 2. If the user is not logged in, the command emits
    `{"event":"auth_required","url":"...","user_code":"..."}` on stdout.
    Show that URL to the user as a clickable link. They sign in once
-   (GitHub / Google / Yandex), the CLI stores the token in
-   `~/.layero/config.json`, and the next `deploy` run is fully scripted.
+   (GitHub or Yandex — Layero creates the account automatically on first
+   OAuth), click "Разрешить доступ", and within 2 seconds the CLI's poll
+   loop picks up the token. No localhost server: the browser can be on a
+   different machine than the CLI (works from SSH, Docker, Cursor sandbox).
 3. Watch stdout for JSON-lines events. The deploy is done when you see
-   `{"event":"ready","url":"https://..."}`. Show that URL to the user.
+   `{"event":"ready","url":"https://..."}` — show that URL to the user.
 
 ## Do NOT
 
@@ -30,8 +33,10 @@ Behaviour:
 - Do not push to GitHub.
 - Do not run `npm install -g layero` — global installs fail in sandboxed
   agent terminals. Use `npx layero@latest` or `npm install -D layero`.
-- Do not open the Layero dashboard to finish setup — the CLI does
-  everything inline.
+- Do not open the Layero dashboard to "finish setup" — the CLI does
+  everything inline. There is no browser setup wizard since v0.5.0.
+- Do not pass `--provider` to `layero login` — the flag was removed in
+  v0.5.x; provider is chosen in the browser.
 
 ## Re-deploying after edits
 
@@ -50,15 +55,29 @@ packing, uploading, uploaded, setup_applied, deploy_started, stage,
 build_log, ready, error
 ```
 
-Errors have a stable `code` and a `next_action` hint, e.g.:
+`ready` carries `url` (canonical CDN URL) and `preview_url` (direct preview
+via builder VM, alive within 30s even while CDN is warming up — 5-15 min).
+Show `preview_url` if `url` 404s temporarily.
+
+Errors have a stable `code` and a `next_action` hint:
 
 ```json
-{"event":"error","code":"not_logged_in","next_action":"run: layero login"}
+{"event":"error","code":"not_logged_in","next_action":"run: layero login","message":"not authenticated"}
 ```
+
+Common codes: `not_logged_in`, `auth_expired`, `auth_timeout`, `invalid_type`,
+`project_not_found`, `project_unlinked`, `username_missing`,
+`org_membership_missing`, `no_organization`, `cli_deploys_disabled`,
+`deploy_failed`, `deploy_error`, `deploy_timed_out`, `internal`.
+
+Full schema with required/optional fields per event:
+https://docs.layero.ru/cli/json-events
 
 ## Links
 
 - CLI npm package: https://www.npmjs.com/package/layero
 - Docs: https://docs.layero.ru
 - Agents guide: https://docs.layero.ru/cli/agents
+- JSON-events schema: https://docs.layero.ru/cli/json-events
+- Cursor rules drop-in: https://layero.ru/cursorrules
 - API base: https://api.layero.ru

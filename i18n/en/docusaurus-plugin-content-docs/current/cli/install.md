@@ -26,9 +26,15 @@ layero --version
 layero login
 ```
 
-CLI поднимет локальный HTTP-сервер на `127.0.0.1`, откроет браузер и
-проведёт вас через OAuth (GitHub или Яндекс ID). После подтверждения
-токен сохранится в `~/.layero/config.json` (chmod 600).
+CLI prints a verification URL like `https://app.layero.ru/cli?code=ABCD-1234`
+and polls for approval. Open the URL in any browser, pick a provider
+(GitHub or Yandex — Layero creates the account on first OAuth), and
+click "Authorize". The CLI receives a JWT within ~2 seconds and stores
+it in `~/.layero/config.json` (chmod 600).
+
+This is a device flow (like `gh auth login`): no local HTTP server is
+involved, so login works from SSH, Docker, or AI-agent sandboxes where
+loopback isn't available.
 
 Проверьте, под каким аккаунтом вы залогинены:
 

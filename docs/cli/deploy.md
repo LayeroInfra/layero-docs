@@ -131,7 +131,7 @@ npx layero deploy --json
 {"event":"uploading"}
 {"event":"deploy_started","deploy_id":"..."}
 {"event":"build_log","line":"...","stream":"stdout"}
-{"event":"ready","url":"https://...","deploy_id":"..."}
+{"event":"ready","url":"https://alice-my-site-cli.layero.ru","preview_url":"https://my-site-abc1234.preview.layero.ru","deploy_id":"..."}
 ```
 
 Ошибки приходят со стабильным `code` и `next_action`:
@@ -140,7 +140,9 @@ npx layero deploy --json
 {"event":"error","code":"not_logged_in","next_action":"run: layero login","message":"not authenticated"}
 ```
 
-JSON-режим включается автоматически когда CLI запущен внутри Cursor / Claude Code / любого процесса с не-TTY stdout. Подробнее — [Деплой из AI-агентов](./agents.md).
+Поле `preview_url` в `ready` событии — это прямая ссылка через builder VM, живёт через ~30 секунд после успешной сборки, даже когда канонический `url` (через CDN) ещё прогревается 5–15 минут. Показывайте `preview_url` если `url` пока 404'ит.
+
+JSON-режим включается автоматически когда CLI запущен внутри Cursor / Claude Code / любого процесса с не-TTY stdout. Подробнее — [Деплой из AI-агентов](./agents.md), полный список событий — [JSON-events схема](./json-events.md).
 
 ## Правила игнорирования
 
@@ -193,8 +195,8 @@ CLI уважает:
 
 ## Postinstall-баннер
 
-После `npm install -g layero` CLI пишет краткую инструкцию в `/dev/tty`. В CI-окружениях и при `npm install -D layero` баннер не выводится. Чтобы выключить вручную:
+После `npm install -g layero` или `npm install -D layero` (без `--silent`) CLI пишет краткий quick-start в `/dev/tty`. В CI-окружениях баннер подавляется автоматически (`CI=1`). Чтобы выключить вручную:
 
 ```bash
-LAYERO_SKIP_POSTINSTALL=1 npm install -g layero
+LAYERO_SKIP_POSTINSTALL=1 npm install -D layero
 ```

@@ -9,7 +9,7 @@ description: Полный список команд layero — init, login, proj
 | Команда | Что делает |
 |---|---|
 | `layero init` | Авто-детект фреймворка, скаффолд `.layero/project.json` + блок для AI-агентов в `AGENTS.md` / `CLAUDE.md` / `.cursorrules`. |
-| `layero login` | Авторизоваться через браузер (GitHub / Google / Яндекс ID). |
+| `layero login` | Авторизоваться через браузер (GitHub / Яндекс ID) — device-flow. |
 | `layero logout` | Удалить сохранённый токен. |
 | `layero whoami` | Показать текущий аккаунт. |
 | `layero orgs list` | Список Layero-организаций (личная + команды). |
