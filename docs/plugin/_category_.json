@@ -1,0 +1,9 @@
+{
+  "label": "@layero — плагин для AI-IDE",
+  "position": 4,
+  "link": {
+    "type": "generated-index",
+    "title": "@layero — плагин для AI-IDE",
+    "description": "MCP-плагин Layero, который собирает лендинги прямо в Cursor / Claude Code / Codex и деплоит их одним движением."
+  }
+}
