@@ -8,7 +8,7 @@ description: Vite, Next.js, Astro, CRA, Nuxt, SvelteKit, Gatsby — что Layer
 
 Layero определяет фреймворк автоматически по содержимому `package.json`,
 конфиг-файлам в корне и lock-файлу. Если автодетект ошибся — переопределите
-выбор через [`layero.json`](../deploys/layero-json.md), флаг
+выбор через [`layero.json`](../deploys/layero-json), флаг
 `layero deploy --type` или настройки проекта в панели.
 
 ## Автодетект (статика)
@@ -51,7 +51,7 @@ layero deploy --type vite
 `cra`, `eleventy`, `hugo`, `static`, `generic`. Принимаются также
 популярные алиасы — `next`, `react-router`, `rr7`, `ng`, `11ty`.
 
-Через [`layero.json`](../deploys/layero-json.md) в корне репозитория:
+Через [`layero.json`](../deploys/layero-json) в корне репозитория:
 
 ```json
 {
