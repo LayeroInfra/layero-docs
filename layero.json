@@ -1,0 +1,6 @@
+{
+  "$schema": "https://layero.ru/schema/layero-v1.json",
+  "framework": "docusaurus",
+  "build": "npm run build",
+  "output": "build"
+}
