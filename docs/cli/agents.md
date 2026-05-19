@@ -80,7 +80,7 @@ npx layero init
 {"event":"build_log","line":"npm install ...","stream":"stdout"}
 {"event":"stage","name":"build"}
 {"event":"build_log","line":"vite v5.0.0 building...","stream":"stdout"}
-{"event":"ready","url":"https://alice-my-site-cli.layero.ru","preview_url":"https://my-site-abc1234.preview.layero.ru","deploy_id":"..."}
+{"event":"ready","url":"https://alice-my-site-cli.preview.layero.ru","preview_url":"https://alice-my-site-cli.preview.layero.ru","deploy_id":"..."}
 ```
 
 ### Коды ошибок

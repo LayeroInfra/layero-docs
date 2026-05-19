@@ -20,7 +20,8 @@ description: Полный список команд layero — init, login, proj
 | `layero deploy --org <slug>` | Создать новый проект в указанной команде вместо личной. |
 | `layero deploy --json` | Machine-readable стрим событий — для агентов и CI. |
 | `layero deploys list` | Показать недавние деплои текущего проекта. |
-| `layero rollback` | Откатить активный деплой на предыдущий ready. |
+| `layero promote` | Переключить production apex на конкретный ready-деплой. |
+| `layero promote --rollback` | Атомарный rollback apex'а на предыдущий production. |
 | `layero token set <jwt>` | Задать токен вручную (для CI). |
 
 Полный список флагов конкретной команды:
@@ -105,13 +106,16 @@ npx layero deploys list --limit 50            # больше истории
 | `(cli)` | Загружен через `layero deploy` |
 | `(manual)` | Запущен вручную через дашборд (Redeploy) |
 
-## `layero rollback`
+## `layero promote`
 
-Откатить активный деплой ветки на предыдущий successful — без пересборки. Подробно — [`layero rollback`](./rollback.md).
+Перевести production apex `<org>-<project>.layero.ru` на конкретный ready-деплой. Подробно — [`layero promote`](./promote.md).
 
 ```bash
-npx layero rollback                       # default-ветка → previous ready
-npx layero rollback --branch=staging      # конкретная ветка
-npx layero rollback --deploy=a3f9c2b      # на конкретный commit/deploy
-npx layero rollback --yes                 # без подтверждения (CI)
+npx layero promote                        # default-ветка → последний ready
+npx layero promote --branch=staging       # последний ready ветки staging
+npx layero promote --deploy=a3f9c2b       # конкретный commit/deploy
+npx layero promote --rollback             # вернуть apex на прошлый production
+npx layero promote --yes                  # без подтверждения (CI)
 ```
+
+`layero deploy --promote` — короткий путь: «собери и сразу выкати в production», эквивалент `layero deploy ... && layero promote --deploy=<last>`.

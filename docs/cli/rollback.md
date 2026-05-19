@@ -1,73 +1,73 @@
 ---
-sidebar_position: 4
-title: layero rollback
-description: Как откатить активный деплой ветки на предыдущий successful артефакт без пересборки.
+sidebar_position: 6
+title: Rollback
+description: Откатить production apex на предыдущий рабочий деплой одной командой. Атомарный swap указателя, без пересборки.
 ---
 
-# `layero rollback`
+# Rollback
 
-Откатить активный деплой на предыдущий ready-артефакт. Без пересборки —
-артефакт уже лежит в Object Storage с прошлого успешного деплоя.
+Откатить production apex `<org>-<project>.layero.ru` на **предыдущий** production-деплой. Без пересборки, без выбора commit'а — Layero запоминает прошлое значение указателя при каждом promote, и rollback просто меняет их местами.
 
 ## Зачем
 
-Production упал после релиза. Нужно мгновенно вернуть рабочий артефакт,
-не дожидаясь нового билда. Pересборка предыдущего commit'а из git-истории
-не сработает идемпотентно: `npm install` против сегодняшнего npm-registry
-может дать другой `node_modules` (lockfile drift, transitive republish).
-Rollback берёт **точно тот же** артефакт, что работал раньше.
+Только что promote'нули новый билд, и оказалось, что он сломал production. Нужно мгновенно вернуть рабочую версию.
+
+Pересборка предыдущего commit'а из git-истории не сработает идемпотентно: `npm install` против сегодняшнего реестра может дать другой `node_modules` (lockfile drift, transitive republish). Rollback берёт **тот же** артефакт, что работал раньше — он уже в S3.
 
 ## Использование
 
 ```bash
-# default-ветка → последний ready, который не текущий active
-layero rollback
-
-# конкретная ветка
-layero rollback --branch=staging
-
-# на конкретный deploy (по полному id или начальным 7+ символов SHA)
-layero rollback --deploy=a3f9c2b
-layero rollback --deploy=550e8400-e29b-41d4-a716-446655440000
+# rollback: вернуть apex на предыдущий production
+layero promote --rollback
 
 # CI: без подтверждения
-layero rollback --yes
+layero promote --rollback --yes
 ```
+
+Это эквивалентно кнопке «Откатить production» на странице проекта в UI.
+
+## Как это работает
+
+Под капотом Layero хранит **два** указателя на проекте:
+
+```
+projects.production_deploy_id           ── что apex отдаёт прямо сейчас
+projects.previous_production_deploy_id  ── что отдавал до прошлого promote'а
+```
+
+Rollback — это **атомарный swap** этих двух полей одним SQL-апдейтом. Apex моментально (через CDN edge cache propagation, ~30–60 сек) возвращается на прошлый рабочий билд.
+
+`previous_production_deploy_id` обновляется автоматически при каждом promote'е (UI / CLI / auto-promote), так что rollback всегда есть «куда».
+
+**Стабильность ping-pong**: вызвав `layero promote --rollback` два раза подряд, вы вернётесь в исходную точку. Удобно когда хочется: откатить → проверить старую версию → вернуть новую обратно.
 
 ## Что происходит
 
-1. CLI вытаскивает список деплоев ветки и показывает текущий active +
-   target кандидат:
-
+1. CLI показывает план:
    ```
    rollback plan:
-     from: 1743a29  2026-05-08 20:30  v2.4.1 — bugfix release
-     to:   8b34f01  2026-05-08 19:42  v2.4.0 — initial 2.4
-   proceed with rollback? [y/N]
+     from: ce70191  2026-05-19 07:09  feature: new pricing page (current production)
+     to:   1743a29  2026-05-08 20:30  v2.4.0 — stable release   (previous production)
+   proceed? [y/N]
    ```
-
 2. После confirm бэкенд:
-   * Меняет `environments.active_deploy_id` на target deploy.
-   * Сбрасывает CDN-кеш hostname'а ветки (новые запросы получат
-     старый артефакт; старые edge-кеши по TTL обновятся за ~5 мин).
-   * Возвращает обновлённый deploy с новым активным флагом.
-
-3. CDN propagation — ~30–60 секунд.
+   - Атомарный swap `production_deploy_id ↔ previous_production_deploy_id`.
+   - Запись в `promote_events` (action='promote', source='cli', с заметкой что это rollback).
+   - Инвалидация resolver-кеша через Postgres NOTIFY.
+3. CDN propagation — 30–60 секунд, и apex отдаёт прошлую версию.
 
 ## Ограничения
 
-* Кандидат должен быть в статусе `ready` и иметь `s3_path` (артефакт в
-  S3). Failed/queued/building деплои в кандидаты не идут.
-* Rollback к самому себе (текущий active) — 400 error.
-* Для **runtime**-проектов (SSR Next, Streamlit, Gradio, Flask)
-  rollback флипает указатель на старый артефакт, но running-инстанс
-  старого деплоя нужно явно дёрнуть — следующий request триггернёт
-  cold start.
+- На проекте должен быть **минимум один** предыдущий promote — иначе rollback'у некуда (CLI вернёт ошибку с понятным сообщением).
+- Rollback двигает **production apex** проекта; preview-URL'ы веток остаются нетронутыми — у каждой ветки своя независимая история деплоев.
+- Для **runtime**-проектов (SSR Next, Streamlit, Gradio, Flask) rollback переключает указатель моментально, но running-инстанс старого билда продолжает отвечать пока его не дёрнут (cold-start на следующем запросе уже на старом артефакте).
 
 ## Альтернативы
 
-* В дашборде на странице **Deploys** у каждого ready-деплоя есть
-  кнопка «Откатить» (кроме активного). Тот же endpoint.
-* Если хочется **rebuild** того же commit'а (а не reuse артефакта) —
-  делайте новый `layero deploy` с тем же кодом или жмите Redeploy в
-  дашборде.
+- В UI: Project page → Production card → кнопка «Откатить».
+- Откатить **на конкретный** деплой (не предыдущий): `layero promote --deploy=<sha>`. См. [`layero promote`](./promote.md).
+- Если хочется **rebuild** прошлого коммита (а не reuse артефакта) — обычный `layero deploy` с тем кодом или Redeploy в дашборде.
+
+## Что было раньше (до V071)
+
+В прошлой модели у каждой ветки был **свой** канонический hostname `<branch>.layero.ru`, и `layero rollback` менял `environments.active_deploy_id` per-ветка. С переходом на «один apex на проект» rollback теперь — это операция уровня проекта, не env'а. Команда `layero rollback` удалена; используйте `layero promote --rollback`.

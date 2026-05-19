@@ -125,8 +125,8 @@ CLI упаковал директорию в tar.gz.
 
 | поле | тип | примечание |
 |---|---|---|
-| `url` | string | канонический URL: `https://<org>-<project>.layero.ru` (или с веткой/`-cli` для preview) |
-| `preview_url` | string? | прямой preview-URL через builder VM, минуя CDN; доступен через ~30 секунд после сборки даже если CDN ещё прогревается (5–15 минут). Полезно показывать когда `url` пока 404'ит. |
+| `url` | string | URL, по которому деплой реально доступен. Для production-деплоев (через `--prod` + auto-promote или `--promote`) — apex `https://<org>-<project>.layero.ru`. Для preview-деплоев — preview-форма `https://<org>-<project>-<branch>.preview.layero.ru` (24 ч TTL). |
+| `preview_url` | string? | Preview-URL ветки (`*.preview.layero.ru`), доступен через ~30 секунд после сборки и работает 24 часа. Всегда заполнен, даже когда деплой стал production. Используйте этот URL пока apex ещё прогревается на первом деплое (5–15 мин). |
 | `deploy_id` | string | |
 
 ### `error`

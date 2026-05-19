@@ -50,40 +50,50 @@ CLI читает `package.json` и характерные конфиги:
 
 | Флаг | Описание |
 |---|---|
-| `--prod` | Задеплоить в production (apex-домен). Без флага — preview. |
-| `--branch <name>` | Задеплоить в конкретную ветку. Имеет приоритет над `--prod`. |
+| `--prod` | Деплой приземляется в default-ветку проекта (то же что push в main). Если у проекта включён auto-promote — apex переключится на свежий билд автоматически. |
+| `--promote` | После успешного билда **сразу** двигает `production_deploy_id` на этот деплой. Работает для любой ветки — удобно чтобы выкатить feature-ветку в production одной командой. |
+| `--branch <name>` | Деплой в конкретную ветку (создаст окружение, если не было). Без флага CLI кладёт в псевдо-ветку `cli`. |
 | `--type <preset>` | Оверрайд авто-детекта: `vite`, `next`, `astro`, `cra`, `sveltekit`, `nuxt`, `gatsby`, `docusaurus`, `static`. |
 | `--name <name>` | Имя проекта. Только при первом деплое. |
 | `--project <id_or_slug>` | Деплоить в конкретный проект, игнорируя `./.layero/project.json`. Удобно для CI. |
 | `--org <slug>` | Создать проект в указанной Layero-организации (при первом деплое). |
-| `--yes`, `-y` | Пропустить подтверждение `--prod` и интерактивные вопросы. |
+| `--yes`, `-y` | Пропустить подтверждение `--prod` / `--promote` и интерактивные вопросы. |
 | `--json` | JSON-lines на stdout (для AI-агентов и CI). |
 | `--config` | Legacy alias текущего поведения (авто-детект + `.layero/project.json`). |
 
 ## Куда приземляется деплой
 
-CLI разделяет **preview** и **production** — по образцу Vercel:
-
 ```bash
-# preview на CLI-pseudo-ветку, отдельный hostname
-# никогда не перетирает production
+# preview на CLI-pseudo-ветку — изолированный URL, не трогает apex
 npx layero deploy
-# → https://<org>-<project>-cli.layero.ru
+# → https://<org>-<project>-cli.preview.layero.ru   (24 ч TTL)
 
-# preview на конкретную ветку (создаст environment если её нет)
+# preview на конкретную ветку
 npx layero deploy --branch=staging
-# → https://<org>-<project>-staging.layero.ru
+# → https://<org>-<project>-staging.preview.layero.ru   (24 ч TTL)
 
-# production: apex-домен, нужно подтверждение
-npx layero deploy --prod
-# → https://<org>-<project>.layero.ru
+# деплой в default-ветку проекта (push-эквивалент)
+# если auto-promote включён → apex переключится автоматом
 # CLI спросит: deploy to production? [y/N]
+npx layero deploy --prod
+
+# выкатить из любой ветки сразу в production одной командой
+# (промоут идёт сразу после успешного билда, без полной поездки CI)
+npx layero deploy --branch=staging --promote
+# → apex: https://<org>-<project>.layero.ru теперь отдаёт этот деплой
 
 # CI-режим: без подтверждения
 npx layero deploy --prod --yes
 ```
 
-**Зачем псевдо-ветка `cli`:** локальные эксперименты не должны случайно заменить production. По умолчанию `layero deploy` приземляется на изолированный hostname `<org>-<project>-cli.layero.ru`. Чтобы пропихнуть в production, нужно явное `--prod`.
+**Чем `--prod` отличается от `--promote`:**
+
+- `--prod` = «положи на default-ветку». Дальше за apex отвечает либо auto-promote (если включён в Settings), либо ваш ручной клик «Promote».
+- `--promote` = «после того как соберётся, переведи apex на этот деплой». Работает для любой ветки — короткий путь «hot-fix из feature-ветки → production».
+
+Обычно одно из двух: либо `--prod --yes` в CI на пуш в main, либо `--branch=hot-fix --promote --yes` для срочного фикса.
+
+**Зачем псевдо-ветка `cli`:** локальные эксперименты не должны случайно затронуть production. По умолчанию `layero deploy` уходит в изолированный `cli`-env с preview-URL — apex остаётся нетронутым.
 
 ## Mixed-mode: GitHub + CLI на одном проекте
 
@@ -131,7 +141,7 @@ npx layero deploy --json
 {"event":"uploading"}
 {"event":"deploy_started","deploy_id":"..."}
 {"event":"build_log","line":"...","stream":"stdout"}
-{"event":"ready","url":"https://alice-my-site-cli.layero.ru","preview_url":"https://my-site-abc1234.preview.layero.ru","deploy_id":"..."}
+{"event":"ready","url":"https://alice-my-site-cli.preview.layero.ru","preview_url":"https://alice-my-site-cli.preview.layero.ru","deploy_id":"..."}
 ```
 
 Ошибки приходят со стабильным `code` и `next_action`:
@@ -140,7 +150,7 @@ npx layero deploy --json
 {"event":"error","code":"not_logged_in","next_action":"run: layero login","message":"not authenticated"}
 ```
 
-Поле `preview_url` в `ready` событии — это прямая ссылка через builder VM, живёт через ~30 секунд после успешной сборки, даже когда канонический `url` (через CDN) ещё прогревается 5–15 минут. Показывайте `preview_url` если `url` пока 404'ит.
+Поле `preview_url` в `ready` событии — это всегда живая preview-ссылка ветки (`*.preview.layero.ru`), доступная через ~30 секунд после успешной сборки. Поле `url` — production-apex, если этот деплой стал production (через `--prod` + auto-promote, или `--promote`); иначе равно `preview_url`. Apex'у нужно 5–15 мин на первый прогрев CDN — пока он не готов, шерьте `preview_url`.
 
 JSON-режим включается автоматически когда CLI запущен внутри Cursor / Claude Code / любого процесса с не-TTY stdout. Подробнее — [Деплой из AI-агентов](./agents.md), полный список событий — [JSON-events схема](./json-events.md).
 
@@ -191,7 +201,12 @@ CLI уважает:
 
 ## После деплоя
 
-После `ready` сайт доступен на `https://<organization>-<project>.layero.ru` и preview-URL `https://<project>-<sha7>.preview.layero.ru` (см. [Окружения](../deploys/environments.md)). Для канонического hostname после **первого** деплоя нужно подождать ~30–60 секунд, пока CDN прогреется.
+После `ready`:
+
+- **Preview-URL ветки** `https://<org>-<project>-<branch>.preview.layero.ru` живёт через ~30 сек и работает 24 часа.
+- **Apex** `https://<org>-<project>.layero.ru` отдаёт этот деплой если он стал production (auto-promote default-ветки или `--promote`). Если деплой остался в preview — apex продолжает отдавать предыдущий production-билд, а ваш текущий доступен только через preview-URL.
+
+См. [Окружения, preview и production](../deploys/environments.md) для полной картины.
 
 ## Postinstall-баннер
 

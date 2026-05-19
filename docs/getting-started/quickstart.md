@@ -57,8 +57,8 @@ CLI:
 
 После завершения сборки сайт будет доступен на `https://<organization>-<project>.layero.ru`. Например, для пользователя `vasya` (его персональная организация — `vasya`) и проекта `my-site` — `https://vasya-my-site.layero.ru`.
 
-:::tip Preview-URL за 30 секунд
-Полный канонический hostname на CDN прогревается 5–15 минут. Чтобы вы могли сразу проверить результат, Layero выдаёт **preview-URL** вида `https://<project>-<sha7>.preview.layero.ru` уже через ~30 секунд после успешной сборки. Подробнее — в [Окружения и preview-URL](../deploys/environments.md).
+:::tip Apex прогревается 5–15 мин — preview работает сразу
+При **первом** деплое в новом проекте apex `<org>-<project>.layero.ru` прогревается 5–15 минут (YC CDN выпускает per-host LE-сертификат). Пока он ещё не готов, шерьте **preview-URL** вида `https://<org>-<project>-cli.preview.layero.ru` — доступен через ~30 секунд после успешной сборки. Все последующие promote'ы apex'а — моментальные. Подробнее — в [Окружения, preview и production](../deploys/environments.md).
 :::
 
 ## 5. Поменяли код — снова `layero deploy`
@@ -66,10 +66,20 @@ CLI:
 ```bash
 # отредактировали что-то в редакторе (или AI-агент это сделал)
 npx layero deploy
-# → новый preview URL
+# → новый preview URL на ту же CLI-pseudo-ветку
 ```
 
-Тот же проект, новая версия. Никаких коммитов между, никакого push в GitHub.
+`layero deploy` по умолчанию приземляется в **preview** (псевдо-ветку `cli`), apex остаётся нетронутым. Чтобы выкатить в production:
+
+```bash
+# auto-promote default-ветки (то же что push в main)
+npx layero deploy --prod
+
+# или явно: собрать и сразу промоутнуть на apex
+npx layero deploy --promote
+```
+
+См. [`layero promote`](../cli/promote.md) для подробностей о production-флоу.
 
 ## Что дальше
 
