@@ -1,0 +1,7 @@
+# robots.txt — https://docs.layero.ru
+# Документация Layero. Открыта для всех поисковых и AI-краулеров.
+
+User-agent: *
+Allow: /
+
+Sitemap: https://docs.layero.ru/sitemap.xml
