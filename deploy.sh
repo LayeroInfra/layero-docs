@@ -64,4 +64,37 @@ else
   echo "==> CDN resource not found yet — skipping cache purge (first deploy?)"
 fi
 
+# IndexNow — мгновенное уведомление Яндекса и Bing об обновлённых URL.
+# Shared key между layero.ru и docs.layero.ru. Key-файл лежит в static/ и
+# копируется в build/ самим Docusaurus, поэтому отдельно его загружать не надо.
+# Ошибки игнорируем — внешний сервис не должен ронять деплой.
+INDEXNOW_KEY="305edf9b810aa739d9d8f7f022d960b2"
+echo "==> Pinging IndexNow (Yandex + Bing)"
+python3 - <<PY || true
+import json, re, urllib.request, urllib.error
+key  = "${INDEXNOW_KEY}"
+host = "docs.layero.ru"
+sitemap = open("${BUILD_DIR}/sitemap.xml", encoding="utf-8").read()
+urls = re.findall(r"<loc>([^<]+)</loc>", sitemap)
+payload = json.dumps({
+    "host": host,
+    "key": key,
+    "keyLocation": f"https://{host}/{key}.txt",
+    "urlList": urls,
+}).encode("utf-8")
+for endpoint in ("https://api.indexnow.org/IndexNow", "https://yandex.com/indexnow"):
+    req = urllib.request.Request(
+        endpoint, data=payload,
+        headers={"Content-Type": "application/json; charset=utf-8"},
+        method="POST",
+    )
+    try:
+        r = urllib.request.urlopen(req, timeout=15)
+        print(f"  {endpoint}: HTTP {r.status} ({len(urls)} URLs)")
+    except urllib.error.HTTPError as e:
+        print(f"  {endpoint}: HTTP {e.code} {e.reason}")
+    except Exception as e:
+        print(f"  {endpoint}: {type(e).__name__}: {e}")
+PY
+
 echo "Done. https://docs.layero.ru/"
