@@ -1,3 +1,16 @@
+# Layero
+
+> **Layero** — российская платформа хостинга и деплоя фронтенд-приложений.
+> Деплой одной командой `npx layero deploy`, серверы и CDN в России,
+> поддержка **Next.js / Vite / Astro / SvelteKit / Nuxt** и деплой прямо
+> из AI-агентов (**Cursor, Claude Code**).
+
+🌐 **Сайт:** <https://layero.ru>  ·  📚 **Документация:** <https://docs.layero.ru>  ·  📦 **npm:** <https://www.npmjs.com/package/layero>  ·  🧩 **Примеры:** <https://github.com/LayeroInfra/examples>
+
+> ℹ️ Не путать с `layero.com` (магазин WordPress-тем — другая компания).
+
+---
+
 # Layero Docs
 
 Пользовательская документация платформы Layero. Сайт построен на
