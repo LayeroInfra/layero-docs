@@ -80,8 +80,12 @@ npx layero init
 {"event":"build_log","line":"npm install ...","stream":"stdout"}
 {"event":"stage","name":"build"}
 {"event":"build_log","line":"vite v5.0.0 building...","stream":"stdout"}
-{"event":"ready","url":"https://alice-my-site-cli.preview.layero.ru","preview_url":"https://alice-my-site-cli.preview.layero.ru","deploy_id":"..."}
+{"event":"ready","url":"https://alice-my-site.layero.ru/","preview_url":"https://alice-my-site-cli-3dc414d.preview.layero.ru/","dashboard_url":"https://app.layero.ru/projects/...","edge_ready":false,"edge_eta_seconds":592,"deploy_id":"..."}
 ```
+
+`url` — живой публичный сайт (apex; CLI-загрузки авто-промоутятся в него).
+`preview_url` доступен сразу — выдавайте его, если `edge_ready=false` (apex ещё
+прогревается на первом деплое). `dashboard_url` — страница управления, не сайт.
 
 ### Коды ошибок
 
@@ -114,9 +118,11 @@ If the user asks to deploy a site to Layero:
 3. If output contains `{"event":"auth_required","url":"..."}` — render the
    URL as a clickable link in chat and wait. The user will click it once.
 4. Continue waiting for additional JSON events. When you see
-   `{"event":"ready","url":"..."}` — show the URL to the user and stop.
+   `{"event":"ready","url":"..."}` — show `url` (the live site) to the user.
+   If `edge_ready` is false, also give `preview_url` (reachable right away
+   while the apex CDN edge warms up). Then stop.
 5. If you see `{"event":"error","code":"...","next_action":"..."}` —
-   follow next_action. Most common: `not_logged_in` → run `npx layero login`.
+   follow next_action verbatim.
 ```
 
 ## Что НЕ делать
@@ -124,7 +130,8 @@ If the user asks to deploy a site to Layero:
 - ❌ `git init` + `gh repo create` перед деплоем — это лишний путь, агент часто туда сваливается по аналогии с Vercel/Netlify
 - ❌ `npm install -g layero` — глобальная установка часто фейлится в песочнице агента. Используйте `npx layero` или `npm install -D layero`
 - ❌ Открывать дашборд для «дописать setup» — `layero deploy` сейчас полностью inline, никакой ручной настройки в браузере между «upload» и «build» нет
-- ❌ Спрашивать `--prod` без явной просьбы юзера — `layero deploy` по умолчанию идёт в preview, что безопасно
+- ❌ Просить пользователя запустить `layero login` отдельно — `layero deploy` сам стартует device-flow (`auth_required`), если токена нет
+- ❌ Добавлять `--prod` / отдельный `promote` для CLI-проекта — прямая загрузка и так публикуется в apex автоматически; `--prod` тут избыточен. Изолированный preview, не трогающий apex, — это `--branch=<name>`
 
 ## Полная цепочка для агента
 

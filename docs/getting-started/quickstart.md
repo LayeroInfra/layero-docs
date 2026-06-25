@@ -66,20 +66,24 @@ CLI:
 ```bash
 # отредактировали что-то в редакторе (или AI-агент это сделал)
 npx layero deploy
-# → новый preview URL на ту же CLI-pseudo-ветку
+# → новая сборка снова публикуется на apex <org>-<project>.layero.ru
 ```
 
-`layero deploy` по умолчанию приземляется в **preview** (псевдо-ветку `cli`), apex остаётся нетронутым. Чтобы выкатить в production:
+Для CLI-проекта (без подключённого репозитория) каждый `layero deploy`
+**публикуется в apex автоматически** — прямые загрузки авто-промоутятся, отдельный
+`--prod` или `promote` не нужен. На первом деплое apex прогревается несколько минут;
+пока он не готов (`edge_ready=false` в событии `ready`), шерьте `preview_url` — он
+доступен сразу.
+
+Нужен изолированный preview, который **не** трогает production? Деплойте в
+именованную ветку:
 
 ```bash
-# auto-promote default-ветки (то же что push в main)
-npx layero deploy --prod
-
-# или явно: собрать и сразу промоутнуть на apex
-npx layero deploy --promote
+npx layero deploy --branch=staging
+# → https://<org>-<project>-staging.preview.layero.ru  (24 ч TTL, apex нетронут)
 ```
 
-См. [`layero promote`](../cli/promote.md) для подробностей о production-флоу.
+См. [`layero promote`](../cli/promote.md) и [Окружения](../deploys/environments.md) для production-флоу git-проектов.
 
 ## Что дальше
 

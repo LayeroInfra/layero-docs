@@ -32,8 +32,8 @@ layero deploy
 
 | Флаг | Описание |
 |---|---|
-| `--prod` | Задеплоить в production (apex-домен). Без флага — preview. |
-| `--branch <name>` | Задеплоить в конкретную ветку. Имеет приоритет над `--prod`. |
+| `--prod` | Задеплоить в default-ветку (push-эквивалент для git-проектов). Для CLI-проекта без репозитория apex обновляется и без этого флага. |
+| `--branch <name>` | Задеплоить в конкретную ветку (изолированный preview, apex не трогает). Имеет приоритет над `--prod`. |
 | `--type <preset>` | Пресет фреймворка: `vite`, `next`, `astro`, `cra`, `sveltekit`, `nuxt`, `gatsby`, `static`. См. [Фреймворки](../getting-started/frameworks.md). |
 | `--name <name>` | Имя проекта. Только при первом деплое. |
 | `--project <id_or_slug>` | Деплоить в конкретный проект, игнорируя `./.layero/project.json`. Удобно для CI. |
@@ -42,31 +42,31 @@ layero deploy
 
 ## Куда приземляется деплой
 
-CLI разделяет **preview** и **production** — по образцу Vercel:
-
 ```bash
-# preview на CLI-pseudo-ветку, отдельный hostname
-# никогда не перетирает production
+# CLI-проект (без репозитория): публикуется в apex АВТОМАТИЧЕСКИ
+# (прямые загрузки авто-промоутятся — отдельный --prod / promote не нужен)
 layero deploy
-# → https://<org>-<project>-cli.layero.ru
+# → https://<org>-<project>.layero.ru   (apex — живой публичный адрес)
+#   + per-deploy preview https://<org>-<project>-cli-<sha>.preview.layero.ru,
+#     доступен сразу (мимо CDN), пока apex прогревается на первом деплое
 
-# preview на конкретную ветку (создаст environment если её нет)
+# изолированный preview на конкретную ветку — НЕ трогает apex
 layero deploy --branch=staging
-# → https://<org>-<project>-staging.layero.ru
+# → https://<org>-<project>-staging.preview.layero.ru   (24 ч TTL)
 
-# production: apex-домен, нужно подтверждение
-layero deploy --prod
-# → https://<org>-<project>.layero.ru
-# CLI спросит: deploy to production? [y/N]
+# выкатить из любой ветки сразу в production одной командой
+layero deploy --branch=staging --promote
+# → apex теперь отдаёт этот деплой
 
 # CI-режим: без подтверждения
 layero deploy --prod --yes
 ```
 
-**Зачем псевдо-ветка `cli`:** локальные эксперименты не должны случайно
-заменить production. По умолчанию `layero deploy` приземляется на
-изолированный hostname `<org>-<project>-cli.layero.ru`. Чтобы пропихнуть
-в production, нужно явное `--prod`.
+**Для CLI-проекта (без репозитория)** каждый `layero deploy` заменяет то, что
+отдаёт apex — это и есть публикация. На первом деплое apex прогревается на YC CDN
+несколько минут; пока `edge_ready=false` в событии `ready`, шерьте `preview_url` —
+он доступен сразу. Нужен изолированный preview, не трогающий apex, — деплойте в
+именованную ветку (`--branch=<name>`).
 
 ## Mixed-mode: GitHub + CLI на одном проекте
 

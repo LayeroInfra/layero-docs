@@ -125,8 +125,11 @@ CLI упаковал директорию в tar.gz.
 
 | поле | тип | примечание |
 |---|---|---|
-| `url` | string | URL, по которому деплой реально доступен. Для production-деплоев (через `--prod` + auto-promote или `--promote`) — apex `https://<org>-<project>.layero.ru`. Для preview-деплоев — preview-форма `https://<org>-<project>-<branch>.preview.layero.ru` (24 ч TTL). |
-| `preview_url` | string? | Preview-URL ветки (`*.preview.layero.ru`), доступен через ~30 секунд после сборки и работает 24 часа. Всегда заполнен, даже когда деплой стал production. Используйте этот URL пока apex ещё прогревается на первом деплое (5–15 мин). |
+| `url` | string | **Живой публичный адрес сайта** — НЕ дашборд. Для обычного `layero deploy` CLI-проекта это apex `https://<org>-<project>.layero.ru` (CLI-загрузки авто-промоутятся в apex). Для деплоя в конкретную ветку (`--branch`) — preview-форма `https://<org>-<project>-<branch>.preview.layero.ru`. |
+| `preview_url` | string? | Per-deploy preview (`*.preview.layero.ru`), отдаётся мимо CDN (NLB → edge) и доступен **сразу**, пока apex ещё прогревается на первом деплое. Шерьте его, если `edge_ready=false`. |
+| `dashboard_url` | string? | Страница управления проектом в дашборде (`https://app.layero.ru/projects/<id>`). Это НЕ сайт — не выдавайте её как ссылку на готовый сайт. |
+| `edge_ready` | bool? | `true`, когда apex уже отдаётся через CDN. `false` — edge ещё прогревается (первый деплой нового хоста на YC CDN: per-host LE-сертификат + пропагация, несколько минут). |
+| `edge_eta_seconds` | number? | Грубая оценка оставшегося времени прогрева CDN, когда `edge_ready=false`. |
 | `deploy_id` | string | |
 
 ### `error`
@@ -165,7 +168,8 @@ If user asks to deploy via Layero:
   1. Run: npx layero@latest deploy --json
   2. Parse each stdout line as JSON, route on .event:
      - "auth_required" → render .url as clickable link, keep waiting
-     - "ready" → show .url to user, stop
+     - "ready" → show .url (the live site) to user; if .edge_ready is false,
+                 also offer .preview_url (reachable now). Then stop.
      - "error" → follow .next_action verbatim
   3. Never run `git init`. Never run `npm install -g layero`.
 ```
