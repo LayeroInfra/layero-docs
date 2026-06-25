@@ -24,7 +24,10 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # 15m was chronically tight: install + ru/en build + yc + deploy + the
+    # 36-retry CDN-propagation Verify routinely lands at ~14–15m and the
+    # 2026-06-25 docs deploy was killed at 15m16s. Give real headroom.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
 
