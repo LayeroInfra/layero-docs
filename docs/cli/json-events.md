@@ -241,6 +241,15 @@ CLI упаковал директорию в tar.gz.
 | `branch_without_env` | Для ветки ещё нет окружения | Сначала задеплоить эту ветку |
 | `analytics_not_connected` | Аналитика не подключена | `layero analytics connect` |
 | `no_runs` | Нет прогонов замера скорости | `layero perf check` |
+| `data_api_disabled` | `layero data …` вызван для базы, у которой Data API не включён | `layero data enable --db <база>` |
+| `data_key_kind` | `layero data keys create --kind` с неизвестным видом ключа | `--kind public` — ключ для сайта, `--kind secret` — для сервера |
+| `data_key_expiry` | `--expires-in` с неподдерживаемым сроком | Допустимые сроки — в `next_action`, либо `never` |
+| `data_key_unknown` | У базы нет действующего ключа с таким id или префиксом | `layero data keys list --db <база>` |
+| `data_key_ambiguous` | Префикс совпал с несколькими ключами базы | Передать id ключа — список id в `next_action` |
+| `data_levels_missing` | `layero data grant` вызван без единого уровня | Таблица: `--get visitor --post server …`; функция: `--call visitor` |
+| `data_level_unknown` | Уровень доступа не из списка | `closed` — закрыто, `visitor` — любой посетитель, `user` — вошедшие, `server` — только сервер |
+| `data_levels_blocked` | Платформа отказалась применять уровни: например, права выданы на отдельные колонки или схема принадлежит чужой роли. Причина — в `message`, изменения не отправлялись | Изменить запрос по тексту отказа; текущие уровни — `layero data methods --db <база>` |
+| `confirmation_required` | Команда меняет доступ (отзыв ключа, удаление сайта, применение уровней), а подтвердить её в агентском режиме некому. Ничего не изменено; план команд пришёл отдельным событием | Показать план человеку и повторить с `--yes` — готовая команда в `next_action` |
 | `internal` | Непредвиденная ошибка CLI (сеть, неожиданное исключение) | Перезапустить с `--debug` |
 
 :::note[Код деплоя собирается из статуса]

@@ -244,6 +244,15 @@ Do not write handling for codes that are not on this list.
 | `branch_without_env` | The branch has no environment yet | Deploy that branch first |
 | `analytics_not_connected` | Analytics is not connected | `layero analytics connect` |
 | `no_runs` | No speed-check runs recorded | `layero perf check` |
+| `data_api_disabled` | `layero data …` was run for a database whose Data API is off | `layero data enable --db <database>` |
+| `data_key_kind` | `layero data keys create --kind` with an unknown key kind | `--kind public` — a key for the site, `--kind secret` — for the server |
+| `data_key_expiry` | `--expires-in` with an unsupported lifetime | Allowed lifetimes are in `next_action`, or `never` |
+| `data_key_unknown` | The database has no active key with that id or prefix | `layero data keys list --db <database>` |
+| `data_key_ambiguous` | The prefix matches several keys of the database | Pass the key id — the ids are in `next_action` |
+| `data_levels_missing` | `layero data grant` was run without a single level | Table: `--get visitor --post server …`; function: `--call visitor` |
+| `data_level_unknown` | The access level is not on the list | `closed`, `visitor` — any visitor, `user` — signed-in users, `server` — server only |
+| `data_levels_blocked` | The platform refused to apply the levels: e.g. privileges are granted on individual columns, or the schema belongs to another role. The reason is in `message`; nothing was sent | Change the request as the refusal says; current levels — `layero data methods --db <database>` |
+| `confirmation_required` | The command changes access (revoking a key, removing a site, applying levels) and there is nobody to confirm it in agent mode. Nothing was changed; the command plan came as a separate event | Show the plan to a human and rerun with `--yes` — the ready command is in `next_action` |
 | `internal` | An unexpected CLI error (network, unhandled exception) | Re-run with `--debug` |
 
 :::note[The deploy code is built from the status]
