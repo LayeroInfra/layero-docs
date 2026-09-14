@@ -192,6 +192,102 @@ CLI упаковал директорию в tar.gz.
 | `url` | string — публичный адрес |
 | `deploy_id` | string |
 
+### `data_api_enabled`
+
+Итог `layero data enable`: у базы включён Data API.
+
+| поле | тип | примечание |
+|---|---|---|
+| `org` | string | slug организации |
+| `database` | string | слаг или id базы |
+| `slug` | string | адрес базы в Data API: `https://data.layero.ru/<slug>` |
+| `public_key` | string \| null | публичный ключ для сайта — полное значение, приходит один раз |
+| `secret_key` | string \| null | секретный ключ — только с `--with-secret`; хранить на сервере, в код сайта не класть |
+
+### `data_keys`
+
+Итог `layero data keys list`. Значений ключей в событии нет никогда — только префиксы.
+
+| поле | тип | примечание |
+|---|---|---|
+| `org` | string | slug организации |
+| `database` | string | слаг или id базы |
+| `keys` | array | ключи: `id`, `kind` (`public` \| `secret`), `prefix`, `label`, `created_at`, `last_used_at`, `expires_at` (string \| null), `in_build` (boolean — ключ подставляется в сборку сайта), `service` (boolean) |
+
+### `data_key_issued`
+
+Итог `layero data keys create`. Полное значение ключа приходит один раз — сохраните его сразу.
+
+| поле | тип | примечание |
+|---|---|---|
+| `org` | string | slug организации |
+| `database` | string | слаг или id базы |
+| `id` | string | id ключа — им ключ отзывают |
+| `kind` | string | `public` или `secret` |
+| `prefix` | string | начало ключа, по нему ключ узнают в списке |
+| `key` | string | полное значение ключа |
+| `expires_at` | string \| null | когда ключ перестанет действовать; `null` — бессрочный |
+
+### `data_key_revoked`
+
+Итог `layero data keys revoke`.
+
+| поле | тип |
+|---|---|
+| `org` | string — slug организации |
+| `database` | string — слаг или id базы |
+| `id` | string — id отозванного ключа |
+
+### `data_origins`
+
+Итог `layero data origins list`: сайты, с которых браузер может обращаться к Data API.
+
+| поле | тип | примечание |
+|---|---|---|
+| `org` | string | slug организации |
+| `database` | string | слаг или id базы |
+| `origins` | array | добавленные вручную: `origin`, `note` (string \| null) |
+| `from_projects` | string[] | адреса проектов организации — разрешены без добавления |
+| `localhost_allowed` | boolean | разрешены ли запросы с `localhost` |
+
+### `data_origin_added` и `data_origin_removed`
+
+Итог `layero data origins add` и `layero data origins remove`.
+
+| поле | тип |
+|---|---|
+| `org` | string — slug организации |
+| `database` | string — слаг или id базы |
+| `origin` | string — адрес сайта |
+
+### `data_methods`
+
+Итог `layero data methods`: таблицы и функции базы с уровнем доступа по каждому методу. Уровни: `closed` — закрыто, `visitor` — любой посетитель, `user` — вошедшие, `server` — только сервер.
+
+| поле | тип | примечание |
+|---|---|---|
+| `org` | string | slug организации |
+| `database` | string | слаг или id базы |
+| `tables` | array | `schema`, `name`, `kind` (`table` \| `view`), `rls` (boolean \| null), `path`, `profile` (string \| null), `shadowed_by` (string \| null), `levels` (`GET`, `POST`, `PATCH`, `DELETE` → уровень), `writable` (какие из `POST`, `PATCH`, `DELETE` таблица принимает) |
+| `functions` | array | `schema`, `name`, `args`, `kind` (`function` \| `procedure`), `signature`, `path` (string \| null — `null`, если по HTTP не вызывается), `overloaded` (boolean), `level`, `public_only` (boolean) |
+
+### `data_grant`
+
+Показ и итог `layero data grant`. Без `--yes` вне терминала событие приходит с `applied: false`, а следом — `error` с кодом `confirmation_required` или `data_levels_blocked`. После применения — `applied: true`, и `current` описывает состояние после.
+
+| поле | тип | примечание |
+|---|---|---|
+| `org` | string | slug организации |
+| `database` | string | слаг или id базы |
+| `object` | object | `kind` (`table` \| `view` \| `function` \| `procedure`), `schema`, `name`, `args` — только у функций |
+| `current` | object | метод → уровень сейчас; у функции — только `POST` |
+| `next` | object | метод → уровень после применения |
+| `sql` | string[] | команды, которые выполнит применение |
+| `warnings` | string[] | предупреждения, включая причины из `blocked` |
+| `blocked` | string[] | почему применить нельзя; пусто — можно |
+| `applied` | boolean | применено ли |
+| `next_action` | string | только когда нужно подтверждение — готовая команда повтора |
+
 ### `data_probe`
 
 Итог `layero data probe`: ответ шлюза на пробу метода Data API. Запрос настоящий, запись откатывается. Отказ шлюза (`401`, `403`, `404`) — тоже результат пробы: событие приходит, код выхода 0.

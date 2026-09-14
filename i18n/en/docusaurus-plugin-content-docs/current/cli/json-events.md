@@ -200,6 +200,102 @@ The apex now points at the given deploy. Emitted by `layero promote` and by
 | `url` | string — the public address |
 | `deploy_id` | string |
 
+### `data_api_enabled`
+
+Result of `layero data enable`: the Data API is on for the database.
+
+| field | type | note |
+|---|---|---|
+| `org` | string | organisation slug |
+| `database` | string | database slug or id |
+| `slug` | string | the database address in the Data API: `https://data.layero.ru/<slug>` |
+| `public_key` | string \| null | the public key for the site — full value, sent once |
+| `secret_key` | string \| null | the secret key — only with `--with-secret`; keep it on the server, never in site code |
+
+### `data_keys`
+
+Result of `layero data keys list`. Key values are never in this event — prefixes only.
+
+| field | type | note |
+|---|---|---|
+| `org` | string | organisation slug |
+| `database` | string | database slug or id |
+| `keys` | array | keys: `id`, `kind` (`public` \| `secret`), `prefix`, `label`, `created_at`, `last_used_at`, `expires_at` (string \| null), `in_build` (boolean — the key goes into the site build), `service` (boolean) |
+
+### `data_key_issued`
+
+Result of `layero data keys create`. The full key value is sent once — store it right away.
+
+| field | type | note |
+|---|---|---|
+| `org` | string | organisation slug |
+| `database` | string | database slug or id |
+| `id` | string | key id — used to revoke it |
+| `kind` | string | `public` or `secret` |
+| `prefix` | string | start of the key, shown in the list |
+| `key` | string | the full key value |
+| `expires_at` | string \| null | when the key stops working; `null` — never |
+
+### `data_key_revoked`
+
+Result of `layero data keys revoke`.
+
+| field | type |
+|---|---|
+| `org` | string — organisation slug |
+| `database` | string — database slug or id |
+| `id` | string — id of the revoked key |
+
+### `data_origins`
+
+Result of `layero data origins list`: sites a browser may call the Data API from.
+
+| field | type | note |
+|---|---|---|
+| `org` | string | organisation slug |
+| `database` | string | database slug or id |
+| `origins` | array | added by hand: `origin`, `note` (string \| null) |
+| `from_projects` | string[] | addresses of the organisation's projects — allowed without adding |
+| `localhost_allowed` | boolean | whether requests from `localhost` are allowed |
+
+### `data_origin_added` and `data_origin_removed`
+
+Result of `layero data origins add` and `layero data origins remove`.
+
+| field | type |
+|---|---|
+| `org` | string — organisation slug |
+| `database` | string — database slug or id |
+| `origin` | string — site address |
+
+### `data_methods`
+
+Result of `layero data methods`: tables and functions of the database with the access level of each method. Levels: `closed`, `visitor` — any visitor, `user` — signed-in users, `server` — server only.
+
+| field | type | note |
+|---|---|---|
+| `org` | string | organisation slug |
+| `database` | string | database slug or id |
+| `tables` | array | `schema`, `name`, `kind` (`table` \| `view`), `rls` (boolean \| null), `path`, `profile` (string \| null), `shadowed_by` (string \| null), `levels` (`GET`, `POST`, `PATCH`, `DELETE` → level), `writable` (which of `POST`, `PATCH`, `DELETE` the table accepts) |
+| `functions` | array | `schema`, `name`, `args`, `kind` (`function` \| `procedure`), `signature`, `path` (string \| null — `null` when not callable over HTTP), `overloaded` (boolean), `level`, `public_only` (boolean) |
+
+### `data_grant`
+
+Preview and result of `layero data grant`. Without `--yes` outside a terminal the event comes with `applied: false`, followed by an `error` with `confirmation_required` or `data_levels_blocked`. After applying — `applied: true`, and `current` describes the new state.
+
+| field | type | note |
+|---|---|---|
+| `org` | string | organisation slug |
+| `database` | string | database slug or id |
+| `object` | object | `kind` (`table` \| `view` \| `function` \| `procedure`), `schema`, `name`, `args` — functions only |
+| `current` | object | method → level now; a function has `POST` only |
+| `next` | object | method → level after applying |
+| `sql` | string[] | the commands applying will run |
+| `warnings` | string[] | warnings, including the reasons from `blocked` |
+| `blocked` | string[] | why it cannot be applied; empty — it can |
+| `applied` | boolean | whether it was applied |
+| `next_action` | string | only when confirmation is needed — the ready command to rerun |
+
 ### `data_probe`
 
 The result of `layero data probe`: the gateway's answer to a Data API method probe. The request is real, writes are rolled back. A gateway refusal (`401`, `403`, `404`) is a probe result too: the event arrives and the exit code is 0.
