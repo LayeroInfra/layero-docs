@@ -200,6 +200,28 @@ The apex now points at the given deploy. Emitted by `layero promote` and by
 | `url` | string — the public address |
 | `deploy_id` | string |
 
+### `data_probe`
+
+The result of `layero data probe`: the gateway's answer to a Data API method probe. The request is real, writes are rolled back. A gateway refusal (`401`, `403`, `404`) is a probe result too: the event arrives and the exit code is 0.
+
+| field | type | note |
+|---|---|---|
+| `org` | string | organization slug |
+| `database` | string | database slug or id |
+| `request` | object | `method`, `path`, `as`, `user_id`, `query`, `schema` — what was sent; the body is not repeated |
+| `status` | number | HTTP status of the gateway response |
+| `elapsed_ms` | number | duration of the gateway request |
+| `caller` | string \| null | who the gateway took the request for: `visitor`, `user`, `server`; `null` — the key or token was not accepted |
+| `rows` | number \| null | rows in the response |
+| `total` | number \| null | rows visible to the role, from `Content-Range` |
+| `owner_total` | number \| null | rows in the table as the owner sees them — the M in "N of M". `null` — not counted; do not substitute `total`: that is the role's own count |
+| `rollback_expected` | boolean | a rollback was expected — for everything except `/whoami` |
+| `rolled_back` | boolean | the gateway confirmed the rollback |
+| `not_rolled_back` | boolean | `true` — a rollback was expected, the response was 200–399 and there is no confirmation: data may have changed. An `error` with code `data_probe_not_rolled_back` follows |
+| `body_truncated` | boolean | the response is longer than 64 KB; `body` holds only its beginning |
+| `headers` | object | gateway response headers passed on by the platform |
+| `body` | any | response body: JSON or a string |
+
 ### `error`
 
 | field | type |
@@ -253,6 +275,14 @@ Do not write handling for codes that are not on this list.
 | `data_level_unknown` | The access level is not on the list | `closed`, `visitor` — any visitor, `user` — signed-in users, `server` — server only |
 | `data_levels_blocked` | The platform refused to apply the levels: e.g. privileges are granted on individual columns, or the schema belongs to another role. The reason is in `message`; nothing was sent | Change the request as the refusal says; current levels — `layero data methods --db <database>` |
 | `confirmation_required` | The command changes access (revoking a key, removing a site, applying levels) and there is nobody to confirm it in agent mode. Nothing was changed; the command plan came as a separate event | Show the plan to a human and rerun with `--yes` — the ready command is in `next_action` |
+| `data_probe_method` | `layero data probe` with a method other than `GET`, `POST`, `PATCH`, `DELETE`, or `/whoami` with a method other than `GET` | `GET`, `POST`, `PATCH` or `DELETE`; `/whoami` — `GET` only |
+| `data_probe_path` | The probe path contains `?`: query parameters are accepted only as `--query` flags. Nothing was sent | The ready command with `--query` is in `next_action` |
+| `data_probe_query` | `--query` is not `name=value`, or the same name is given twice | `--query select=id,title --query price=gt.100`; several conditions on one column — one `or=(…)` parameter |
+| `data_probe_body` | The probe body could not be used: not JSON, not an object or array, the file is unreadable, both `--body` and `--body-file` are given, or a body with `GET` or `DELETE` | A JSON object or array in `--body` or `--body-file`, for `POST` and `PATCH` only |
+| `data_probe_as` | `--as` is not `visitor`, `user` or `server`, or `--user` without `--as user` | `--as visitor`, `--as user --user <id>` or `--as server` |
+| `data_probe_user_required` | `--as user` without `--user`: no user to probe as | `--user <app user id>` |
+| `data_probe_rejected` | The platform refused the probe before calling the gateway: the path is not a method of the database, sign-in is off for the database, the body exceeds 64 KB, more than 50 parameters, no admin rights. The reason is in `message`; nothing was run. A refusal by the gateway itself (`401`, `403`) is not this code but a `data_probe` event | Fix the request as the refusal says; method paths — `layero data methods --db <database>` |
+| `data_probe_not_rolled_back` | A write probe went through (response 200–399) and the gateway did not confirm the rollback: data may have changed. The `data_probe` event arrived before the error | Check the database data; do not repeat the write probe until the cause is found |
 | `internal` | An unexpected CLI error (network, unhandled exception) | Re-run with `--debug` |
 
 :::note[The deploy code is built from the status]
