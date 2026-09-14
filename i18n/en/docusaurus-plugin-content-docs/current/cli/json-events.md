@@ -211,6 +211,7 @@ Result of `layero data enable`: the Data API is on for the database.
 | `slug` | string | the database address in the Data API: `https://data.layero.ru/<slug>` |
 | `public_key` | string \| null | the public key for the site — full value, sent once |
 | `secret_key` | string \| null | the secret key — only with `--with-secret`; keep it on the server, never in site code |
+| `reapplied` | boolean | `true` — the Data API was already on and was re-applied with `--repair` |
 
 ### `data_keys`
 
@@ -278,7 +279,7 @@ Result of `layero data methods`: tables and functions of the database with the a
 | `database` | string | database slug or id |
 | `tables` | array | `schema`, `name`, `kind` (`table` \| `view`), `rls` (boolean \| null), `path`, `profile` (string \| null), `shadowed_by` (string \| null), `levels` (`GET`, `POST`, `PATCH`, `DELETE` → level), `writable` (which of `POST`, `PATCH`, `DELETE` the table accepts) |
 | `functions` | array | `schema`, `name`, `args`, `kind` (`function` \| `procedure`), `signature`, `path` (string \| null — `null` when not callable over HTTP), `overloaded` (boolean), `level`, `public_only` (boolean) |
-| `warnings` | string[] | always present; why some methods do not work as shown: a privilege in a schema the role cannot use, privileges the platform will revoke. Empty — no warnings |
+| `warnings` | string[] | always present; one line per table whose privilege does not work: the role has no USAGE on its schema, so the gateway cannot see the table. The line says what to do. Empty — no warnings |
 
 ### `data_grant`
 
@@ -381,6 +382,7 @@ Do not write handling for codes that are not on this list.
 | `data_levels_missing` | `layero data grant` was run without a single level | Table: `--get visitor --post server …`; function: `--call visitor` |
 | `data_level_unknown` | The access level is not on the list | `closed`, `visitor` — any visitor, `user` — signed-in users, `server` — server only |
 | `data_levels_blocked` | The platform refused to apply the levels: e.g. privileges are granted on individual columns, or the schema belongs to another role. The reason is in `message`; nothing was sent | Change the request as the refusal says; current levels — `layero data methods --db <database>` |
+| `data_api_already_enabled` | `layero data enable --db <database>` for a database whose Data API is already on. Nothing changed: enabling again would revoke the API roles' privileges on schema `public` | Keys — `layero data keys list --db <database>`, methods — `layero data methods --db <database>`. If the roles or the `api` schema privileges were broken by hand — `layero data enable --db <database> --repair --yes` |
 | `confirmation_required` | The command changes access (revoking a key, removing a site, applying levels) and there is nobody to confirm it in agent mode. Nothing was changed; the command plan came as a separate event | Show the plan to a human and rerun with `--yes` — the ready command is in `next_action` |
 | `data_probe_method` | A method other than `GET`, `POST`, `PATCH`, `DELETE`; `/whoami` with a method other than `GET`; a function (`/rest/v1/rpc/…`) with a method other than `GET` or `POST`. Nothing was sent | A suitable method is in `next_action`; for `/whoami` and functions, as a ready command |
 | `data_probe_path` | The probe path contains `?` or ends with a slash. Nothing was sent | A ready command with all the flags you passed is in `next_action`: parameters from `?` become `--query` flags, the path loses the slash |

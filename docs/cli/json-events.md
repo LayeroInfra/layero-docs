@@ -203,6 +203,7 @@ CLI упаковал директорию в tar.gz.
 | `slug` | string | адрес базы в Data API: `https://data.layero.ru/<slug>` |
 | `public_key` | string \| null | публичный ключ для сайта — полное значение, приходит один раз |
 | `secret_key` | string \| null | секретный ключ — только с `--with-secret`; хранить на сервере, в код сайта не класть |
+| `reapplied` | boolean | `true` — Data API у базы уже был включён и переприменён через `--repair` |
 
 ### `data_keys`
 
@@ -270,7 +271,7 @@ CLI упаковал директорию в tar.gz.
 | `database` | string | слаг или id базы |
 | `tables` | array | `schema`, `name`, `kind` (`table` \| `view`), `rls` (boolean \| null), `path`, `profile` (string \| null), `shadowed_by` (string \| null), `levels` (`GET`, `POST`, `PATCH`, `DELETE` → уровень), `writable` (какие из `POST`, `PATCH`, `DELETE` таблица принимает) |
 | `functions` | array | `schema`, `name`, `args`, `kind` (`function` \| `procedure`), `signature`, `path` (string \| null — `null`, если по HTTP не вызывается), `overloaded` (boolean), `level`, `public_only` (boolean) |
-| `warnings` | string[] | всегда есть; почему часть методов не работает так, как показано: право в схеме без доступа к ней, права, которые платформа снимет. Пусто — предупреждений нет |
+| `warnings` | string[] | всегда есть; по строке на таблицу, право на которую не работает: у роли нет USAGE на её схему, и шлюз таблицы не видит. В строке — что сделать. Пусто — предупреждений нет |
 
 ### `data_grant`
 
@@ -378,6 +379,7 @@ CLI упаковал директорию в tar.gz.
 | `data_levels_missing` | `layero data grant` вызван без единого уровня | Таблица: `--get visitor --post server …`; функция: `--call visitor` |
 | `data_level_unknown` | Уровень доступа не из списка | `closed` — закрыто, `visitor` — любой посетитель, `user` — вошедшие, `server` — только сервер |
 | `data_levels_blocked` | Платформа отказалась применять уровни: например, права выданы на отдельные колонки или схема принадлежит чужой роли. Причина — в `message`, изменения не отправлялись | Изменить запрос по тексту отказа; текущие уровни — `layero data methods --db <база>` |
+| `data_api_already_enabled` | `layero data enable --db <база>` у базы, где Data API уже включён. Ничего не изменено: повторное включение сняло бы у ролей API права на схему `public` | Ключи — `layero data keys list --db <база>`, методы — `layero data methods --db <база>`. Если роли или права на схему `api` испорчены вручную — `layero data enable --db <база> --repair --yes` |
 | `confirmation_required` | Команда меняет доступ (отзыв ключа, удаление сайта, применение уровней), а подтвердить её в агентском режиме некому. Ничего не изменено; план команд пришёл отдельным событием | Показать план человеку и повторить с `--yes` — готовая команда в `next_action` |
 | `data_probe_method` | Метод не из `GET`, `POST`, `PATCH`, `DELETE`; `/whoami` не методом `GET`; функция (`/rest/v1/rpc/…`) не методом `GET` или `POST`. Запрос не отправлялся | Подходящий метод — в `next_action`, для `/whoami` и функции — готовой командой |
 | `data_probe_path` | В пути пробы есть `?` или косая черта в конце. Запрос не отправлялся | Готовая команда со всеми переданными флагами — в `next_action`: параметры из `?` стали флагами `--query`, путь без косой черты |
