@@ -278,6 +278,7 @@ Result of `layero data methods`: tables and functions of the database with the a
 | `database` | string | database slug or id |
 | `tables` | array | `schema`, `name`, `kind` (`table` \| `view`), `rls` (boolean \| null), `path`, `profile` (string \| null), `shadowed_by` (string \| null), `levels` (`GET`, `POST`, `PATCH`, `DELETE` → level), `writable` (which of `POST`, `PATCH`, `DELETE` the table accepts) |
 | `functions` | array | `schema`, `name`, `args`, `kind` (`function` \| `procedure`), `signature`, `path` (string \| null — `null` when not callable over HTTP), `overloaded` (boolean), `level`, `public_only` (boolean) |
+| `warnings` | string[] | always present; why some methods do not work as shown: a privilege in a schema the role cannot use, privileges the platform will revoke. Empty — no warnings |
 
 ### `data_grant`
 

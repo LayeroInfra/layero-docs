@@ -270,6 +270,7 @@ CLI упаковал директорию в tar.gz.
 | `database` | string | слаг или id базы |
 | `tables` | array | `schema`, `name`, `kind` (`table` \| `view`), `rls` (boolean \| null), `path`, `profile` (string \| null), `shadowed_by` (string \| null), `levels` (`GET`, `POST`, `PATCH`, `DELETE` → уровень), `writable` (какие из `POST`, `PATCH`, `DELETE` таблица принимает) |
 | `functions` | array | `schema`, `name`, `args`, `kind` (`function` \| `procedure`), `signature`, `path` (string \| null — `null`, если по HTTP не вызывается), `overloaded` (boolean), `level`, `public_only` (boolean) |
+| `warnings` | string[] | всегда есть; почему часть методов не работает так, как показано: право в схеме без доступа к ней, права, которые платформа снимет. Пусто — предупреждений нет |
 
 ### `data_grant`
 
