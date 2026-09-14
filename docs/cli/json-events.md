@@ -217,7 +217,7 @@ CLI упаковал директорию в tar.gz.
 
 ### `data_key_issued`
 
-Итог `layero data keys create`. Полное значение ключа приходит один раз — сохраните его сразу.
+Итог `layero data keys issue`. Полное значение ключа приходит один раз — сохраните его сразу.
 
 | поле | тип | примечание |
 |---|---|---|
@@ -364,7 +364,7 @@ CLI упаковал директорию в tar.gz.
 | `domain_rejected` | Платформа отклонила домен | Причина — в сообщении |
 | `forbidden` | Операции не хватает scope у токена CI (`layero_ci_*`) | Выпустить токен с нужным scope |
 | `org_unknown` | У аккаунта несколько организаций, а команда не знает, в какой работать | Передать `--org <slug>`; список — `layero orgs list` |
-| `database_unknown` | В организации нет базы с таким именем, слагом или id | `layero db list`; завести — `layero db create <имя>` |
+| `database_unknown` | В организации нет базы с таким именем, слагом или id. У `layero data enable --repair` — база не указана через `--db`: переприменение снимает у ролей API права на схему `public`, и базу не угадываем | `layero db list`; завести — `layero db create <имя>`. Для `--repair` — `layero data enable --db <база> --repair` |
 | `sql_missing` | `layero db sql` вызван без запроса | Передать запрос следом за именем базы: `layero db sql моя-база "select 1"` |
 | `gb_not_supported` | `layero db create --gb` — объём базы так не выбирается. Флаг остался ради этого отказа: раньше он молча ничего не делал | У базы из тарифа объём задан тарифом, у выделенного инстанса — диском ступени |
 | `dedicated_needs_panel` | `layero db create --cpu/--ram/--dedicated` — выделенный инстанс из терминала не заказывается: у него есть цена и заморозка денег на карте, а подтвердить сумму в терминале негде | Заказать в панели: адрес приходит в `next_action` |
@@ -372,15 +372,15 @@ CLI упаковал директорию в tar.gz.
 | `analytics_not_connected` | Аналитика не подключена | `layero analytics connect` |
 | `no_runs` | Нет прогонов замера скорости | `layero perf check` |
 | `data_api_disabled` | `layero data …` вызван для базы, у которой Data API не включён | `layero data enable --db <база>` |
-| `data_key_kind` | `layero data keys create --kind` с неизвестным видом ключа | `--kind public` — ключ для сайта, `--kind secret` — для сервера |
+| `data_key_kind` | `layero data keys issue --kind` с неизвестным видом ключа | `--kind public` — ключ для сайта, `--kind secret` — для сервера |
 | `data_key_expiry` | `--expires-in` с неподдерживаемым сроком | Допустимые сроки — в `next_action`, либо `never` |
 | `data_key_unknown` | У базы нет действующего ключа с таким id или префиксом | `layero data keys list --db <база>` |
 | `data_key_ambiguous` | Префикс совпал с несколькими ключами базы | Передать id ключа — список id в `next_action` |
 | `data_levels_missing` | `layero data grant` вызван без единого уровня | Таблица: `--get visitor --post server …`; функция: `--call visitor` |
 | `data_level_unknown` | Уровень доступа не из списка | `closed` — закрыто, `visitor` — любой посетитель, `user` — вошедшие, `server` — только сервер |
 | `data_levels_blocked` | Платформа отказалась применять уровни: например, права выданы на отдельные колонки или схема принадлежит чужой роли. Причина — в `message`, изменения не отправлялись | Изменить запрос по тексту отказа; текущие уровни — `layero data methods --db <база>` |
-| `data_api_already_enabled` | `layero data enable --db <база>` у базы, где Data API уже включён. Ничего не изменено: повторное включение сняло бы у ролей API права на схему `public` | Ключи — `layero data keys list --db <база>`, методы — `layero data methods --db <база>`. Если роли или права на схему `api` испорчены вручную — `layero data enable --db <база> --repair --yes` |
-| `confirmation_required` | Команда меняет доступ (отзыв ключа, удаление сайта, применение уровней), а подтвердить её в агентском режиме некому. Ничего не изменено; план команд пришёл отдельным событием | Показать план человеку и повторить с `--yes` — готовая команда в `next_action` |
+| `data_api_already_enabled` | `layero data enable --db <база>` у базы, где Data API уже включён. Ничего не изменено: повторное включение сняло бы у ролей API права на схему `public` | Ключи — `layero data keys list --db <база>`, методы — `layero data methods --db <база>`; при `--with-secret` — выпуск секретного ключа `layero data keys issue --db <база> --kind secret`. Если роли или права на схему `api` испорчены вручную — `layero data enable --db <база> --repair`: вне терминала и с `--json` следом придёт `confirmation_required` с готовой командой `--repair --yes` |
+| `confirmation_required` | Команда меняет доступ (отзыв ключа, удаление сайта, применение уровней, переприменение Data API — `layero data enable --repair`), а подтвердить её в агентском режиме некому. Ничего не изменено; план команд пришёл отдельным событием | Показать план человеку и повторить с `--yes` — готовая команда в `next_action` |
 | `data_probe_method` | Метод не из `GET`, `POST`, `PATCH`, `DELETE`; `/whoami` не методом `GET`; функция (`/rest/v1/rpc/…`) не методом `GET` или `POST`. Запрос не отправлялся | Подходящий метод — в `next_action`, для `/whoami` и функции — готовой командой |
 | `data_probe_path` | В пути пробы есть `?`, косая черта в конце или нет имени таблицы или функции (`/rest/v1/`, `/rest/v1/rpc/`). Запрос не отправлялся | Готовая команда со всеми переданными флагами — в `next_action`: параметры из `?` стали флагами `--query`, путь без косой черты. Для пути без имени — `layero data methods --db <база>` |
 | `data_probe_query` | `--query` не в виде `имя=значение`, имя пустое, одно имя указано дважды или задано и в пути после `?`, и флагом `--query` | `--query select=id,title --query price=gt.100`; несколько условий на одну колонку — одним параметром `or=(…)` |

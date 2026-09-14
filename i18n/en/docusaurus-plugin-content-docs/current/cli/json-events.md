@@ -225,7 +225,7 @@ Result of `layero data keys list`. Key values are never in this event — prefix
 
 ### `data_key_issued`
 
-Result of `layero data keys create`. The full key value is sent once — store it right away.
+Result of `layero data keys issue`. The full key value is sent once — store it right away.
 
 | field | type | note |
 |---|---|---|
@@ -371,19 +371,20 @@ Do not write handling for codes that are not on this list.
 | `domain_not_found` | The project has no such domain | `layero domains list` |
 | `domain_rejected` | The platform refused the domain | The reason is in the message |
 | `forbidden` | The token lacks the scope this operation needs | Issue a token with the required scope |
+| `database_unknown` | The organization has no database with that name, slug or id. For `layero data enable --repair` — no `--db` given: re-applying revokes the API roles' privileges on schema `public`, so the database is never guessed | `layero db list`; create one — `layero db create <name>`. For `--repair` — `layero data enable --db <database> --repair` |
 | `branch_without_env` | The branch has no environment yet | Deploy that branch first |
 | `analytics_not_connected` | Analytics is not connected | `layero analytics connect` |
 | `no_runs` | No speed-check runs recorded | `layero perf check` |
 | `data_api_disabled` | `layero data …` was run for a database whose Data API is off | `layero data enable --db <database>` |
-| `data_key_kind` | `layero data keys create --kind` with an unknown key kind | `--kind public` — a key for the site, `--kind secret` — for the server |
+| `data_key_kind` | `layero data keys issue --kind` with an unknown key kind | `--kind public` — a key for the site, `--kind secret` — for the server |
 | `data_key_expiry` | `--expires-in` with an unsupported lifetime | Allowed lifetimes are in `next_action`, or `never` |
 | `data_key_unknown` | The database has no active key with that id or prefix | `layero data keys list --db <database>` |
 | `data_key_ambiguous` | The prefix matches several keys of the database | Pass the key id — the ids are in `next_action` |
 | `data_levels_missing` | `layero data grant` was run without a single level | Table: `--get visitor --post server …`; function: `--call visitor` |
 | `data_level_unknown` | The access level is not on the list | `closed`, `visitor` — any visitor, `user` — signed-in users, `server` — server only |
 | `data_levels_blocked` | The platform refused to apply the levels: e.g. privileges are granted on individual columns, or the schema belongs to another role. The reason is in `message`; nothing was sent | Change the request as the refusal says; current levels — `layero data methods --db <database>` |
-| `data_api_already_enabled` | `layero data enable --db <database>` for a database whose Data API is already on. Nothing changed: enabling again would revoke the API roles' privileges on schema `public` | Keys — `layero data keys list --db <database>`, methods — `layero data methods --db <database>`. If the roles or the `api` schema privileges were broken by hand — `layero data enable --db <database> --repair --yes` |
-| `confirmation_required` | The command changes access (revoking a key, removing a site, applying levels) and there is nobody to confirm it in agent mode. Nothing was changed; the command plan came as a separate event | Show the plan to a human and rerun with `--yes` — the ready command is in `next_action` |
+| `data_api_already_enabled` | `layero data enable --db <database>` for a database whose Data API is already on. Nothing changed: enabling again would revoke the API roles' privileges on schema `public` | Keys — `layero data keys list --db <database>`, methods — `layero data methods --db <database>`; with `--with-secret` — issue the secret key with `layero data keys issue --db <database> --kind secret`. If the roles or the `api` schema privileges were broken by hand — `layero data enable --db <database> --repair`: outside a terminal and with `--json`, a `confirmation_required` follows with the ready `--repair --yes` command |
+| `confirmation_required` | The command changes access (revoking a key, removing a site, applying levels, re-applying the Data API — `layero data enable --repair`) and there is nobody to confirm it in agent mode. Nothing was changed; the command plan came as a separate event | Show the plan to a human and rerun with `--yes` — the ready command is in `next_action` |
 | `data_probe_method` | A method other than `GET`, `POST`, `PATCH`, `DELETE`; `/whoami` with a method other than `GET`; a function (`/rest/v1/rpc/…`) with a method other than `GET` or `POST`. Nothing was sent | A suitable method is in `next_action`; for `/whoami` and functions, as a ready command |
 | `data_probe_path` | The probe path contains `?`, ends with a slash, or has no table or function name (`/rest/v1/`, `/rest/v1/rpc/`). Nothing was sent | A ready command with all the flags you passed is in `next_action`: parameters from `?` become `--query` flags, the path loses the slash. For a path without a name — `layero data methods --db <database>` |
 | `data_probe_query` | `--query` is not `name=value`, the name is empty, the same name is given twice, or it is given both in the path after `?` and as `--query` | `--query select=id,title --query price=gt.100`; several conditions on one column — one `or=(…)` parameter |
