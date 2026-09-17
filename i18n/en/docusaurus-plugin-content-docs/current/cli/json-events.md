@@ -361,7 +361,7 @@ The result of `layero claim status [code]`. Without a code it reads
 | field | type |
 |---|---|
 | `code` | string |
-| `status` | string — the claim's state on the server (`pending`, `claimed`, `expired`) |
+| `status` | string — the claim's state on the server (`unclaimed`, `claimed`, `expired`) |
 | `claimed` | boolean |
 | `expires_at` | string \| null |
 | `url` | string \| null — the site address |
@@ -585,7 +585,7 @@ Do not write handling for codes that are not on this list.
 | `source_rejected` | The provider rejected the token (the API answered 502): wrong, revoked, or missing permissions | Where to issue it and with which rights — in `next_action` (the provider's `token_hint`) |
 | `connection_not_found` | `layero sources repos` with an id the organization does not have | `layero sources list` |
 | `hook_not_found` | `layero hooks delete` with an id the project does not have (already deleted?) | `layero hooks list` |
-| `claimable_unavailable` | Deploying without an account is not enabled on the platform (the API answered 404/501), or the platform returned no claim code | Sign in: `layero login` — or `LAYERO_TOKEN` |
+| `claimable_unavailable` | Deploying without an account is not enabled on the platform (the API answered 404/501/503), the claim quota is exhausted (429), or the platform returned no claim code | Sign in: `layero login` — or `LAYERO_TOKEN` |
 | `claim_unknown` | `layero claim status`/`accept` without a code and without a claim in `.layero/project.json`, or the claim with that code expired or the code is wrong | Pass the code; a new project without an account — `layero deploy --claim` |
 | `internal` | An unexpected CLI error (network, unhandled exception) | Re-run with `--debug` |
 

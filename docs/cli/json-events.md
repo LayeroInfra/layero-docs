@@ -352,7 +352,7 @@ CLI упаковал директорию в tar.gz.
 | поле | тип |
 |---|---|
 | `code` | string |
-| `status` | string — состояние заявки на сервере (`pending`, `claimed`, `expired`) |
+| `status` | string — состояние заявки на сервере (`unclaimed`, `claimed`, `expired`) |
 | `claimed` | boolean |
 | `expires_at` | string \| null |
 | `url` | string \| null — адрес сайта |
@@ -577,7 +577,7 @@ CLI упаковал директорию в tar.gz.
 | `source_rejected` | Провайдер не принял токен (API ответил 502): неверный, отозван или без нужных прав | Где выпустить и с какими правами — в `next_action` (`token_hint` провайдера) |
 | `connection_not_found` | `layero sources repos` с id, которого нет в организации | `layero sources list` |
 | `hook_not_found` | `layero hooks delete` с id, которого у проекта нет (уже удалён?) | `layero hooks list` |
-| `claimable_unavailable` | Деплой без аккаунта на платформе не включён (API ответил 404/501) либо платформа не вернула код заявки | Войти: `layero login` — или `LAYERO_TOKEN` |
+| `claimable_unavailable` | Деплой без аккаунта на платформе не включён (API ответил 404/501/503), исчерпан лимит заявок (429) либо платформа не вернула код заявки | Войти: `layero login` — или `LAYERO_TOKEN` |
 | `claim_unknown` | `layero claim status`/`accept` без кода и без заявки в `.layero/project.json`, либо заявка с таким кодом истекла или код неверный | Передать код; новый проект без аккаунта — `layero deploy --claim` |
 | `internal` | Непредвиденная ошибка CLI (сеть, неожиданное исключение) | Перезапустить с `--debug` |
 
