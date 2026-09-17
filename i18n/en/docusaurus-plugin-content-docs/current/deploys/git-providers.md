@@ -47,7 +47,7 @@ the site: `https://gitlab.example.com/api/v4`,
 | Build on push (webhook) | yes, created automatically | yes, created automatically | yes, created automatically | yes; if the API refuses to create it, add it by hand | **no** |
 | Webhook signature | HMAC-SHA256 | undocumented | token in a header | token in a header | — |
 | Branch previews | yes | yes | yes | yes | no (no push events) |
-| Archive by commit (fast build without a clone) | yes | no, full clone | yes | no, full clone | no, full clone |
+| Archive by commit | yes | no, shallow fetch of the commit | yes | no, shallow fetch | no, shallow fetch |
 | Self-hosted instance | no | no | yes | yes | no |
 | Nested groups in the path | no | no | yes (`group/sub/repo`) | no | no |
 | API rate limit | standard | standard | standard | **500 per hour per token** | standard |

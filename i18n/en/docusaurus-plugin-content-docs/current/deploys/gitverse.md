@@ -52,17 +52,11 @@ production, the others to a preview at `<project>-<branch>.layero.app`.
 
 ## What differs from GitHub
 
-- **A full clone on every build.** GitVerse has no archive by commit, so the
-  builder clones the whole repository; on large repositories the build starts a
-  few seconds later.
-- **The webhook signature is undocumented.** The webhook address contains a
-  secret token known only to Layero and GitVerse; that is enough to stop an
-  outsider from triggering a build. If GitVerse does send an HMAC‑SHA256
-  signature header (GitHub or Gitea form), Layero verifies it; a delivery
-  without a signature is accepted by the token in the address.
-- **The token expires.** When it does, builds on push stop and the connection
-  list shows "token invalid". Issue a new one and update the connection — the
-  projects do not need to be re-linked.
+- **No archive by commit.** The GitVerse API has no archive download
+  (checked 2026-09-17: `archive`, `tarball` and `statuses` answer 400), so
+  the builder fetches the needed commit with a shallow `git fetch` — usually a
+  fraction of a second even on large repositories. Commit statuses are not
+  posted to GitVerse either: the API has no such endpoint.
 
 ## If the webhook was not created
 
