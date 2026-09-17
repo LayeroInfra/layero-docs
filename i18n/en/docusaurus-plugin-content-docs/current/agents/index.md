@@ -27,9 +27,9 @@ SourceCraft. Then a deploy is a `git push`:
 - push to `main` (the production branch) → production.
 
 The agent commits and pushes; nothing needs to be run. A repository is
-connected in the dashboard — **"Create project" → "Import from repository"**;
-later this arrives in the CLI (`layero sources connect`) and in MCP
-(`import_repo`). Details: [Connecting a repository](../deploys/git-providers.md).
+connected in the dashboard: **"Create project" → "Import from repository"**.
+The CLI and MCP cannot connect a repository yet.
+Details: [Connecting a repository](../deploys/git-providers.md).
 
 ### (b) There is a folder with code
 

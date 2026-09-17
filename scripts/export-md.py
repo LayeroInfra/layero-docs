@@ -98,7 +98,7 @@ def export(lang: str, build: Path) -> tuple[int, list[tuple[str, str, str, str]]
         target = (out_root / (route + ".md")) if route else (out_root / "index.md")
         target.parent.mkdir(parents=True, exist_ok=True)
         # Маркеры генератора `{/* … */}` — служебные, читателю не нужны.
-        body = re.sub(r"^\{/\*.*?\*/\}\n?", "", body, flags=re.M)
+        body = re.sub(r"^\{/\*.*?\*/\}\n?", "", body, flags=re.M | re.S)
         target.write_text(head + body.lstrip("\n"), encoding="utf-8")
         written += 1
         section = rel.parts[0] if len(rel.parts) > 1 else ""

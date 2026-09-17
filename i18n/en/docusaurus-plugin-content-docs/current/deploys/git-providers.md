@@ -8,7 +8,8 @@ description: The five git providers Layero builds from on push. How each one con
 
 Layero builds a site from a repository on five services: **GitHub**,
 **GitVerse**, **GitLab**, **GitFlic** and **SourceCraft**. A connected
-repository is path (a) for an agent and for a person alike: a push to a
+repository is [path (a)](../agents/index.md#a-there-is-a-connected-repository)
+for an agent and for a person alike: a push to a
 branch gives a preview, a push to the production branch gives production. The
 model is the same for all; what differs is how the connection is made and what
 the provider's API supports.
@@ -54,7 +55,7 @@ the site: `https://gitlab.example.com/api/v4`,
 ### SourceCraft: deploy hook only
 
 The SourceCraft API has no webhooks at all, so there are no automatic builds
-on push and none can be promised. The standard route is SourceCraft's own CI,
+on push. The standard route is SourceCraft's own CI,
 which calls a Layero deploy hook after the push:
 
 ```bash
@@ -72,8 +73,8 @@ the framework is detected from the names of the root files (`package.json`,
 
 500 requests per hour per token is the shared budget for everything the
 organisation does, builds included. With many projects on one token, listing
-repositories and building can hit the limit; issue a dedicated token for the
-organisation.
+repositories and building can hit the limit; issue Layero a dedicated token
+that nothing else uses.
 
 ## What happens on a push
 

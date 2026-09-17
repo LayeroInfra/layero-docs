@@ -6,10 +6,13 @@ description: Layero install commands for the CLI, the skill, Claude Code, Cursor
 
 # Connect an agent
 
-Every command on this page comes from the file
-[`agents-install.json`](https://github.com/LayeroInfra/layero-docs/blob/main/agents-install.json)
-— the same one the landing page and the dashboard read. The table below is
-generated from it and checked by a gate; it is not edited by hand, the file is.
+The commands on this page come from the file
+[`agents-install.json`](https://github.com/LayeroInfra/layero-docs/blob/main/agents-install.json),
+the same one the landing page and the dashboard read.
+
+{/* The table below is generated from agents-install.json by
+    scripts/check-agents-install.py --write and checked by a gate in make check.
+    Do not edit it by hand — edit the file. */}
 
 {/* agents-install:begin */}
 MCP server: `https://mcp.layero.ru/mcp` (transport `http`, name `layero`).

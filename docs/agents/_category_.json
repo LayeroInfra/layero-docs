@@ -1,9 +1,4 @@
 {
   "label": "AI-агенты",
-  "position": 3,
-  "link": {
-    "type": "generated-index",
-    "slug": "/agents",
-    "description": "Как AI-агент работает с Layero: три пути, установка навыка и MCP, инструменты MCP."
-  }
+  "position": 3
 }

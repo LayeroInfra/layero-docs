@@ -6,10 +6,13 @@ description: Команды установки Layero для CLI, навыка, 
 
 # Подключить агента
 
-Все команды на этой странице берутся из файла
-[`agents-install.json`](https://github.com/LayeroInfra/layero-docs/blob/main/agents-install.json)
-— того же, что читают лендинг и панель. Таблица ниже сгенерирована из него и
-сверяется гейтом; править её руками нельзя, правится файл.
+Команды на этой странице — из файла
+[`agents-install.json`](https://github.com/LayeroInfra/layero-docs/blob/main/agents-install.json),
+того же, что читают лендинг и панель.
+
+{/* Таблица ниже генерируется из agents-install.json скриптом
+    scripts/check-agents-install.py --write и сверяется гейтом в make check.
+    Руками не править — правится файл. */}
 
 {/* agents-install:begin */}
 MCP-сервер: `https://mcp.layero.ru/mcp` (транспорт `http`, имя `layero`).
@@ -52,7 +55,7 @@ Code, Cursor, Codex), при первом вызове инструмента **
 
 ## `LAYERO_TOKEN` для CI
 
-В CI и в средах без браузера вход делается токеном в переменной окружения
+В CI и в средах без браузера входите токеном в переменной окружения
 `LAYERO_TOKEN`. Выпустить токен:
 
 ```bash

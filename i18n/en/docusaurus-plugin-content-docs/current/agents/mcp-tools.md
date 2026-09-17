@@ -6,13 +6,13 @@ description: The full list of tools on mcp.layero.ru by group, which of them cha
 
 # MCP tools
 
-The Layero MCP server is `https://mcp.layero.ru/mcp`, Streamable HTTP
-transport, named `layero` in client configs. How to connect is on
-[Connect an agent](./install.md). This page is what the server can do.
+The Layero MCP server: `https://mcp.layero.ru/mcp`, Streamable HTTP
+transport, named `layero` in client configs. How to connect is described on
+[Connect an agent](./install.md); this page is what the server can do, one
+line per tool.
 
-There are 28 tools, one line each. The names on this page are checked against
-the live server by the `check-tool-names.py` gate — if a tool is renamed, the
-page fails the build.
+{/* Tool names are checked against the live server by ../mcp/check-tool-names.py:
+    retired names (compose_landing and the like) are not allowed here. */}
 
 ## Account
 
