@@ -57,7 +57,9 @@ production, the others to a preview at `<project>-<branch>.layero.app`.
   few seconds later.
 - **The webhook signature is undocumented.** The webhook address contains a
   secret token known only to Layero and GitVerse; that is enough to stop an
-  outsider from triggering a build.
+  outsider from triggering a build. If GitVerse does send an HMAC‑SHA256
+  signature header (GitHub or Gitea form), Layero verifies it; a delivery
+  without a signature is accepted by the token in the address.
 - **The token expires.** When it does, builds on push stop and the connection
   list shows "token invalid". Issue a new one and update the connection — the
   projects do not need to be re-linked.
