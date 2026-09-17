@@ -16,7 +16,9 @@ In this mode the CLI:
   still needs `--yes`);
 - prints one `{"event":"…", …}` line per action on stdout;
 - reports errors with a stable `code` and a `next_action`;
-- adds a `ts` field (ISO-8601 timestamp) to every event.
+- adds a `ts` field (ISO-8601 timestamp) to every event;
+- **every command** emits events — since 0.10.0 also `whoami`, `projects`, `orgs`, `link`, `hooks`, `logout`, `init`;
+- the exit code tells error classes apart — see [Exit codes](#exit-codes).
 
 ## Events
 
@@ -183,7 +185,7 @@ an error — successful builds produce a lot of noise.
 
 | field | type | note |
 |---|---|---|
-| `url` | string | **The live public address of the site** — not the dashboard. For a plain `layero deploy` of a CLI project this is the project's production address (CLI uploads auto-promote to the apex). For a deploy into a named branch (`--branch`) it is that branch's preview address. It is reachable straight away; this is the link to open and to show the user. |
+| `url` | string | **The live public address of the site** — not the dashboard. For a plain `layero deploy` of a CLI project this is the project's production address (CLI uploads auto-promote to the apex). For a project with a repository, where a CLI upload is not promoted, it is the address of the `cli` environment (`--branch` on `deploy` is refused, see `branch_unsupported`). It is reachable straight away; this is the link to open and to show the user. |
 | `dashboard_url` | string? | The project management page (`https://app.layero.ru/projects/<id>`). This is **not** the site — never hand it over as the link to the finished site. |
 | `preview_url` | string? | **Legacy, no longer emitted.** A separate per-deploy preview host in the `*.preview.layero.ru` zone. It existed to give out a link while the apex warmed up on the CDN. `layero.app` has no separate preview zone and no user sites remain on `layero.ru`, so the field is never populated. |
 | `edge_ready` | bool? | Whether the address answers at the moment the deploy finishes. The field used to mean "the apex warmed up on the CDN" and stayed `false` forever for new hosts; it now comes from a real probe. You still should not gate on it — the address is live immediately. |
@@ -330,6 +332,180 @@ The error arrives as an `error` event right after `data_probe`.
 | `headers` | object | only `content-type`, `content-range`, `x-layero-caller`, `x-layero-key` (key prefix), `x-layero-user`, `x-layero-rolled-back` |
 | `body` | any | response body: JSON or a string |
 
+### `claimable`
+
+A deploy without an account (`layero deploy --claim`, or automatically: no
+token, an agent environment — not a terminal and not CI — and `--yes`). The
+platform created a temporary project and a token for it; the site lives for
+72 hours. The event arrives **before** `ready`: after `ready` an agent stops
+reading, and without this link the site disappears with its deadline.
+
+| field | type | note |
+|---|---|---|
+| `project_id` | string | |
+| `slug` | string | |
+| `url` | string | the live site address — the same as in `ready` |
+| `claim_url` | string | the link a human uses to take the project into their account. Only a person signed in to the dashboard can accept a claim — neither the CLI nor an agent does it |
+| `expires_at` | string | ISO-8601 — when the site and the token stop working |
+
+The claim code is saved in `.layero/project.json` (`claim`), the token in
+`~/.layero/config.json`; another `layero deploy` in the same directory updates
+the same site until the deadline. It never turns on by itself in CI: a runner
+without `LAYERO_TOKEN` gets `auth_required`.
+
+### `claim_status`
+
+The result of `layero claim status [code]`. Without a code it reads
+`.layero/project.json`.
+
+| field | type |
+|---|---|
+| `code` | string |
+| `status` | string — the claim's state on the server (`pending`, `claimed`, `expired`) |
+| `claimed` | boolean |
+| `expires_at` | string \| null |
+| `url` | string \| null — the site address |
+| `claim_url` | string \| null |
+
+### `claim_accept`
+
+The result of `layero claim accept [code]`. In a terminal the CLI opens
+`claim_url` in the browser; in agent mode it only prints it: a person signed
+in to the dashboard has to confirm.
+
+| field | type |
+|---|---|
+| `code` | string |
+| `claim_url` | string |
+| `opened` | boolean — whether a browser was opened |
+
+### `me`
+
+The result of `layero whoami`.
+
+| field | type |
+|---|---|
+| `id` | string |
+| `username` | string \| null |
+| `email` | string \| null |
+| `github_login` | string \| null |
+
+### `logged_out`
+
+The result of `layero logout`.
+
+| field | type |
+|---|---|
+| `config_path` | string — the removed token file |
+
+### `projects`
+
+The result of `layero projects list`.
+
+| field | type |
+|---|---|
+| `projects` | array — `id`, `slug`, `name`, `organization`, `url` (live address), `source_type` (`cli` \| `github` \| `git`), `repo` (string \| null — `owner/repo` of the connected repository), `status` |
+
+### `organizations`
+
+The result of `layero orgs list`.
+
+| field | type |
+|---|---|
+| `organizations` | array — `id`, `slug`, `kind` (`personal` \| `team`), `role` (`admin` \| `member`) |
+
+### `init_done`
+
+The result of `layero init` (after `detected`).
+
+| field | type |
+|---|---|
+| `framework` | string |
+| `agent_docs` | array — `file` (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`), `result` (`created` \| `updated` \| `unchanged`) |
+| `project_json` | `created` \| `unchanged` |
+
+### `hooks`, `hook_created`, `hook_deleted`
+
+The results of `layero hooks list`, `hooks create`, `hooks delete`. The hook
+URL is a credential: anyone holding it can start a build.
+
+| field | type | event |
+|---|---|---|
+| `project` | string — project id | all three |
+| `hooks` | array — `id`, `name`, `branch` (string \| null), `target` (`preview` \| `production`), `url`, `last_triggered_at` (string \| null) | `hooks` |
+| `id`, `name`, `branch`, `target`, `url` | as in the list | `hook_created` |
+| `id` | string | `hook_deleted` |
+
+### `sources`
+
+The result of `layero sources list`: the providers the platform supports and
+the organization's connections. No tokens in the event — the platform never
+returns them.
+
+| field | type |
+|---|---|
+| `org` | string — organization slug |
+| `providers` | array — `id` (`gitverse`, `gitlab`, `gitflic`, `sourcecraft`, …), `title`, `self_hosted` (boolean — accepts `--base-url`), `webhook_supported` (boolean — `false` for SourceCraft: no push-triggered builds there), `token_hint` (string \| null — where to issue a token and with which permissions) |
+| `connections` | array — `id`, `provider`, `account` (string \| null — the token owner's login), `status` (`active` \| `invalid`), `projects_count`, `token_expiry_state` (`ok` \| `soon` \| `today` \| `expired` \| `unknown`), `last_error` (string \| null) |
+
+### `source_connected`
+
+The result of `layero sources connect <provider>` and a step of
+`layero projects create --repo`.
+
+| field | type |
+|---|---|
+| `org` | string |
+| `connection_id` | string — connection id (for the GitHub App — the account key `github:<installation>`) |
+| `provider` | string |
+| `account` | string \| null |
+
+### `source_repos`
+
+The result of `layero sources repos <connection_id>`.
+
+| field | type |
+|---|---|
+| `org` | string |
+| `connection_id` | string |
+| `repos` | array — `path` (`owner/repo`, `group/sub/project` on GitLab), `name`, `default_branch`, `private`, `can_admin` (boolean — enough rights to create a webhook), `updated_at` (string \| null) |
+
+### `webhook_installed` and `webhook_unavailable`
+
+A step of `layero projects create --repo`. A separate event rather than a
+field: without a webhook a push does not build, and the agent has to say so
+to the user in words. On `webhook_unavailable` the repository **is already
+connected** — builds from the button and from `layero deploy` work; automatic
+builds start once the webhook is registered by hand at `url`.
+
+| field | type | event |
+|---|---|---|
+| `project` | string — slug | both |
+| `url` | string — the webhook address (empty for the GitHub App: there the webhook is part of the installation) | both |
+| `hint` | string — why it failed and what to do | `webhook_unavailable` |
+
+### `environments`
+
+The result of `layero envs list`. An environment and a branch are one thing:
+a CLI project has a single one (`cli`), a project with a repository has one
+per branch. Archived and retired ones are not included.
+
+| field | type |
+|---|---|
+| `project` | string — slug |
+| `environments` | array — `id`, `branch`, `url` (the environment's address), `hostname`, `active_deploy_id` (string \| null), `active_deploy_at` (string \| null), `production` (boolean — this is the production branch) |
+
+### `project_deleted`
+
+The result of `layero projects delete <slug> --yes`. Resource cleanup (CDN,
+S3, certificates, webhook) runs in the background; the address and slug are
+freed immediately.
+
+| field | type |
+|---|---|
+| `project_id` | string |
+| `slug` | string |
+
 ### `error`
 
 | field | type |
@@ -398,6 +574,19 @@ Do not write handling for codes that are not on this list.
 | `data_probe_gateway_failed` | The gateway gave no answer: it answered `5xx` (e.g. `503` with `too_busy`) or did not answer the platform at all. If the gateway answered, the `data_probe` event arrived before the error. A status listed in `--expect` never produces this error | Repeat the probe later |
 | `data_probe_unexpected_status` | The gateway status did not match `--expect`. The `data_probe` event arrived before the error | Compare the probe answer with the access levels: `layero data methods --db <database>` |
 | `data_probe_not_rolled_back` | A write probe went through (response 200–399) and the gateway did not confirm the rollback: data may have changed. The `data_probe` event arrived before the error; `--expect` does not suppress this error | Check the database data; do not repeat the write probe until the cause is found |
+| `branch_unsupported` | `layero deploy --branch`: an archive upload cannot land in a branch — the platform files every archive under the `cli` environment whatever you pass. Before 0.10.0 the flag was accepted and silently ignored. Nothing was packed or uploaded | Branch previews exist only for projects with a repository: connect one — `layero projects create --repo <provider>:<owner/repo>` — and push to a branch. For a project with a repository `next_action` names the repository to push to |
+| `repo_format` | `--repo` is not of the form `<provider>:<owner/repo>`, or missing | `layero projects create --repo github:acme/site`; providers — `layero sources list` |
+| `account_not_found` | The organization has no connection to that provider, or it is inactive (token revoked, App installation suspended) | `layero sources connect <provider> --token-stdin`; GitHub — install the App in the dashboard; the address is in `next_action` |
+| `repo_not_found` | The repository is not visible to the connection: a typo in the path, or the token lacks access | Available paths are in `next_action`; the full list — `layero sources repos <connection_id>` |
+| `repo_already_imported` | The repository is already connected to a project of the organization | `layero link <id>` — link the directory to it |
+| `source_connect_failed` | The project was created but the repository did not attach (the provider did not answer or refused). The project was deleted if the token had the rights; otherwise it stays without a repository — `next_action` says which | Check the connection (`layero sources list`) and retry; a stray project — `layero projects delete <slug> --yes` |
+| `provider_unknown` | `layero sources connect` with a provider not on the list | The list is in `next_action` and in `layero sources list`; GitHub is connected by installing the App |
+| `token_missing` | `layero sources connect` without `--token` and without `--token-stdin` (or stdin is empty) | `echo "$PAT" \| layero sources connect <provider> --token-stdin` |
+| `source_rejected` | The provider rejected the token (the API answered 502): wrong, revoked, or missing permissions | Where to issue it and with which rights — in `next_action` (the provider's `token_hint`) |
+| `connection_not_found` | `layero sources repos` with an id the organization does not have | `layero sources list` |
+| `hook_not_found` | `layero hooks delete` with an id the project does not have (already deleted?) | `layero hooks list` |
+| `claimable_unavailable` | Deploying without an account is not enabled on the platform (the API answered 404/501), or the platform returned no claim code | Sign in: `layero login` — or `LAYERO_TOKEN` |
+| `claim_unknown` | `layero claim status`/`accept` without a code and without a claim in `.layero/project.json`, or the claim with that code expired or the code is wrong | Pass the code; a new project without an account — `layero deploy --claim` |
 | `internal` | An unexpected CLI error (network, unhandled exception) | Re-run with `--debug` |
 
 :::note[The deploy code is built from the status]
@@ -407,6 +596,21 @@ build status, and a deploy has four statuses: `ready`, `building`, `failed`,
 `deploy_cancelled` — `deploy_error` and `deploy_timed_out` do not exist, do not
 branch on them.
 :::
+
+## Exit codes
+
+Since 0.10.0 the exit code tells error classes apart — a script does not need
+to parse the `error` event to know whose fault it is. The class comes from the
+error code.
+
+| Exit code | Class | `error` codes |
+|---|---|---|
+| `0` | success | — |
+| `1` | other | `plan_limit`, `forbidden`, `confirmation_required`, `repeated_failure`, `cli_deploys_disabled`, `username_required` and anything not in the classes below |
+| `2` | sign-in needed | `auth_required`, `auth_expired`, `auth_timeout` |
+| `3` | not found | `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `no_runs`, `data_key_unknown` |
+| `4` | invalid input | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `sql_missing`, `branch_unsupported`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect` |
+| `5` | remote failure | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, any `deploy_<status>` and `http_5xx` |
 
 ## Cold-start template for an agent
 

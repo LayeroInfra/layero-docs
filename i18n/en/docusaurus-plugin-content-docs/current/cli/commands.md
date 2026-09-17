@@ -14,11 +14,19 @@ description: The full list of layero commands — init, login, projects, deploy,
 | `layero whoami` | Show the current account. |
 | `layero orgs list` | List your Layero organizations (personal + teams). |
 | `layero projects list` | List your projects. |
+| `layero projects create --repo <provider>:<owner/repo>` | Create a project from a repository of a connected provider — push to a branch = preview, push to main = production. |
+| `layero projects delete <slug> --yes` | Delete a project. Irreversible; needs a token with scope `admin`. |
+| `layero sources list` | Git providers the platform supports and the organization's connections. |
+| `layero sources connect <provider> --token-stdin` | Connect a provider with a personal access token (read from stdin, so it stays out of shell history). |
+| `layero sources repos <connection_id>` | Repositories visible to a connection. |
+| `layero envs list` | Environments (branches) of a project with their addresses. |
 | `layero link <id_or_slug>` | Link the current directory to an existing project. |
 | `layero deploy` | Auto-detect the framework, pack the current directory, deploy. |
 | `layero deploy --prod` | Deploy to production (with confirmation). |
 | `layero deploy --org <slug>` | Create the new project in the given team instead of your personal organization. |
 | `layero deploy --json` | A machine-readable event stream — for agents and CI. |
+| `layero deploy --claim` | Deploy without an account: a temporary project for 72 hours and a link for a human to take the site over. |
+| `layero claim status` / `claim accept <code>` | State of a claimable project's claim; open the page where a human accepts it. |
 | `layero deploys list` | Show recent deploys of the current project. |
 | `layero promote` | Point the production apex at a specific ready deploy. |
 | `layero promote <sha>` | Point the apex at a specific deploy by `commit_sha` — the working way to roll back, see [Rollback](./rollback). |
@@ -122,6 +130,54 @@ timestamp and the deploy **source**:
 | `(cli)` | Uploaded through `layero deploy` |
 | `(manual)` | Started by hand from the dashboard (Redeploy) |
 
+
+## `layero projects create`
+
+A project from a repository without the dashboard — path (a) for agents and
+the terminal:
+
+```bash
+layero sources list                                           # providers and connections
+echo "$GITVERSE_TOKEN" | layero sources connect gitverse --token-stdin
+layero sources repos <connection_id>
+layero projects create --repo gitverse:acme/site --branch main --json
+```
+
+GitHub is connected by installing the Layero GitHub App in the dashboard; the
+other providers take a personal access token. The command checks the
+repository against the connection, creates the project and installs the
+webhook. If the provider refuses the webhook (token permissions; SourceCraft
+has no outgoing webhooks at all), the CLI says so with `webhook_unavailable`
+and the URL to register by hand — the repository is connected either way, only
+push-triggered builds wait for the webhook.
+
+## `layero projects delete`
+
+```bash
+layero projects delete <slug> --yes
+```
+
+Irreversible: the address and slug are freed immediately, resources are
+cleaned up in the background. The route needs a token with scope `admin` —
+the default token (`read` + `deploy`) gets `forbidden`, and that is right: an
+agent holding a deploy token must not be able to wipe a project. In a terminal
+without `--yes` the command asks you to type the slug; outside a terminal
+without `--yes` it refuses with `confirmation_required`.
+
+## `layero envs list`
+
+The project's environments with their addresses. An environment and a branch
+are the same thing: a CLI project has one (`cli`), a project with a repository
+has one per branch; production is marked. In `--json` — the `environments`
+event.
+
+## `layero claim`
+
+For a project created without an account (`layero deploy --claim`):
+`layero claim status` shows whether the claim is alive, `layero claim accept`
+opens the dashboard page where a human takes the site into their account. A
+claim cannot be accepted from the terminal — only by a person in the
+dashboard.
 
 ## `layero hooks`
 

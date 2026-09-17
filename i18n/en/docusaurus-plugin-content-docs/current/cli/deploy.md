@@ -64,7 +64,8 @@ survive later runs and can be edited by hand.
 |---|---|
 | `--prod` | The deploy lands on the project's default branch (the same as a push to main). If the project has auto-promote on, the apex switches to the fresh build automatically. |
 | `--promote` | After a successful build, moves `production_deploy_id` to this deploy **immediately**. Works for any branch — handy for shipping a feature branch to production in one command. |
-| `--branch <name>` | **Does not work for `deploy`** — archive uploads always land in the pseudo-branch `cli` (see below). The flag is only meaningful for `layero promote --branch`. |
+| `--branch <name>` | **Refused** with `branch_unsupported` (exit code 4): archive uploads always land in the `cli` environment (see below), so the flag cannot give you a preview. Only meaningful for `layero promote --branch`. |
+| `--claim` | Deploy without an account: a temporary project for 72 hours and a `claim_url` for a human to take the site over. Turns on by itself when there is no token, the run is non-interactive (an agent, not CI) and `--yes` is passed. |
 | `--prebuilt [dir]` | Ship an already-built artifact instead of building on the platform. Without an argument it picks the first existing of `dist/`, `build/`, `public/`, `out/`, `_site/`. `.gitignore` and `.layeroignore` rules are **not applied** — see the note below. |
 | `--type <preset>` | Override auto-detection: `vite`, `next`, `astro`, `cra`, `sveltekit`, `nuxt`, `gatsby`, `docusaurus`, `static`. |
 | `--name <name>` | Project name. Only on the first deploy. |
@@ -107,12 +108,14 @@ direct CLI uploads the apex moves anyway):
 - `--promote` = "once it builds, point the apex at this deploy". Works for any
   branch — the short path for "hot-fix from a feature branch → production".
 
-:::danger[`--branch` does nothing in `layero deploy`]
-The flag is accepted and silently ignored: the backend files **every** archive
-upload under the reserved `cli` environment, so that a manual upload can never
-collide with a branch of a connected repository (`projects.py:2865`). Verified
-by experiment: after `layero deploy --branch=probe` no `probe` environment is
-created.
+:::danger[`--branch` is refused in `layero deploy`]
+Archive uploads are **always** filed under the reserved `cli` environment, so a
+manual upload never collides with a branch of a connected repository. Before
+0.10.0 the flag was accepted and silently ignored: after
+`layero deploy --branch=probe` no `probe` environment appeared and the live
+site was replaced. Since 0.10.0 the CLI refuses before packing —
+`branch_unsupported`, exit code 4 — and `next_action` says what to do:
+connect a repository (`layero projects create --repo …`) and push a branch.
 
 What that means in practice:
 

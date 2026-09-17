@@ -14,11 +14,19 @@ description: Полный список команд layero — init, login, proj
 | `layero whoami` | Показать текущий аккаунт. |
 | `layero orgs list` | Список Layero-организаций (личная + команды). |
 | `layero projects list` | Список ваших проектов. |
+| `layero projects create --repo <provider>:<owner/repo>` | Создать проект из репозитория подключённого провайдера — push в ветку = превью, push в main = прод. |
+| `layero projects delete <slug> --yes` | Удалить проект. Необратимо; нужен токен со scope `admin`. |
+| `layero sources list` | Git-провайдеры платформы и подключения организации. |
+| `layero sources connect <provider> --token-stdin` | Подключить провайдера по персональному токену (токен — из stdin, чтобы не попал в историю). |
+| `layero sources repos <connection_id>` | Репозитории, видимые подключению. |
+| `layero envs list` | Окружения (ветки) проекта с адресами. |
 | `layero link <id_or_slug>` | Привязать cwd к существующему проекту. |
 | `layero deploy` | Авто-детект фреймворка, упаковать cwd, задеплоить (preview по умолчанию). |
 | `layero deploy --prod` | Задеплоить в production (с подтверждением). |
 | `layero deploy --org <slug>` | Создать новый проект в указанной команде вместо личной. |
 | `layero deploy --json` | Machine-readable стрим событий — для агентов и CI. |
+| `layero deploy --claim` | Деплой без аккаунта: временный проект на 72 часа и ссылка, по которой человек заберёт сайт. |
+| `layero claim status` / `claim accept <code>` | Состояние заявки claimable-проекта; открыть страницу, где человек её принимает. |
 | `layero deploys list` | Показать недавние деплои текущего проекта. |
 | `layero promote` | Переключить production apex на конкретный ready-деплой. |
 | `layero promote <sha>` | Вернуть апекс на конкретный деплой по `commit_sha` — рабочий способ отката, см. [Rollback](./rollback.md). |
@@ -116,6 +124,50 @@ npx layero@latest deploys list --limit 50            # больше истори
 | `(cli)` | Загружен через `layero deploy` |
 | `(manual)` | Запущен вручную через дашборд (Redeploy) |
 
+
+## `layero projects create`
+
+Проект из репозитория без панели — путь (a) для агента и терминала:
+
+```bash
+layero sources list                                           # провайдеры и подключения
+echo "$GITVERSE_TOKEN" | layero sources connect gitverse --token-stdin
+layero sources repos <connection_id>
+layero projects create --repo gitverse:acme/site --branch main --json
+```
+
+GitHub подключается установкой Layero GitHub App в панели, остальные
+провайдеры — персональным токеном. Команда сверяет репозиторий со списком
+подключения, создаёт проект и ставит вебхук. Если провайдер вебхук не дал
+(не хватает прав токена; у SourceCraft исходящих вебхуков нет вовсе), CLI
+скажет об этом событием `webhook_unavailable` с адресом для ручной
+настройки — репозиторий при этом уже привязан, не работает только автосборка
+на push.
+
+## `layero projects delete`
+
+```bash
+layero projects delete <slug> --yes
+```
+
+Необратимо: адрес и слаг освобождаются сразу, ресурсы вычищаются в фоне.
+Маршрут требует токена со scope `admin` — токен по умолчанию (`read` +
+`deploy`) получит `forbidden`, и это правильно: агент с деплой-токеном не
+должен уметь снести проект. В терминале без `--yes` команда просит ввести
+слаг; вне терминала без `--yes` — отказ `confirmation_required`.
+
+## `layero envs list`
+
+Окружения проекта с адресами. Окружение и ветка — одно и то же: у
+CLI-проекта оно одно (`cli`), у проекта с репозиторием — по ветке; production
+помечена. В `--json` — событие `environments`.
+
+## `layero claim`
+
+Для проекта, созданного без аккаунта (`layero deploy --claim`):
+`layero claim status` показывает, жива ли заявка, `layero claim accept`
+открывает страницу в панели, где человек забирает сайт в свой аккаунт.
+Принять заявку из терминала нельзя — только человеком в панели.
 
 ## `layero hooks`
 

@@ -14,6 +14,8 @@ CLI переключается в JSON-lines режим автоматическ
 - На stdout печатает по одной строке `{"event":"...", ...}` за действие
 - Ошибки приходят со стабильным `code` и `next_action`
 - Каждое событие также содержит поле `ts` (ISO-8601 timestamp)
+- **Каждая команда** печатает события — с 0.10.0 и `whoami`, `projects`, `orgs`, `link`, `hooks`, `logout`, `init`
+- Код выхода различает классы ошибок — см. [Коды выхода](#коды-выхода)
 
 ## События
 
@@ -175,7 +177,7 @@ CLI упаковал директорию в tar.gz.
 
 | поле | тип | примечание |
 |---|---|---|
-| `url` | string | **Живой публичный адрес сайта** — НЕ дашборд. Для обычного `layero deploy` CLI-проекта это production-адрес проекта (CLI-загрузки авто-промоутятся в apex). Для деплоя в конкретную ветку (`--branch`) — preview-адрес ветки. Адрес живой сразу; открывайте и показывайте пользователю именно его. |
+| `url` | string | **Живой публичный адрес сайта** — НЕ дашборд. Для обычного `layero deploy` CLI-проекта это production-адрес проекта (CLI-загрузки авто-промоутятся в apex). Для проекта с репозиторием, где CLI-загрузка не промоутится, — адрес окружения `cli` (`--branch` у `deploy` отклоняется, см. `branch_unsupported`). Адрес живой сразу; открывайте и показывайте пользователю именно его. |
 | `dashboard_url` | string? | Страница управления проектом в дашборде (`https://app.layero.ru/projects/<id>`). Это НЕ сайт — не выдавайте её как ссылку на готовый сайт. |
 | `preview_url` | string? | **Legacy, больше не приходит.** Отдельный per-deploy preview-хост в зоне `*.preview.layero.ru`. Существовал, чтобы дать ссылку, пока apex прогревался на CDN. Отдельной preview-зоны у `layero.app` нет, а на `layero.ru` пользовательских сайтов не осталось — поле не заполняется ни для одного проекта. |
 | `edge_ready` | bool? | Отвечает ли адрес на момент завершения деплоя. Раньше поле означало «apex прогрелся на CDN» и у новых хостов навсегда оставалось `false`; теперь берётся из реальной пробы. Как гейт всё равно не нужно: адрес живой сразу. |
@@ -322,6 +324,176 @@ CLI упаковал директорию в tar.gz.
 | `headers` | object | только `content-type`, `content-range`, `x-layero-caller`, `x-layero-key` (префикс ключа), `x-layero-user`, `x-layero-rolled-back` |
 | `body` | any | тело ответа: JSON или строка |
 
+### `claimable`
+
+Деплой без аккаунта (`layero deploy --claim`, либо автоматически: нет токена,
+среда агентская — не терминал и не CI, — и передан `--yes`). Платформа
+завела временный проект и выдала токен на него; сайт живёт 72 часа. Событие
+приходит **до** `ready`: после `ready` агент не читает, а без ссылки сайт
+исчезнет вместе со сроком.
+
+| поле | тип | примечание |
+|---|---|---|
+| `project_id` | string | |
+| `slug` | string | |
+| `url` | string | живой адрес сайта — тот же, что в `ready` |
+| `claim_url` | string | ссылка, по которой человек забирает проект в свой аккаунт. Принять заявку может только человек в панели — CLI и агент этого не делают |
+| `expires_at` | string | ISO-8601 — когда сайт и токен перестанут действовать |
+
+Код заявки сохраняется в `.layero/project.json` (`claim`), токен — в
+`~/.layero/config.json`; повторный `layero deploy` в той же папке обновляет
+тот же сайт до истечения срока. В CI автоматически не включается: раннер без
+`LAYERO_TOKEN` получает `auth_required`.
+
+### `claim_status`
+
+Итог `layero claim status [code]`. Без кода — из `.layero/project.json`.
+
+| поле | тип |
+|---|---|
+| `code` | string |
+| `status` | string — состояние заявки на сервере (`pending`, `claimed`, `expired`) |
+| `claimed` | boolean |
+| `expires_at` | string \| null |
+| `url` | string \| null — адрес сайта |
+| `claim_url` | string \| null |
+
+### `claim_accept`
+
+Итог `layero claim accept [code]`. В терминале CLI открывает `claim_url` в
+браузере, в агентском режиме — только печатает: подтвердить заявку должен
+человек, вошедший в панель.
+
+| поле | тип |
+|---|---|
+| `code` | string |
+| `claim_url` | string |
+| `opened` | boolean — открыт ли браузер |
+
+### `me`
+
+Итог `layero whoami`.
+
+| поле | тип |
+|---|---|
+| `id` | string |
+| `username` | string \| null |
+| `email` | string \| null |
+| `github_login` | string \| null |
+
+### `logged_out`
+
+Итог `layero logout`.
+
+| поле | тип |
+|---|---|
+| `config_path` | string — удалённый файл с токеном |
+
+### `projects`
+
+Итог `layero projects list`.
+
+| поле | тип |
+|---|---|
+| `projects` | array — `id`, `slug`, `name`, `organization`, `url` (живой адрес), `source_type` (`cli` \| `github` \| `git`), `repo` (string \| null — `owner/repo` подключённого репозитория), `status` |
+
+### `organizations`
+
+Итог `layero orgs list`.
+
+| поле | тип |
+|---|---|
+| `organizations` | array — `id`, `slug`, `kind` (`personal` \| `team`), `role` (`admin` \| `member`) |
+
+### `init_done`
+
+Итог `layero init` (после `detected`).
+
+| поле | тип |
+|---|---|
+| `framework` | string |
+| `agent_docs` | array — `file` (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`), `result` (`created` \| `updated` \| `unchanged`) |
+| `project_json` | `created` \| `unchanged` |
+
+### `hooks`, `hook_created`, `hook_deleted`
+
+Итоги `layero hooks list`, `hooks create`, `hooks delete`. Адрес хука —
+секрет: кто угодно с ним запускает сборку.
+
+| поле | тип | событие |
+|---|---|---|
+| `project` | string — id проекта | все три |
+| `hooks` | array — `id`, `name`, `branch` (string \| null), `target` (`preview` \| `production`), `url`, `last_triggered_at` (string \| null) | `hooks` |
+| `id`, `name`, `branch`, `target`, `url` | как в списке | `hook_created` |
+| `id` | string | `hook_deleted` |
+
+### `sources`
+
+Итог `layero sources list`: провайдеры, которые платформа умеет, и
+подключения организации. Токенов в событии нет — платформа их не отдаёт.
+
+| поле | тип |
+|---|---|
+| `org` | string — slug организации |
+| `providers` | array — `id` (`gitverse`, `gitlab`, `gitflic`, `sourcecraft`, …), `title`, `self_hosted` (boolean — принимает `--base-url`), `webhook_supported` (boolean — `false` у SourceCraft: автосборки на push там не будет), `token_hint` (string \| null — где выпустить токен и с какими правами) |
+| `connections` | array — `id`, `provider`, `account` (string \| null — логин владельца токена), `status` (`active` \| `invalid`), `projects_count`, `token_expiry_state` (`ok` \| `soon` \| `today` \| `expired` \| `unknown`), `last_error` (string \| null) |
+
+### `source_connected`
+
+Итог `layero sources connect <provider>` и шаг `layero projects create --repo`.
+
+| поле | тип |
+|---|---|
+| `org` | string |
+| `connection_id` | string — id подключения (у GitHub App — ключ аккаунта `github:<installation>`) |
+| `provider` | string |
+| `account` | string \| null |
+
+### `source_repos`
+
+Итог `layero sources repos <connection_id>`.
+
+| поле | тип |
+|---|---|
+| `org` | string |
+| `connection_id` | string |
+| `repos` | array — `path` (`owner/repo`, у GitLab — `group/sub/project`), `name`, `default_branch`, `private`, `can_admin` (boolean — хватит ли прав завести вебхук), `updated_at` (string \| null) |
+
+### `webhook_installed` и `webhook_unavailable`
+
+Шаг `layero projects create --repo`. Отдельным событием, а не полем: без
+вебхука push в репозиторий не собирается, и агент обязан сказать это
+человеку словами. Репозиторий при `webhook_unavailable` **уже привязан** —
+деплой по кнопке и по `layero deploy` работает, автосборка включится после
+ручной настройки вебхука по `url`.
+
+| поле | тип | событие |
+|---|---|---|
+| `project` | string — slug | оба |
+| `url` | string — адрес вебхука (пустой у GitHub App: там вебхук — часть установки) | оба |
+| `hint` | string — почему не вышло и что сделать | `webhook_unavailable` |
+
+### `environments`
+
+Итог `layero envs list`. Окружение и ветка — одна сущность: у CLI-проекта
+оно одно (`cli`), у проекта с репозиторием — по ветке. Архивные и снятые с
+раздачи не входят.
+
+| поле | тип |
+|---|---|
+| `project` | string — slug |
+| `environments` | array — `id`, `branch`, `url` (адрес окружения), `hostname`, `active_deploy_id` (string \| null), `active_deploy_at` (string \| null), `production` (boolean — это production-ветка) |
+
+### `project_deleted`
+
+Итог `layero projects delete <slug> --yes`. Очистка ресурсов (CDN, S3,
+сертификаты, вебхук) идёт в фоне; адрес и слаг освобождены сразу.
+
+| поле | тип |
+|---|---|
+| `project_id` | string |
+| `slug` | string |
+
 ### `error`
 
 | поле | тип |
@@ -394,6 +566,19 @@ CLI упаковал директорию в tar.gz.
 | `data_probe_gateway_failed` | Шлюз не дал ответа: ответил `5xx` (например, `503` с `too_busy`) или не ответил платформе вовсе. Если шлюз ответил, событие `data_probe` пришло перед ошибкой. Статус, указанный в `--expect`, этой ошибкой не бывает | Повторить пробу позже |
 | `data_probe_unexpected_status` | Статус ответа шлюза не совпал с `--expect`. Событие `data_probe` пришло перед ошибкой | Сверить ответ пробы с уровнями доступа: `layero data methods --db <база>` |
 | `data_probe_not_rolled_back` | Проба записи прошла (ответ 200–399), а шлюз не подтвердил откат: данные могли измениться. Событие `data_probe` пришло перед ошибкой; `--expect` эту ошибку не снимает | Проверить данные базы; пробу записи не повторять, пока причина не найдена |
+| `branch_unsupported` | `layero deploy --branch`: архивная загрузка не попадает в ветку — платформа кладёт каждый архив в окружение `cli`, что бы ни передали. До 0.10.0 флаг принимался и молча игнорировался. Ничего не упаковано и не загружено | Превью-ветки есть только у проектов с репозиторием: подключить его — `layero projects create --repo <provider>:<owner/repo>` — и пушить в ветку. У проекта с репозиторием в `next_action` — имя репозитория, куда пушить |
+| `repo_format` | `--repo` не в виде `<provider>:<owner/repo>` или не передан | `layero projects create --repo github:acme/site`; провайдеры — `layero sources list` |
+| `account_not_found` | В организации нет подключения к этому провайдеру, либо оно не активно (токен отозван, установка App приостановлена) | `layero sources connect <provider> --token-stdin`; GitHub — установить App в панели; адрес — в `next_action` |
+| `repo_not_found` | Репозиторий не виден подключению: опечатка в пути или токену не хватает прав | Доступные пути — в `next_action`; полный список — `layero sources repos <connection_id>` |
+| `repo_already_imported` | Репозиторий уже привязан к проекту организации | `layero link <id>` — привязать папку к нему |
+| `source_connect_failed` | Проект создан, а репозиторий к нему не привязался (провайдер не ответил или отказал). Проект удалён, если у токена хватило прав; иначе остался без репозитория — сказано в `next_action` | Проверить подключение (`layero sources list`) и повторить; лишний проект — `layero projects delete <slug> --yes` |
+| `provider_unknown` | `layero sources connect` с провайдером не из списка | Список — в `next_action` и в `layero sources list`; GitHub подключается установкой App |
+| `token_missing` | `layero sources connect` без `--token` и без `--token-stdin` (или stdin пуст) | `echo "$PAT" \| layero sources connect <provider> --token-stdin` |
+| `source_rejected` | Провайдер не принял токен (API ответил 502): неверный, отозван или без нужных прав | Где выпустить и с какими правами — в `next_action` (`token_hint` провайдера) |
+| `connection_not_found` | `layero sources repos` с id, которого нет в организации | `layero sources list` |
+| `hook_not_found` | `layero hooks delete` с id, которого у проекта нет (уже удалён?) | `layero hooks list` |
+| `claimable_unavailable` | Деплой без аккаунта на платформе не включён (API ответил 404/501) либо платформа не вернула код заявки | Войти: `layero login` — или `LAYERO_TOKEN` |
+| `claim_unknown` | `layero claim status`/`accept` без кода и без заявки в `.layero/project.json`, либо заявка с таким кодом истекла или код неверный | Передать код; новый проект без аккаунта — `layero deploy --claim` |
 | `internal` | Непредвиденная ошибка CLI (сеть, неожиданное исключение) | Перезапустить с `--debug` |
 
 :::note[Код деплоя собирается из статуса]
@@ -402,6 +587,20 @@ CLI упаковал директорию в tar.gz.
 практике встречаются ровно `deploy_failed` и `deploy_cancelled` — кодов
 `deploy_error` и `deploy_timed_out` не существует, не закладывайтесь на них.
 :::
+
+## Коды выхода
+
+С 0.10.0 код выхода различает классы ошибок — скрипту не нужно разбирать
+событие `error`, чтобы понять, кто виноват. Класс берётся из кода ошибки.
+
+| Код выхода | Класс | Коды `error` |
+|---|---|---|
+| `0` | успех | — |
+| `1` | прочее | `plan_limit`, `forbidden`, `confirmation_required`, `repeated_failure`, `cli_deploys_disabled`, `username_required` и всё, что не попало в классы ниже |
+| `2` | нужен вход | `auth_required`, `auth_expired`, `auth_timeout` |
+| `3` | не найдено | `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `no_runs`, `data_key_unknown` |
+| `4` | неверный ввод | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `sql_missing`, `branch_unsupported`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect` |
+| `5` | удалённая ошибка | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, любой `deploy_<status>` и `http_5xx` |
 
 ## Cold-start template для агента
 
