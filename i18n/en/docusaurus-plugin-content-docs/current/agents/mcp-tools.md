@@ -21,14 +21,14 @@ line per tool.
 | `whoami` | Who is connected: user, organisation, token expiry. |
 | `my_projects` | The list of projects with addresses and source (repository or CLI). |
 | `list_sources` | Git providers (GitHub, GitVerse, GitLab, GitFlic, SourceCraft) and the organisation's connections. |
-| `import_repo` ⚠️ | Create a project from a repository: GitHub through the App installation, the others through the organisation's connection. Provider not connected — the answer is `needs_connection` with the dashboard address; the provider token is connected by the person, not the agent. |
+| `import_repo` ⚠️ | Create a project from a repository: GitHub through the App installation, the others through the organisation's connection. Once linked, it applies the detected settings and starts the first build itself — what the dashboard's "Start deploy" button does; the result carries `setup` (`applied` / `pending` / `failed`), `first_deploy_id` and an honest `next_action`. `deploy=false` leaves the project in the setup wizard. Provider not connected — the answer is `needs_connection` with the dashboard address; the provider token is connected by the person, not the agent. |
 | `project_create` ⚠️ | An empty project with no repository — an address reserved for a later `publish_site` or `npx layero@latest deploy`. |
 
 ## Site and deploys
 
 | Tool | What it does |
 |---|---|
-| `site_status` | Site state: latest deploy, address, environments. |
+| `site_status` | Site state: latest deploy, address, environments. When there has been no build yet it says so instead of passing a missing build off as a successful one. |
 | `list_environments` | The project's environments — one per branch — with addresses and the state of the latest build. |
 | `list_deploys` | The project's build history. |
 | `deploy_logs` | Build and application logs. |

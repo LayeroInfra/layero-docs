@@ -470,8 +470,22 @@ CLI упаковал директорию в tar.gz.
 | поле | тип | событие |
 |---|---|---|
 | `project` | string — slug | оба |
-| `url` | string — адрес вебхука (пустой у GitHub App: там вебхук — часть установки) | оба |
+| `url` | string — адрес вебхука; у GitHub App поля нет: там вебхук — часть установки, своего адреса у него нет | оба |
 | `hint` | string — почему не вышло и что сделать | `webhook_unavailable` |
+
+### `setup_applied`, `deploy_started`, `setup_pending`, `setup_failed`
+
+Завершение мастера в `layero projects create --repo` (с 0.10.2). Раньше
+команда останавливалась на привязке: проект оставался в `pending_setup`, и
+первая сборка ждала клика «Начать деплой» в панели. Теперь команда делает то
+же, что кнопка: берёт подсказку детекта, применяет её и запускает сборку.
+
+| событие | поля | смысл |
+|---|---|---|
+| `setup_applied` | `project`, `framework`, `build_cmd` (string \| null), `output_dir` (string \| null), `layero_found` (boolean) | Настройки применены. Пустые поля не заглушка: чем собирать, решит сборщик по репозиторию |
+| `deploy_started` | `project`, `deploy_id`, `url` | Первая сборка запущена; следить — `layero deploys list --project <slug>` |
+| `setup_pending` | `project`, `url`, `hint` | `--no-deploy`: проект оставлен в мастере, сборок не будет, пока настройку не завершат по `url` |
+| `setup_failed` | `project`, `reason`, `url`, `hint` | Детект, настройка или запуск сборки не удались. Проект **создан**, выход 0 — сказать человеку завершить в панели по `url` |
 
 ### `environments`
 

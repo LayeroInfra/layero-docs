@@ -151,6 +151,20 @@ has no outgoing webhooks at all), the CLI says so with `webhook_unavailable`
 and the URL to register by hand — the repository is connected either way, only
 push-triggered builds wait for the webhook.
 
+Once linked, the command finishes the setup wizard itself: it takes the
+detection hint (framework, build command, output directory), applies it and
+starts the first build — exactly what the dashboard's "Start deploy" button
+does. Events `setup_applied` and `deploy_started`; from there, `layero deploys
+list --project <slug>`. With `--no-deploy` the project stays in the wizard
+(event `setup_pending` with the dashboard URL) and nothing builds until setup
+is completed there. If detection or setup fails, the project is still created
+(exit 0): event `setup_failed` with the reason and the wizard URL.
+
+```bash
+layero projects create --repo github:acme/site --json              # link, set up, build
+layero projects create --repo github:acme/site --no-deploy --json  # link only
+```
+
 ## `layero projects delete`
 
 ```bash

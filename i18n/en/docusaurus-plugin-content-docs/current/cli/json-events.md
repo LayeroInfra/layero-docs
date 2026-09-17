@@ -481,8 +481,23 @@ builds start once the webhook is registered by hand at `url`.
 | field | type | event |
 |---|---|---|
 | `project` | string — slug | both |
-| `url` | string — the webhook address (empty for the GitHub App: there the webhook is part of the installation) | both |
+| `url` | string — the webhook address; absent for the GitHub App: there the webhook is part of the installation and has no address of its own | both |
 | `hint` | string — why it failed and what to do | `webhook_unavailable` |
+
+### `setup_applied`, `deploy_started`, `setup_pending`, `setup_failed`
+
+Finishing the setup wizard in `layero projects create --repo` (since 0.10.2).
+The command used to stop at the link: the project stayed in `pending_setup`
+and the first build waited for a "Start deploy" click in the dashboard. Now
+the command does what the button does: takes the detection hint, applies it
+and starts the build.
+
+| event | fields | meaning |
+|---|---|---|
+| `setup_applied` | `project`, `framework`, `build_cmd` (string \| null), `output_dir` (string \| null), `layero_found` (boolean) | Settings applied. Empty fields are not placeholders: the builder decides from the repository |
+| `deploy_started` | `project`, `deploy_id`, `url` | First build started; follow it with `layero deploys list --project <slug>` |
+| `setup_pending` | `project`, `url`, `hint` | `--no-deploy`: the project stays in the wizard; nothing builds until setup is finished at `url` |
+| `setup_failed` | `project`, `reason`, `url`, `hint` | Detection, setup or the build start failed. The project **is created**, exit 0 — tell the person to finish in the dashboard at `url` |
 
 ### `environments`
 
