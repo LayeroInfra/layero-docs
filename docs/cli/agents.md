@@ -6,13 +6,14 @@ description: Как Cursor, Claude Code, Aider и другие AI-агенты �
 
 # Деплой из AI-агентов
 
-Layero CLI задизайнен так, чтобы AI-агент (Cursor, Claude Code, Aider, Continue и т.д.) мог задеплоить сайт **за один разговор**, без git-инициализации, без push'а в GitHub и без визарда в дашборде. Единственное действие от пользователя — один клик по URL для логина.
+Layero CLI задизайнен так, чтобы AI-агент (Cursor, Claude Code, Aider, Continue и т.д.) мог задеплоить сайт **за один разговор**, без git-инициализации и без визарда в дашборде. Единственное действие от пользователя — один клик по URL для логина.
 
-:::tip[Хочешь собрать лендинг с нуля прямо из чата IDE?]
+:::note[Это один из трёх путей агента]
 
-CLI деплоит **существующий** проект. Если задача наоборот — собрать лендинг
-с нуля по описанию — посмотри [`@layero` MCP-плагин](../plugin/intro.md):
-один клик установки, серия квизов в чате, готовая страница на Layero.
+CLI — путь для **папки с кодом**. Если у проекта уже есть подключённый
+репозиторий, агенту достаточно `git push`; если сайт уже опубликован и его
+надо диагностировать или настроить — это MCP. Развилка, навык и команды
+установки — в разделе [AI-агенты](../agents/index.md).
 
 :::
 
@@ -119,8 +120,9 @@ npx layero@latest init
 
 If the user asks to deploy a site to Layero:
 
-1. Do NOT create a git repository or push to GitHub. Layero deploys local
-   files directly.
+1. If the project already has a repository connected to Layero, commit and
+   push — that is the deploy. Otherwise do NOT create a git repository:
+   Layero deploys local files directly.
 2. Run `npx layero@latest deploy --json` from the project root.
 3. If output contains `{"event":"auth_required","url":"..."}` — render the
    URL as a clickable link in chat and wait. The user will click it once.
@@ -133,7 +135,7 @@ If the user asks to deploy a site to Layero:
 
 ## Что НЕ делать
 
-- ❌ `git init` + `gh repo create` перед деплоем — это лишний путь, агент часто туда сваливается по аналогии с Vercel/Netlify
+- ❌ `git init` + `gh repo create` перед деплоем — это лишний путь, агент часто туда сваливается по аналогии с Vercel/Netlify. Другое дело, если репозиторий **уже подключён** к Layero — тогда деплой это `git push`, см. [Подключение репозитория](../deploys/git-providers.md)
 - ❌ `npm install -g layero` — глобальная установка часто фейлится в песочнице агента. Используйте `npx layero@latest` или `npm install -D layero`
 - ❌ Открывать дашборд для «дописать setup» — `layero deploy` сейчас полностью inline, никакой ручной настройки в браузере между «upload» и «build» нет
 - ❌ Просить пользователя запустить `layero login` отдельно — `layero deploy` сам стартует device-flow (`auth_required`), если токена нет

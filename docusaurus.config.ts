@@ -100,6 +100,24 @@ const config: Config = {
     ],
   ],
 
+  // Раздел docs/plugin/* (генерация лендингов через MCP) снят 17.09.2026 как
+  // неудачный эксперимент; его заменил docs/agents/*. Старые адреса жили в
+  // карте сайта, IndexNow и внешних каталогах — отдавать по ним 404 значит
+  // терять именно тех читателей, что пришли по ссылке. Плагин создаёт
+  // HTML-заглушки с meta refresh для обеих локалей.
+  plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        redirects: [
+          {from: ['/plugin', '/plugin/intro', '/plugin/integrations'], to: '/agents/'},
+          {from: '/plugin/install', to: '/agents/install'},
+          {from: '/plugin/catalogue', to: '/agents/mcp-tools'},
+        ],
+      },
+    ],
+  ],
+
   // Docusaurus сам кладёт на страницы только BreadcrumbList (и BlogPosting в
   // блоге) — узла Organization нет нигде. То есть вся развязка сущности жила
   // на лендинге, а 56 страниц документации не сообщали поисковику и ассистенту
@@ -160,7 +178,7 @@ const config: Config = {
             url: 'https://docs.layero.ru/',
             name: 'Документация Layero',
             description:
-              'Документация платформы Layero: деплой фронтенда из GitHub или одной командой, кастомные домены, runtime-приложения, CLI и MCP-плагин для AI-IDE.',
+              'Документация платформы Layero: деплой фронтенда из репозитория (GitHub, GitVerse, GitLab, GitFlic, SourceCraft) или одной командой, кастомные домены, runtime-приложения, CLI, навык и MCP-сервер для AI-агентов.',
             publisher: {'@id': 'https://layero.ru/#organization'},
           },
         ],

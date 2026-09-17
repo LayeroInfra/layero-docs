@@ -8,6 +8,12 @@ description: Connect a repository and every git push publishes a new version aut
 
 Connect a repository and every `git push` publishes a new version.
 
+:::note
+GitHub is one of five providers. GitVerse, GitLab, GitFlic and SourceCraft
+connect with a token; the differences and the capability table are on
+[Connecting a repository](./git-providers.md).
+:::
+
 ## Connecting
 
 1. Sign in to [app.layero.ru](https://app.layero.ru) with **GitHub**. During

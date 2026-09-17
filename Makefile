@@ -1,23 +1,26 @@
-.PHONY: help setup check typecheck build check-texts serve start
+.PHONY: help setup check typecheck build check-texts check-agents-install export-md serve start
 
 help:
 	@echo "layero-docs — документация → docs.layero.ru"
 	@echo ""
-	@echo "  make check      — типы + сборка (сборка падуча на битой ссылке)"
+	@echo "  make check      — типы + сборка + команды установки ↔ agents-install.json"
 	@echo "  make typecheck  — tsc"
 	@echo "  make build      — сборка Docusaurus, обе локали"
 	@echo "  make check-texts— тексты ↔ код (проверки живут в core и mcp)"
 	@echo "  make start      — локально с горячей перезагрузкой"
 	@echo "  make setup      — npm ci"
 	@echo ""
-	@echo "  🚨 push ≠ публикация: деплой сломан, тикет T-20260816-6"
+	@echo "  push в main выкатывает docs.layero.ru (Deploy docs); после — проверить живой адрес"
 
 # ── Проверка ─────────────────────────────────────────────────────────────────
 #
 # Сборка входит в `check` намеренно и является главным здесь: Docusaurus
-# падает на битой ссылке, а не предупреждает. Уронить публикацию пушем легко,
-# и до правки раннеров это вообще не всплывёт — job уходит в очередь и
-# отменяется через сутки, статус `queued`, а не `failure`.
+# падает на битой ссылке, а не предупреждает. Уронить публикацию пушем легко:
+# push в main катит сразу, и красная сборка = docs.layero.ru не обновился.
+#
+# check-agents-install — команды установки на странице «Подключить агента»
+# генерируются из agents-install.json; расхождение = отказ. Команды
+# установки жили на шести поверхностях и разъехались (аудит AX 17.09.2026).
 #
 # Чего здесь НЕТ и почему:
 #  · тестов — документация проверяется сборкой и сверкой с кодом;
@@ -39,7 +42,16 @@ check-texts:
 	python3 ../core/cli/check-typography.py
 	python3 ../mcp/check-tool-names.py
 
-check: typecheck build
+check-agents-install:
+	python3 scripts/check-agents-install.py
+
+# Markdown-копии страниц и sitemap.md из уже собранного build/ — то, что
+# делает deploy.sh; локально — чтобы посмотреть результат.
+export-md: build
+	python3 scripts/gen-llms.py --build build
+	python3 scripts/export-md.py --build build
+
+check: typecheck check-agents-install build
 	@echo ""
 	@echo "✅ ALL CHECKS PASSED"
 

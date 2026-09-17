@@ -51,6 +51,7 @@ content_type() {
     *.woff) echo "font/woff" ;;
     *.woff2) echo "font/woff2" ;;
     *.xml)  echo "application/xml" ;;
+    *.md)   echo "text/markdown; charset=utf-8" ;;
     *.txt|*.map) echo "text/plain; charset=utf-8" ;;
     *)      echo "application/octet-stream" ;;
   esac
@@ -58,7 +59,7 @@ content_type() {
 
 cache_control() {
   case "$1" in
-    *.html|*.xml) echo "no-cache" ;;
+    *.html|*.xml|*.md|*.txt) echo "no-cache" ;;
     assets/*) echo "public, max-age=31536000, immutable" ;;
     *)        echo "public, max-age=3600" ;;
   esac
@@ -70,6 +71,14 @@ cache_control() {
 # /en/llms.txt. Ровно так 28.07 русский файл попал на английский адрес.
 echo "==> Generating llms.txt (ru + en)"
 python3 scripts/gen-llms.py --build "$BUILD_DIR"
+
+# Каждая страница — ещё и как Markdown по тому же адресу с `.md` на конце
+# (`/cli/agents.md`), плюс sitemap.md со списком страниц. Это для агентов:
+# HTML страницы весит сотни килобайт, исходник — единицы. Тоже из УЖЕ
+# СОБРАННОГО: маршрут сверяется с index.html, чтобы не отдавать текст
+# страницы, которой на сайте нет.
+echo "==> Exporting pages as Markdown (ru + en)"
+python3 scripts/export-md.py --build "$BUILD_DIR"
 
 # Идентификатор сборки уезжает вместе с ней: по нему проверка ПОСЛЕ выкатки
 # отличает «сайт жив» от «выложено то, что мы собрали». Без него шаг Verify

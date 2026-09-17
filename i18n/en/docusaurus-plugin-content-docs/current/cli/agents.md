@@ -8,15 +8,16 @@ description: How Cursor, Claude Code, Aider and other AI agents deploy a site th
 
 The Layero CLI is built so that an AI agent (Cursor, Claude Code, Aider,
 Continue and the like) can deploy a site **within a single conversation** — no
-`git init`, no push to GitHub, no wizard in the dashboard. The only thing the
-user does is click one login link.
+`git init`, no wizard in the dashboard. The only thing the user does is click
+one login link.
 
-:::tip[Want a landing page built from scratch inside the IDE chat?]
+:::note[This is one of the agent's three paths]
 
-The CLI deploys an **existing** project. If the task is the opposite — build a
-landing page from a description — see the [`@layero` MCP plugin](../plugin/intro):
-one click to install, a short series of questions in the chat, a finished page
-on Layero.
+The CLI is the path for **a folder with code**. If the project already has a
+repository connected, the agent only needs to `git push`; if the site is
+already published and needs diagnosing or configuring, that is MCP. The
+decision, the skill and the install commands are in the
+[AI agents](../agents/index.md) section.
 
 :::
 
@@ -138,8 +139,9 @@ skills, `CLAUDE.md`), include something like this:
 
 If the user asks to deploy a site to Layero:
 
-1. Do NOT create a git repository or push to GitHub. Layero deploys local
-   files directly.
+1. If the project already has a repository connected to Layero, commit and
+   push — that is the deploy. Otherwise do NOT create a git repository:
+   Layero deploys local files directly.
 2. Run `npx layero@latest deploy --json` from the project root.
 3. If output contains `{"event":"auth_required","url":"..."}` — render the
    URL as a clickable link in chat and wait. The user will click it once.
@@ -153,7 +155,9 @@ If the user asks to deploy a site to Layero:
 ## What not to do
 
 - ❌ `git init` + `gh repo create` before deploying — a detour agents often
-  take by analogy with Vercel/Netlify.
+  take by analogy with Vercel/Netlify. It is different when a repository is
+  **already connected** to Layero — then the deploy is a `git push`, see
+  [Connecting a repository](../deploys/git-providers.md).
 - ❌ `npm install -g layero` — global installs frequently fail in an agent
   sandbox. Use `npx layero@latest` or `npm install -D layero`.
 - ❌ Opening the dashboard to "finish the setup" — `layero deploy` is fully

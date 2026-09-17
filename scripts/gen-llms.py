@@ -32,34 +32,53 @@ from pathlib import Path
 SKIP_DIRS = {"category", "search", "assets", "img", "_layero"}
 SKIP_PAGES = {"blog/archive", "blog/authors", "blog/tags", "search"}
 
-# Порядок разделов важен: он же определяет порядок в файле.
-SECTIONS_RU = [
-    ("getting-started", "Быстрый старт"),
-    ("cli", "CLI"),
-    ("deploys", "Деплой и окружения"),
-    ("plugin", "Плагин @layero для AI-IDE"),
-    ("runtime", "Runtime-приложения"),
-    ("performance", "Производительность"),
-    ("team", "Команды и интеграции"),
-    ("billing", "Тарифы и оплата"),
-]
-SECTIONS_EN = [
-    ("getting-started", "Getting started"),
-    ("cli", "CLI"),
-    ("deploys", "Deploys & environments"),
-    ("plugin", "The @layero plugin for AI IDEs"),
-    ("runtime", "Runtime apps"),
-    ("performance", "Performance"),
-    ("team", "Teams & integrations"),
-    ("billing", "Plans & billing"),
-]
+# Разделы берутся из `_category_.json` каждого каталога docs/ — порядок по
+# `position`, подпись по `label`; для en подпись берётся из
+# i18n/en/.../current.json (ключ `sidebar.docsSidebar.category.<label>`), а
+# при её отсутствии — из `_category_.json` той же локали. Ручного списка
+# больше нет: пока он был, data-api и database (10 страниц) не попадали в
+# индекс ровно потому, что список не обновили (аудит AX 17.09.2026).
+DOCS_DIR = Path(__file__).resolve().parents[1] / "docs"
+I18N_EN = Path(__file__).resolve().parents[1] / "i18n/en/docusaurus-plugin-content-docs"
+
+
+def sections(lang: str) -> list[tuple[str, str]]:
+    out: list[tuple[int, str, str]] = []
+    en_labels: dict[str, str] = {}
+    if lang == "en":
+        cj = I18N_EN / "current.json"
+        if cj.is_file():
+            for k, v in json.loads(cj.read_text(encoding="utf-8")).items():
+                pre = "sidebar.docsSidebar.category."
+                if k.startswith(pre) and ".link." not in k:
+                    en_labels[k[len(pre):]] = v["message"]
+    for cat in sorted(DOCS_DIR.glob("*/_category_.json")):
+        meta = json.loads(cat.read_text(encoding="utf-8"))
+        key = cat.parent.name
+        label = meta.get("label", key)
+        # Раздел с generated-index живёт по slug (например /deploys), а без
+        # него — по /category/<slug из label>; страницы же всегда под key/.
+        if lang == "en":
+            en_cat = I18N_EN / "current" / key / "_category_.json"
+            if label in en_labels:
+                label = en_labels[label]
+            elif en_cat.is_file():
+                label = json.loads(en_cat.read_text(encoding="utf-8")).get("label", label)
+        out.append((int(meta.get("position", 999)), key, label))
+    return [(k, l) for _, k, l in sorted(out)]
+
 
 HEAD_RU = """# Документация Layero
 
 > Layero — платформа деплоя фронтенда и фуллстек-приложений с серверами в
-> России. Здесь собрана документация: установка и команды CLI, деплой из
-> GitHub, окружения и превью, runtime-приложения, домены, тарифы и MCP-плагин
-> для AI-IDE. О самом продукте — https://layero.ru/llms.txt
+> России. Здесь собрана документация: как AI-агент работает с Layero (навык,
+> MCP, CLI в JSON-режиме), деплой из репозитория (GitHub, GitVerse, GitLab,
+> GitFlic, SourceCraft), окружения и превью, runtime-приложения, базы данных
+> и Data API, домены, тарифы. О самом продукте — https://layero.ru/llms.txt
+
+Каждая страница отдаётся и как Markdown: добавьте `.md` к адресу
+(например https://docs.layero.ru/cli/agents.md). Список страниц с описаниями —
+https://docs.layero.ru/sitemap.md
 
 Английская версия: https://docs.layero.ru/en/llms.txt
 """
@@ -67,10 +86,15 @@ HEAD_RU = """# Документация Layero
 HEAD_EN = """# Layero documentation
 
 > Layero is a deployment platform for frontend and full-stack sites, with build
-> servers in Russia. This file indexes the documentation: installing and using
-> the CLI, deploying from GitHub, environments and previews, runtime apps,
-> domains, plans, and the MCP plugin for AI IDEs. For the product itself, see
-> https://layero.ru/llms.txt
+> servers in Russia. This file indexes the documentation: how an AI agent works
+> with Layero (the skill, MCP, the CLI in JSON mode), deploying from a
+> repository (GitHub, GitVerse, GitLab, GitFlic, SourceCraft), environments and
+> previews, runtime apps, databases and the Data API, domains, plans. For the
+> product itself, see https://layero.ru/llms.txt
+
+Every page is also served as Markdown: append `.md` to the address
+(for example https://docs.layero.ru/en/cli/agents.md). The list of pages with
+descriptions: https://docs.layero.ru/en/sitemap.md
 
 Russian version: https://docs.layero.ru/llms.txt
 """
@@ -132,14 +156,14 @@ def main() -> int:
         print(f"нет каталога сборки: {build}", file=sys.stderr)
         return 2
 
-    ru = render(collect(build, "https://docs.layero.ru/"), SECTIONS_RU, HEAD_RU,
+    ru = render(collect(build, "https://docs.layero.ru/"), sections("ru"), HEAD_RU,
                 "https://docs.layero.ru/", "Прочее")
     (build / "llms.txt").write_text(ru, encoding="utf-8")
     print(f"  build/llms.txt: {len(ru.encode())} б, ссылок {ru.count('- [')}")
 
     en_dir = build / "en"
     if en_dir.is_dir():
-        en = render(collect(en_dir, "https://docs.layero.ru/en/"), SECTIONS_EN,
+        en = render(collect(en_dir, "https://docs.layero.ru/en/"), sections("en"),
                     HEAD_EN, "https://docs.layero.ru/en/", "Other")
         (en_dir / "llms.txt").write_text(en, encoding="utf-8")
         print(f"  build/en/llms.txt: {len(en.encode())} б, ссылок {en.count('- [')}")

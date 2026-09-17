@@ -10,17 +10,18 @@
 ## Команды
 
 ```bash
-make check        # ⬅ типы + сборка. ~7 с
+make check        # ⬅ типы + команды установки ↔ agents-install.json + сборка. ~10 с
 make build        # сборка Docusaurus, обе локали
 make typecheck    # tsc
+make check-agents-install  # страница «Подключить агента» ↔ agents-install.json
+make export-md    # сборка + llms.txt + Markdown-копии страниц + sitemap.md в build/
 make start        # локально с горячей перезагрузкой
 make check-texts  # тексты ↔ код; скрипты живут в core и mcp
 ```
 
 ⚠️ **Сборка — главное здесь.** Docusaurus падает на битой ссылке, а не
-предупреждает; проверено мутацией. Уронить публикацию пушем легко, и до
-починки раннеров это не всплывёт: job уходит в очередь и отменяется через
-сутки со статусом `queued`, а не `failure`.
+предупреждает; проверено мутацией. Push в `main` катит сразу: красная
+сборка = docs.layero.ru не обновился.
 
 **Чего `check` НЕ покрывает:** `check-texts` вынесен отдельно — скрипты
 лежат в соседних репозиториях (`core`, `mcp`), и гейт доков не должен
@@ -43,18 +44,20 @@ make check-texts  # тексты ↔ код; скрипты живут в core �
 
 ## Деплой
 
-### 🚨 Деплой сломан, и это уже стоило коммита
+Push в `main` → workflow **Deploy docs** (`deploy-docs.yml`, self-hosted
+раннер `layero-builder`) → `deploy.sh`: сборка обеих локалей, `llms.txt`,
+Markdown-копии страниц (`/<route>.md`, `sitemap.md`), заливка в бакет
+`layero-docs`, purge CDN, IndexNow. Шаг Verify сверяет `build-id.txt` на
+живом адресе с SHA коммита.
 
-`deploy-docs.yml` смотрит на `runs-on: [self-hosted, layero-builder]`.
-Раннеры снесены 12.08.2026 и **offline**.
+```bash
+gh run list -R LayeroInfra/layero-docs --workflow 'Deploy docs' -L 3
+curl -sI https://docs.layero.ru/build-id.txt
+```
 
-**Последствие уже наступило:** коммит от 13.08 («json-events: поле scope
-у repeated_failure_guard») никогда не выкатился. Последний успешный деплой —
-12.08. Прогон 13.08 отменился по таймауту через 24 часа. docs.layero.ru
-отстаёт от репозитория. Тикет — `T-20260816-6`.
-
-**Пока тикет не закрыт: push ≠ публикация.** Проверяй живой адрес, а не
-статус прогона. Отказ тихий — в `gh run list` он выглядит как `queued`.
+Раннеры были снесены 12.08.2026 и подняты заново; с 16.09 прогоны
+зелёные. Зелёный прогон всё равно не заменяет проверку живого адреса —
+шаг Verify проверяет только идентификатор сборки, не страницы.
 
 ⚠️ `deploy.sh` руками для прода не запускать.
 
@@ -76,6 +79,14 @@ make check-texts  # тексты ↔ код; скрипты живут в core �
 5. **MUST** — правка русской страницы сопровождается решением по `i18n/en`:
    либо переведено, либо явно помечено как отложенное. Молча разъехавшиеся
    локали — отдельный класс долга.
+6. **MUST** — команды установки агента (CLI, навык, Claude Code, Cursor,
+   Codex, MCP) — **только из `agents-install.json`** в корне репозитория.
+   Это копия канона из `LayeroInfra/layero-agents`; таблица на
+   `docs/agents/install.md` (ru и en) генерируется из него между маркерами
+   `agents-install:begin/end` — `python3 scripts/check-agents-install.py
+   --write`. Гейт `check-agents-install` входит в `make check`. Команду
+   установки, написанную руками в любом другом месте доков, считать ошибкой:
+   до канона их было шесть разных.
 
 ---
 
@@ -86,7 +97,12 @@ python3 ../core/cli/check-error-codes.py     # коды ошибок ↔ кон�
 python3 ../core/cli/check-npx-pin.py         # `npx layero` ↔ `@latest`
 python3 ../core/cli/check-typography.py      # неразрывные пробелы, тире, кавычки
 python3 ../mcp/check-tool-names.py           # имена инструментов ↔ живой tools/list
+python3 scripts/check-agents-install.py      # команды установки ↔ agents-install.json (в make check)
 ```
+
+Страницу `docs/agents/mcp-tools.md` читает `../mcp/check-tool-names.py`:
+имена инструментов там должны совпадать с живым сервером, снятые имена
+(`compose_landing` и прочие из генерации лендингов) на ней недопустимы.
 
 Разборы, что каждая ловила и почему ручная вычитка это пропускала, —
 `../core/docs/TEXT-CHECKS.md`.

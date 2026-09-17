@@ -11,14 +11,15 @@ title: Что такое Layero
 
 Платформа поддерживает три сценария публикации:
 
-- **GitHub-flow** — подключите репозиторий, при каждом `git push` Layero
-  склонирует код, соберёт его и опубликует.
-- **CLI-flow** — поставьте npm-пакет `layero` и выполните `layero deploy`
-  в папке проекта. CLI упакует исходники, зальёт их и запустит сборку
-  на стороне платформы.
-- **`@layero`-плагин** — MCP-плагин для AI-IDE (Cursor / Claude Code / Codex),
-  который соберёт лендинг с нуля через серию коротких квизов в чате и сам
-  задеплоит результат. См. [@layero — плагин для AI-IDE](./plugin/intro.md).
+- **Репозиторий** — подключите репозиторий на GitHub, GitVerse, GitLab,
+  GitFlic или SourceCraft: при каждом `git push` Layero заберёт код, соберёт
+  его и опубликует. Ветка — превью, production-ветка — продакшен.
+  См. [Подключение репозитория](./deploys/git-providers.md).
+- **CLI** — `npx layero@latest deploy` в папке проекта. CLI упакует
+  исходники, зальёт их и запустит сборку на стороне платформы; git не нужен.
+- **Агент** — Claude Code, Cursor, Codex или любой другой AI-агент
+  публикует и обслуживает сайт сам: через навык, CLI в JSON-режиме и
+  MCP-сервер. См. [Как AI-агент работает с Layero](./agents/index.md).
 
 Помимо статики Layero умеет запускать **runtime-приложения** — SSR Next.js,
 Streamlit, Gradio и любые контейнеры с долгоживущим процессом. Контейнер
@@ -32,7 +33,7 @@ Streamlit, Gradio и любые контейнеры с долгоживущим
 | Раздача сайтов | Собственный edge (nginx) в `ru-central1`; пользовательская зона `*.layero.app` резолвится прямо в балансировщик платформы |
 | Сертификаты | Let's Encrypt через YC Certificate Manager |
 | Хранилище артефактов | Yandex Object Storage |
-| Билд-окружение | Node.js 18 / 20 (через nvm), git |
+| Билд-окружение | Node.js 20 / 22 / 24 (по умолчанию 22), Python 3.10–3.13 (по умолчанию 3.12), git — см. [Версии Node.js и Python](./deploys/runtime-versions.md) |
 
 ## Куда дальше
 
@@ -41,8 +42,8 @@ Streamlit, Gradio и любые контейнеры с долгоживущим
 - [Основные концепции](./getting-started/concepts.md) — проект,
   окружение, деплой, runtime.
 - [CLI: установка и команды](./cli/install.md) — `layero` в терминале.
-- [@layero — плагин для AI-IDE](./plugin/intro.md) — лендинг с нуля прямо в
-  чате Cursor / Claude Code / Codex.
+- [Как AI-агент работает с Layero](./agents/index.md) — навык, MCP и CLI
+  для Claude Code, Cursor, Codex.
 - [Поддерживаемые фреймворки](./getting-started/frameworks.md) — что
   определяется автоматически.
 

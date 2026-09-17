@@ -19,15 +19,16 @@ automatically.
 
 There are three ways to publish:
 
-- **GitHub flow** — connect a repository, and every `git push` makes Layero
-  clone, build and publish it.
-- **CLI flow** — install the `layero` npm package and run `layero deploy` in
-  the project directory. The CLI packs the sources and uploads them; the build
-  runs on the platform side. Git is not required.
-- **The `@layero` plugin** — an MCP plugin for AI IDEs (Cursor, Claude Code,
-  Codex) that builds a landing page from scratch through a short series of
-  questions in the chat and deploys the result itself. See
-  [@layero — plugin for AI IDEs](./plugin/intro).
+- **Repository** — connect a repository on GitHub, GitVerse, GitLab, GitFlic
+  or SourceCraft: on every `git push` Layero fetches the code, builds and
+  publishes it. A branch is a preview, the production branch is production.
+  See [Connecting a repository](./deploys/git-providers.md).
+- **CLI** — `npx layero@latest deploy` in the project directory. The CLI
+  packs the sources and uploads them; the build runs on the platform side.
+  Git is not required.
+- **Agent** — Claude Code, Cursor, Codex or any other AI agent publishes and
+  maintains the site itself: through the skill, the CLI in JSON mode and the
+  MCP server. See [How an AI agent works with Layero](./agents/index.md).
 
 Beyond static output, Layero also runs **runtime applications** — Next.js in
 server mode, Streamlit, Gradio, and any container with a long-lived process.
@@ -41,7 +42,7 @@ The container starts on the first request and stops when idle.
 | Serving | Own edge (nginx) in `ru-central1`; the user zone `*.layero.app` resolves straight to the platform load balancer |
 | Certificates | Let's Encrypt via YC Certificate Manager |
 | Artifact storage | Yandex Object Storage |
-| Build environment | Node.js 18 / 20 (via nvm), git |
+| Build environment | Node.js 20 / 22 / 24 (default 22), Python 3.10–3.13 (default 3.12), git — see [Node.js and Python versions](./deploys/runtime-versions.md) |
 
 ## Where to go next
 
@@ -50,8 +51,8 @@ The container starts on the first request and stops when idle.
 - [Core concepts](./getting-started/concepts.md) — project, environment,
   deploy, runtime.
 - [CLI: install and commands](./cli/install.md) — `layero` in the terminal.
-- [@layero — plugin for AI IDEs](./plugin/intro) — a landing page from
-  scratch inside the Cursor / Claude Code / Codex chat.
+- [How an AI agent works with Layero](./agents/index.md) — the skill, MCP
+  and the CLI for Claude Code, Cursor, Codex.
 - [Supported frameworks](./getting-started/frameworks.md) — what gets detected
   automatically.
 
