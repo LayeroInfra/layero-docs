@@ -47,14 +47,43 @@ Login succeeded.
 
 ### `detected`
 
-Framework auto-detection finished.
+How the CLI sees the folder. It is advice, not a decision: the platform detects
+the framework again on the uploaded files, and the CLI's guess is **not saved**
+to the project (since 0.11.0). Only what a person names is sent: `--type`,
+`--root`, fields they wrote into `.layero/project.json`.
 
-| field | type |
-|---|---|
-| `framework` | string — `next`/`vite`/`astro`/`sveltekit`/`nuxt`/`gatsby`/`cra`/`docusaurus`/`static` |
-| `build_cmd` | string |
-| `output_dir` | string |
-| `confident` | boolean — `false` for the static fallback |
+| field | type | note |
+|---|---|---|
+| `framework` | string | `vite`/`nextjs`/`astro`/…/`static`/`generic`; for a server — the name of its framework (`express`, `fastapi`…) |
+| `build_cmd` | string \| null | `null` — there is no build (static files, a container app) or nothing to run it with |
+| `output_dir` | string \| null | `null` — the folder is known only after the build |
+| `confident` | boolean | `true` — the folder was recognised: a known framework, a server, or ready-made files with `index.html`. `false` — not recognised: the values above are defaults, read `hint` |
+| `sources` | object | where each value comes from: `framework`, `build_cmd`, `output_dir` → `layero.json`, `--type`, `.layero/project.json`, `project settings`, `package.json`, `framework config`, `framework default`, `detected`, `none` |
+| `runtime_kind` | string? | the app runs in a container: `node_web`, `python_web`, `ssr_next`, … |
+| `hint` | string? | what the CLI saw instead of a recognised app: an app in a subfolder, frontend and backend side by side, a custom build script, a server without a known framework |
+| `next_action` | string? | one concrete step: `npx layero@latest deploy --root apps/web`, the text of a `layero.json`, etc. |
+| `candidates` | string[]? | app folders found below the current one |
+| `ssr_warning` | string? | Nuxt/SvelteKit will build a server, not static files |
+
+`framework`, `buildCommand` and `outputDirectory` from `layero.json` are
+already applied here (`sources` = `layero.json`).
+
+### `plan`
+
+The result of `layero deploy --dry-run`: how the platform will build the folder
+if you deploy now. Nothing is packed, uploaded or created; no login needed. The
+order is the builder's: `layero.json` > project settings > detection.
+
+| field | type | note |
+|---|---|---|
+| `framework`, `build_cmd`, `output_dir`, `confident`, `sources`, `hint`, `next_action`, `candidates` | | as in `detected`, plus the settings of a linked project (`sources` = `project settings`) |
+| `runtime_kind` | string \| null | the app runs in a container |
+| `root` | string \| null | the app's subfolder (`--root` or the project setting) |
+| `project` | object \| null | `id`, `slug`, `project_type`, `repo` of the linked project |
+| `project_settings` | string | `read`, `not linked` or `not read: …` (not signed in) |
+| `creates_project` | boolean | the deploy will create a new project |
+| `replaces_live_site` | boolean | the deploy will replace the live site. `false` only for a project with a connected repository and no `--prod` |
+| `prebuilt_dir` | string? | with `--prebuilt` |
 
 ### `project_created`
 
@@ -109,7 +138,9 @@ dependencies and building on the platform side are skipped.
 ### `runtime_type_applied`
 
 The project was recognised as a runtime application and its type was set
-automatically.
+automatically — both when the project is created and when `--type` changes it.
+A type named by the CLI's detection is stored as a guess the platform may
+refine from the upload; a type from `--type` is the person's choice.
 
 | field | type |
 |---|---|
@@ -163,7 +194,9 @@ The backend accepted the job.
 
 ### `stage`
 
-The build moved to a new stage.
+The build moved to a new stage. Arrives before the first `build_log` line of
+that stage (since 0.11.0 it follows the log lines themselves, not the deploy's
+current stage).
 
 | field | type |
 |---|---|
@@ -173,6 +206,10 @@ The build moved to a new stage.
 
 One line of build output. Only worth forwarding to the user when it contains
 an error — successful builds produce a lot of noise.
+
+The `npm http fetch …` and `npm http cache …` lines (one per package) are
+hidden in JSON mode; a single marker line arrives instead. Full log:
+`npx layero@latest logs --deploy <deploy_id>`.
 
 | field | type |
 |---|---|
@@ -188,7 +225,8 @@ an error — successful builds produce a lot of noise.
 | `url` | string | **The live public address of the site** — not the dashboard. For a plain `layero deploy` of a CLI project this is the project's production address (CLI uploads auto-promote to the apex). For a project with a repository, where a CLI upload is not promoted, it is the address of the `cli` environment (`--branch` on `deploy` is refused, see `branch_unsupported`). It is reachable straight away; this is the link to open and to show the user. |
 | `dashboard_url` | string? | The project management page (`https://app.layero.ru/projects/<id>`). This is **not** the site — never hand it over as the link to the finished site. |
 | `preview_url` | string? | **Legacy, no longer emitted.** A separate per-deploy preview host in the `*.preview.layero.ru` zone. It existed to give out a link while the apex warmed up on the CDN. `layero.app` has no separate preview zone and no user sites remain on `layero.ru`, so the field is never populated. |
-| `edge_ready` | bool? | Whether the address answers at the moment the deploy finishes. The field used to mean "the apex warmed up on the CDN" and stayed `false` forever for new hosts; it now comes from a real probe. You still should not gate on it — the address is live immediately. |
+| `edge_ready` | bool? | `true` — the address already answers with the site itself: before `ready` the CLI (since 0.11.0) polls `url` while the platform's own page answers instead (header `X-Layero-Screen`), for up to 90 s. So a container app no longer shows the "nothing here yet" placeholder after `ready`. `false` — the app did not answer within that time: see `npx layero@latest logs --runtime`. |
+| `screen` | string? | with `edge_ready: false` — which platform page answered (`starting`, `unavailable`, …) |
 | `edge_eta_seconds` | number? | **Legacy, no longer emitted.** An estimate of the remaining CDN warm-up. There is nothing to propagate — user sites do not sit behind a CDN. |
 | `deploy_id` | string | |
 
@@ -350,7 +388,9 @@ reading, and without this link the site disappears with its deadline.
 
 The claim code is saved in `.layero/project.json` (`claim`), the token in
 `~/.layero/config.json`; another `layero deploy` in the same directory updates
-the same site until the deadline. It never turns on by itself in CI: a runner
+the same site until the deadline and prints `claimable` again with the same
+link. `npx layero@latest diagnose` and `logs` in that folder use the sandbox
+token — no login needed. It never turns on by itself in CI: a runner
 without `LAYERO_TOKEN` gets `auth_required`.
 
 A sandbox only ever creates a **new** project. When `--project` is passed or
@@ -429,8 +469,13 @@ The result of `layero init` (after `detected`).
 | field | type |
 |---|---|
 | `framework` | string |
+| `confident` | boolean — as in `detected` |
 | `agent_docs` | array — `file` (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`), `result` (`created` \| `updated` \| `unchanged`) |
 | `project_json` | `created` \| `unchanged` |
+
+Since 0.11.0 `init` records the detection guess neither in
+`.layero/project.json` (only `analytics_enabled` and `env_vars` there) nor in
+`AGENTS.md`: the framework is named there only when detection is sure of it.
 
 ### `hooks`, `hook_created`, `hook_deleted`
 
@@ -558,8 +603,8 @@ Do not write handling for codes that are not on this list.
 | `invalid_choice` | An interactive prompt got an invalid choice in non-TTY mode | Pass the value as an explicit flag |
 | `prebuilt_no_dir` | The `--prebuilt` directory does not exist | Pass it explicitly: `--prebuilt ./dist` |
 | `prebuilt_no_index` | The `--prebuilt` directory has no `index.html` | Point it at the folder containing the built `index.html` |
-| `deploy_not_started` | The build never started | Re-run `layero deploy`; if it repeats, check the project in the dashboard |
-| `deploy_failed` | The build never reached `ready` | Open the logs at the URL in `next_action` |
+| `deploy_not_started` | The build never started | Re-run `layero deploy`; if it repeats, `npx layero@latest diagnose` |
+| `deploy_failed` | The build never reached `ready` | `npx layero@latest diagnose --deploy <id>` — the command in `next_action`; works in a sandbox without an account too |
 | `repeated_failure` | Consecutive builds keep failing with the **same** error, so the platform refused to ship another one blindly. The error text is in `message` and in the `repeated_failure_guard` event | Read the error and fix its cause. Re-running unchanged fails the same way. If you already fixed it — `layero deploy --confirm-repeated-failure` |
 | `repeated_failure_declined` | Same, but the interactive prompt «ship anyway?» was answered no | Fix the error and run `layero deploy` again |
 | `no_deploy` / `no_deploys` | The project has no deploys yet | Run `layero deploy` first |
@@ -643,13 +688,15 @@ A minimal behavioural block to drop into a system prompt:
 
 ```text
 If user asks to deploy via Layero:
-  1. Run: npx layero@latest deploy --json
-  2. Parse each stdout line as JSON, route on .event:
+  1. Run: npx layero@latest deploy --dry-run --json
+     If "detected".confident is false → do what .next_action says first.
+  2. Run: npx layero@latest deploy --json
+  3. Parse each stdout line as JSON, route on .event:
      - "auth_required" → render .url as clickable link, keep waiting
-     - "ready" → show .url (the live site) to user. It is reachable right
-                 away — do NOT gate on .edge_ready. Then stop.
+     - "ready" → show .url (the live site) to user; it already answers
+                 (.edge_ready true). Then stop.
      - "error" → follow .next_action verbatim
-  3. Never run `git init`. Never run `npm install -g layero`.
+  4. Never run `git init`. Never run `npm install -g layero`.
 ```
 
 A fuller example is in [Deploying from AI agents](./agents).

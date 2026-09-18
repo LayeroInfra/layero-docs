@@ -42,14 +42,43 @@ CLI продолжит поллить каждые 2 секунды. Когда 
 
 ### `detected`
 
-Авто-детект фреймворка отработал.
+Как CLI видит папку. Это подсказка, а не решение: платформа определяет
+фреймворк заново по загруженным файлам, и догадка CLI в проект **не
+записывается** (с 0.11.0). В проект уходит только названное человеком:
+`--type`, `--root`, поля `.layero/project.json`, которые он вписал сам.
 
-| поле | тип |
-|---|---|
-| `framework` | string — `next`/`vite`/`astro`/`sveltekit`/`nuxt`/`gatsby`/`cra`/`docusaurus`/`static` |
-| `build_cmd` | string |
-| `output_dir` | string |
-| `confident` | boolean — `false` для static-fallback |
+| поле | тип | примечание |
+|---|---|---|
+| `framework` | string | `vite`/`nextjs`/`astro`/…/`static`/`generic`; у сервера — имя его фреймворка (`express`, `fastapi`…) |
+| `build_cmd` | string \| null | `null` — сборки нет (статика, приложение в контейнере) или её нечем выполнить |
+| `output_dir` | string \| null | `null` — папка результата станет известна только после сборки |
+| `confident` | boolean | `true` — папку узнали: известный фреймворк, сервер или готовые файлы с `index.html`. `false` — не узнали: значения выше взяты по умолчанию, прочитайте `hint` |
+| `sources` | object | откуда каждое значение: `framework`, `build_cmd`, `output_dir` → `layero.json`, `--type`, `.layero/project.json`, `project settings`, `package.json`, `framework config`, `framework default`, `detected`, `none` |
+| `runtime_kind` | string? | приложение запускается в контейнере: `node_web`, `python_web`, `ssr_next`, … |
+| `hint` | string? | что CLI увидел вместо узнанного приложения: приложение в подпапке, фронт и бэк рядом, свой скрипт сборки, сервер без известного фреймворка |
+| `next_action` | string? | один конкретный шаг: `npx layero@latest deploy --root apps/web`, текст `layero.json` и т. п. |
+| `candidates` | string[]? | папки приложений, найденные ниже текущей |
+| `ssr_warning` | string? | Nuxt/SvelteKit соберутся сервером, а не статикой |
+
+`framework`, `buildCommand` и `outputDirectory` из `layero.json` здесь уже
+учтены (`sources` = `layero.json`).
+
+### `plan`
+
+Итог `layero deploy --dry-run`: как платформа соберёт папку, если выкатить
+сейчас. Ничего не упаковано, не загружено и не создано; вход не нужен. Порядок
+тот же, что у сборщика: `layero.json` → настройки проекта → детект.
+
+| поле | тип | примечание |
+|---|---|---|
+| `framework`, `build_cmd`, `output_dir`, `confident`, `sources`, `hint`, `next_action`, `candidates` | | как в `detected`, плюс настройки привязанного проекта (`sources` = `project settings`) |
+| `runtime_kind` | string \| null | тип контейнера, если приложение запускается в контейнере: `node_web`, `python_web`, `ssr_next`, … |
+| `root` | string \| null | подпапка приложения (`--root` или настройка проекта) |
+| `project` | object \| null | `id`, `slug`, `project_type`, `repo` привязанного проекта |
+| `project_settings` | string | `read`, `not linked` или `not read: …` (нет входа) |
+| `creates_project` | boolean | выкатка создаст новый проект |
+| `replaces_live_site` | boolean | выкатка заменит живой сайт. `false` — только у проекта с подключённым репозиторием без `--prod` |
+| `prebuilt_dir` | string? | при `--prebuilt` |
 
 ### `project_created`
 
@@ -103,7 +132,10 @@ CLI упаковал директорию в tar.gz.
 
 ### `runtime_type_applied`
 
-Проект определён как runtime-приложение, и тип проставлен автоматически.
+Проект определён как runtime-приложение, и тип проставлен автоматически — и
+при создании проекта, и при смене типа по `--type`. Тип, названный детектом CLI,
+платформа записывает как догадку и может уточнить по архиву; тип из `--type` —
+выбор человека.
 
 | поле | тип |
 |---|---|
@@ -156,7 +188,8 @@ CLI упаковал директорию в tar.gz.
 
 ### `stage`
 
-Сменилась стадия сборки.
+Сменилась стадия сборки. Приходит перед первой строкой `build_log` этой стадии
+(с 0.11.0 стадия берётся из самих строк лога, а не из текущей стадии деплоя).
 
 | поле | тип |
 |---|---|
@@ -165,6 +198,10 @@ CLI упаковал директорию в tar.gz.
 ### `build_log`
 
 Строка лога сборки. Форвардить пользователю стоит только если содержит ошибку — в успешных билдах их много и они шумные.
+
+Строки `npm http fetch …` и `npm http cache …` (по строке на каждый пакет)
+в JSON-режиме скрыты: вместо них приходит одна строка-пометка. Полный лог —
+`npx layero@latest logs --deploy <deploy_id>`.
 
 | поле | тип |
 |---|---|
@@ -180,7 +217,8 @@ CLI упаковал директорию в tar.gz.
 | `url` | string | **Живой публичный адрес сайта** — НЕ дашборд. Для обычного `layero deploy` CLI-проекта это production-адрес проекта (CLI-загрузки авто-промоутятся в apex). Для проекта с репозиторием, где CLI-загрузка не промоутится, — адрес окружения `cli` (`--branch` у `deploy` отклоняется, см. `branch_unsupported`). Адрес живой сразу; открывайте и показывайте пользователю именно его. |
 | `dashboard_url` | string? | Страница управления проектом в дашборде (`https://app.layero.ru/projects/<id>`). Это НЕ сайт — не выдавайте её как ссылку на готовый сайт. |
 | `preview_url` | string? | **Legacy, больше не приходит.** Отдельный per-deploy preview-хост в зоне `*.preview.layero.ru`. Существовал, чтобы дать ссылку, пока apex прогревался на CDN. Отдельной preview-зоны у `layero.app` нет, а на `layero.ru` пользовательских сайтов не осталось — поле не заполняется ни для одного проекта. |
-| `edge_ready` | bool? | Отвечает ли адрес на момент завершения деплоя. Раньше поле означало «apex прогрелся на CDN» и у новых хостов навсегда оставалось `false`; теперь берётся из реальной пробы. Как гейт всё равно не нужно: адрес живой сразу. |
+| `edge_ready` | bool? | `true` — адрес уже отвечает самим сайтом: перед `ready` CLI (с 0.11.0) опрашивает `url`, пока вместо сайта отвечает экран платформы (заголовок `X-Layero-Screen`), до 90 с. Так после `ready` по адресу уже не открывается заглушка «Здесь пока ничего нет». `false` — за это время приложение так и не ответило. Смотрите лог приложения: `npx layero@latest logs --runtime`. |
+| `screen` | string? | при `edge_ready: false` — какой экран платформы отвечал (`starting`, `unavailable`, …) |
 | `edge_eta_seconds` | number? | **Legacy, больше не приходит.** Оценка остатка прогрева CDN. Распространять нечего — CDN перед пользовательскими сайтами нет. |
 | `deploy_id` | string | |
 
@@ -342,7 +380,9 @@ CLI упаковал директорию в tar.gz.
 
 Код заявки сохраняется в `.layero/project.json` (`claim`), токен — в
 `~/.layero/config.json`; повторный `layero deploy` в той же папке обновляет
-тот же сайт до истечения срока. В CI автоматически не включается: раннер без
+тот же сайт до истечения срока и снова печатает `claimable` с той же ссылкой.
+`npx layero@latest diagnose` и `logs` в этой папке работают с токеном
+песочницы — вход не нужен. В CI песочница сама не включается: раннер без
 `LAYERO_TOKEN` получает `auth_required`.
 
 Песочница создаёт только **новый** проект. Если передан `--project` или папка
@@ -419,8 +459,13 @@ CLI упаковал директорию в tar.gz.
 | поле | тип |
 |---|---|
 | `framework` | string |
+| `confident` | boolean — как в `detected` |
 | `agent_docs` | array — `file` (`AGENTS.md`, `CLAUDE.md`, `.cursorrules`), `result` (`created` \| `updated` \| `unchanged`) |
 | `project_json` | `created` \| `unchanged` |
+
+С 0.11.0 `init` не записывает догадку детекта ни в `.layero/project.json`
+(там только `analytics_enabled` и `env_vars`), ни в `AGENTS.md`: фреймворк
+указан там, только если детект в нём уверен.
 
 ### `hooks`, `hook_created`, `hook_deleted`
 
@@ -544,8 +589,8 @@ CLI упаковал директорию в tar.gz.
 | `invalid_choice` | Интерактивный prompt получил невалидный выбор в non-TTY | Передать значение явным флагом |
 | `prebuilt_no_dir` | Каталог из `--prebuilt` не найден | Указать явно: `--prebuilt ./dist` |
 | `prebuilt_no_index` | В каталоге `--prebuilt` нет `index.html` | Указать папку со собранным `index.html` |
-| `deploy_not_started` | Сборка не стартовала | Повторить `layero deploy`; если повторяется — смотреть проект в дашборде |
-| `deploy_failed` | Билд не дошёл до `ready` | Открыть логи по ссылке из `next_action` |
+| `deploy_not_started` | Сборка не стартовала | Запустить `layero deploy` ещё раз; не помогло — `npx layero@latest diagnose` |
+| `deploy_failed` | Сборка не дошла до `ready` | `npx layero@latest diagnose --deploy <id>` — команда из `next_action`, работает и в песочнице без аккаунта |
 | `repeated_failure` | Подряд идущие сборки падают с **одной и той же** ошибкой, и платформа отказалась выкатывать следующую вслепую. Текст ошибки — в `message` и в событии `repeated_failure_guard` | Прочитать ошибку и устранить причину. Повтор без изменений даст тот же результат. Если причина уже устранена — `layero deploy --confirm-repeated-failure` |
 | `repeated_failure_declined` | То же, но в интерактивном терминале на вопрос «Всё равно выкатить?» ответили «нет» | Исправить ошибку и запустить `layero deploy` заново |
 | `no_deploy` / `no_deploys` | У проекта ещё нет деплоев | Сначала `layero deploy` |
@@ -631,13 +676,15 @@ CLI упаковал директорию в tar.gz.
 
 ```text
 If user asks to deploy via Layero:
-  1. Run: npx layero@latest deploy --json
-  2. Parse each stdout line as JSON, route on .event:
+  1. Run: npx layero@latest deploy --dry-run --json
+     If "detected".confident is false → do what .next_action says first.
+  2. Run: npx layero@latest deploy --json
+  3. Parse each stdout line as JSON, route on .event:
      - "auth_required" → render .url as clickable link, keep waiting
-     - "ready" → show .url (the live site) to user. It is reachable right
-                 away — do NOT gate on .edge_ready. Then stop.
+     - "ready" → show .url (the live site) to user; it already answers
+                 (.edge_ready true). Then stop.
      - "error" → follow .next_action verbatim
-  3. Never run `git init`. Never run `npm install -g layero`.
+  4. Never run `git init`. Never run `npm install -g layero`.
 ```
 
 Полный пример — [Деплой из AI-агентов](./agents.md).

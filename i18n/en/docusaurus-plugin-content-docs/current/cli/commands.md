@@ -8,7 +8,7 @@ description: The full list of layero commands — init, login, projects, deploy,
 
 | Command | What it does |
 |---|---|
-| `layero init` | Auto-detect the framework, scaffold `.layero/project.json` and add a block for AI agents to `AGENTS.md` / `CLAUDE.md` / `.cursorrules`. |
+| `layero init` | A block for AI agents in `AGENTS.md` / `CLAUDE.md` / `.cursorrules` and a `.layero/project.json` scaffold. Optional: `deploy` links the folder by itself. |
 | `layero login` | Sign in through the browser (an emailed code or Yandex ID) — a device flow. |
 | `layero logout` | Remove the saved token. |
 | `layero whoami` | Show the current account. |
@@ -21,8 +21,9 @@ description: The full list of layero commands — init, login, projects, deploy,
 | `layero sources repos <connection_id>` | Repositories visible to a connection. |
 | `layero envs list` | Environments (branches) of a project with their addresses. |
 | `layero link <id_or_slug>` | Link the current directory to an existing project. |
-| `layero deploy` | Auto-detect the framework, pack the current directory, deploy. |
-| `layero deploy --prod` | Deploy to production (with confirmation). |
+| `layero deploy` | Pack the current directory and deploy: the platform builds and publishes it. For a project without a repository every deploy replaces the live site. |
+| `layero deploy --dry-run` | Print the build plan and exit: uploads nothing, no login needed. |
+| `layero deploy --prod` | A project with a connected repository: publish the upload at the live address (with confirmation). |
 | `layero deploy --org <slug>` | Create the new project in the given team instead of your personal organization. |
 | `layero deploy --json` | A machine-readable event stream — for agents and CI. |
 | `layero deploy --claim` | Deploy without an account: a temporary project for 72 hours and a link for a human to take the site over. |
@@ -54,12 +55,17 @@ npx layero@latest init
 
 What it does:
 
-1. Reads `package.json` and the characteristic configs (`next.config.*`,
-   `vite.config.*`, `astro.config.*` and so on) to determine the framework.
-2. Creates `.layero/project.json` with `framework_hint` / `build_cmd` /
-   `output_dir`. If the file already exists it is left alone.
+1. Looks at the folder with the same detection as `deploy --dry-run` and
+   prints the `detected` event — with `hint` and `next_action` when the app is
+   not recognised (a monorepo subfolder, frontend and backend side by side, a
+   custom build script).
+2. Creates `.layero/project.json` with `analytics_enabled` and `env_vars`. It
+   does **not** record the detection guess (`framework_hint` / `build_cmd` /
+   `output_dir`): the CLI reads the fields of this file as your choice. If the
+   file already exists it is left alone.
 3. Appends a "Deploying with Layero" block to `AGENTS.md`, `CLAUDE.md` and/or
-   `.cursorrules` (whichever exist; if none do, it creates `AGENTS.md`).
+   `.cursorrules` (whichever exist; if none do, it creates `AGENTS.md`). The
+   block names the framework only when detection is sure of it.
 
 The block is fenced with `<!-- layero:start -->` / `<!-- layero:end -->`
 markers, so a repeat `init` updates it in place instead of duplicating it.

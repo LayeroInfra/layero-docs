@@ -76,8 +76,8 @@ npx layero@latest init
 
 The command:
 
-- Auto-detects the framework (Next / Vite / Astro / SvelteKit / Nuxt / Gatsby / CRA / Docusaurus / static)
-- Creates `.layero/project.json` scaffolding `framework_hint` / `build_cmd` / `output_dir`
+- Looks at the folder and prints how it sees it (Next / Vite / Astro / SvelteKit / Nuxt / Gatsby / CRA / Docusaurus / static…), and when the app is not recognised — a hint on what to do
+- Creates `.layero/project.json` with `analytics_enabled` and `env_vars` — the detection guess is not written there
 - Appends a "Deploying with Layero" block to `AGENTS.md` / `CLAUDE.md` / `.cursorrules` (when they exist) — so that AI agents in later chat sessions know how to deploy without being told.
 
 Idempotent: running it again updates the existing block rather than duplicating it.
@@ -87,7 +87,7 @@ Idempotent: running it again updates the existing block rather than duplicating 
 | File | Purpose |
 |---|---|
 | `~/.layero/config.json` | Auth token and API URL. Created by `layero login`. |
-| `./.layero/project.json` | Binds the cwd to a project, plus framework/build/output. Created by `layero init` or the first `layero deploy`. |
+| `./.layero/project.json` | Binds the cwd to a project. Created by `layero init` or the first `layero deploy`. The CLI does not write `framework_hint`, `build_cmd`, `output_dir` there — add them yourself to pin your choice. |
 
 `~/.layero/config.json` looks roughly like this:
 
@@ -103,13 +103,15 @@ Idempotent: running it again updates the existing block rather than duplicating 
 
 ```json
 {
-  "framework_hint": "vite",
-  "build_cmd": "npm run build",
-  "output_dir": "dist",
   "analytics_enabled": false,
   "env_vars": {}
 }
 ```
+
+You can add `framework_hint`, `build_cmd`, `output_dir` by hand — a new
+project gets them as your choice. The CLI never fills them in itself: a
+detection guess saved as a setting would override detection from the files on
+every build.
 
 After the first `deploy` it gains `project_id`, `slug`, `organization_slug` and `apex_hostname` — the CLI writes those itself, leave them alone.
 

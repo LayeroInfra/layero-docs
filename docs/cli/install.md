@@ -76,8 +76,8 @@ npx layero@latest init
 
 Команда:
 
-- Авто-детектит фреймворк (Next / Vite / Astro / SvelteKit / Nuxt / Gatsby / CRA / Docusaurus / static)
-- Создаёт `.layero/project.json` со скаффолдом `framework_hint` / `build_cmd` / `output_dir`
+- Смотрит на папку и печатает, как её понял (Next / Vite / Astro / SvelteKit / Nuxt / Gatsby / CRA / Docusaurus / static…), а если приложение не узнано — подсказку, что сделать
+- Создаёт `.layero/project.json` с `analytics_enabled` и `env_vars` — догадку детекта туда не пишет
 - Дописывает блок «Deploying with Layero» в `AGENTS.md` / `CLAUDE.md` / `.cursorrules` (если они есть) — чтобы AI-агенты в следующих чат-сессиях знали как деплоить без подсказок.
 
 Идемпотентно: повторный запуск обновляет существующий блок, не дублируя.
@@ -87,7 +87,7 @@ npx layero@latest init
 | Файл | Назначение |
 |---|---|
 | `~/.layero/config.json` | Auth-токен и URL API. Создаётся `layero login`. |
-| `./.layero/project.json` | Связка cwd с конкретным проектом + framework/build/output. Создаётся `layero init` или первым `layero deploy`. |
+| `./.layero/project.json` | Связка cwd с конкретным проектом. Создаётся `layero init` или первым `layero deploy`. Поля `framework_hint`, `build_cmd`, `output_dir` CLI туда не пишет — впишите их сами, если хотите закрепить выбор. |
 
 `~/.layero/config.json` выглядит примерно так:
 
@@ -103,13 +103,14 @@ npx layero@latest init
 
 ```json
 {
-  "framework_hint": "vite",
-  "build_cmd": "npm run build",
-  "output_dir": "dist",
   "analytics_enabled": false,
   "env_vars": {}
 }
 ```
+
+Поля `framework_hint`, `build_cmd`, `output_dir` можно вписать руками — новый
+проект получит их как ваш выбор. Сам CLI их не заполняет: догадка детекта,
+записанная как настройка, перебивала бы определение по файлам на каждой сборке.
 
 После первого `deploy` к нему добавятся `project_id`, `slug`, `organization_slug`, `apex_hostname` — CLI пишет их сам, не трогайте.
 

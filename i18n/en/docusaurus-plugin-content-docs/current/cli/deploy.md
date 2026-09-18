@@ -19,10 +19,11 @@ npx layero@latest deploy
 
 What happens:
 
-1. The CLI auto-detects the framework (`package.json`, configs such as
-   `vite.config.ts` / `next.config.js`) and fills in `framework_hint` /
-   `build_cmd` / `output_dir` if they are not already set in
-   `.layero/project.json`.
+1. The CLI looks at the folder and prints how it sees it (the `detected`
+   event). That is advice: only what you name goes to the project (`--type`,
+   `--root`, fields of `.layero/project.json`); the framework, the build
+   command and the output folder are decided by the platform from the uploaded
+   files.
 2. It walks the current directory, applies the ignore rules (below), packs
    everything into a tar.gz in a temporary directory and computes the sha256
    on the fly.
@@ -30,11 +31,18 @@ What happens:
 4. The backend creates a deploy and starts the build.
 5. The CLI polls the deploy logs (`/deploys/{id}/logs`) until the status is
    `ready` or `failed`, printing them to the terminal.
-6. At the end it prints the link — a preview or production URL.
+6. Once the address answers with the site, it prints the link.
 
 The first `layero deploy` in a new folder creates a project and writes
 `./.layero/project.json`. Later runs reuse the same project — no browser
 wizard, no manual linking.
+
+Before deploying an unfamiliar folder, look at the plan — it uploads nothing
+and needs no login:
+
+```bash
+npx layero@latest deploy --dry-run
+```
 
 ## Framework auto-detection
 
@@ -50,28 +58,43 @@ The CLI reads `package.json` and the characteristic configs:
 | `@docusaurus/core` / `docusaurus.config.*` | docusaurus | `npm run build` | `build` |
 | `vite` in deps / `vite.config.*` | vite | `npm run build` | `dist` |
 | `react-scripts` in deps | cra | `npm run build` | `build` |
-| `.html` in the root, no `package.json` | static | `true` (no-op) | `.` |
+| `index.html` in the root, no framework | static | none — files are served as they are | `.` |
+| `package.json` with a `build` script, unknown framework | generic | `npm run build` | the folder with `index.html` after the build |
+
+`confident: false` in the `detected` event means the folder was not
+recognised; the event then carries `hint` and `next_action` — what the CLI saw
+and what to do:
+
+| What is in the folder | What the CLI suggests |
+|---|---|
+| an app in a subfolder (`apps/web`) | `--root apps/web` |
+| an app in a subfolder that imports a neighbour workspace package | [`layero.json`](../deploys/layero-json.md) at the root: `"framework": "generic"`, `buildCommand`, `outputDirectory` |
+| `frontend/` and `backend/` side by side | `layero.json` with the `frontend` and `backend` blocks |
+| a custom build script with no known framework | `"framework": "generic"` — static files are never built |
+| a server with no known framework | `-t node_web` / `-t python_web` |
 
 If detection gets it wrong, pass `--type` explicitly: a static preset
 (`--type vite`) or a runtime kind for a server (`-t node_web`,
 `-t python_web`). If the app lives in a monorepo subfolder — `--root apps/web`.
 To make the fix travel with the code, put a
 [`layero.json`](../deploys/layero-json.md) into the repository — that page also
-has the symptom-to-fix table.
+has the symptom-to-fix table. Values from `layero.json` are reflected in
+`detected` and in `--dry-run`.
 
-Local detection is a quick check: it does not read `layero.json` and can be
-confidently wrong. What the platform actually understood is in the
-`[config] …` lines of the build log.
-
-These values are stored in `.layero/project.json` after the first deploy. They
-survive later runs and can be edited by hand.
+The CLI **does not save** its detection guess — neither to the project nor to
+`.layero/project.json` (since 0.11.0; before that the first deploy stored it in
+the project settings, and the build log showed it as `(from hint)` /
+`(from dashboard)`). The `framework_hint`, `build_cmd`, `output_dir` fields of
+`.layero/project.json` are yours: write them by hand, and a new project gets
+them as your choice.
 
 ## Flags
 
 | Flag | Description |
 |---|---|
-| `--prod` | The deploy lands on the project's default branch (the same as a push to main). If the project has auto-promote on, the apex switches to the fresh build automatically. |
-| `--promote` | After a successful build, moves `production_deploy_id` to this deploy **immediately**. Works for any branch — handy for shipping a feature branch to production in one command. |
+| `--dry-run` | Print the build plan and exit: framework, build command, output folder, where each value comes from (`layero.json`, project settings, `package.json`, a framework default), hints about the folder's shape, and whether the deploy replaces the live site. Uploads nothing, needs no login; with a login it also reads the settings of the linked project. The event is [`plan`](./json-events.md#plan). |
+| `--prod` | Only for a project **with a connected repository**: make this upload live — the project's address switches to it. Without the flag such an upload lands in the separate `cli` environment. A project without a repository is always published; it does not need the flag. |
+| `--promote` | After a successful build, point the live address at this deploy (the same as `--prod`, but the CLI switches it after the build). Not needed for a project without a repository. |
 | `--branch <name>` | **Refused** with `branch_unsupported` (exit code 4): archive uploads always land in the `cli` environment (see below), so the flag cannot give you a preview. Only meaningful for `layero promote --branch`. |
 | `--claim` | Deploy without an account: a temporary project for 72 hours and a `claim_url` for a human to take the site over. Turns on by itself when there is no token, the run is non-interactive (an agent, not CI), `--yes` is passed and the project is **new**: no `--project`, and the folder is not linked to an account project. An existing project without a token means signing in (`auth_required`), not a sandbox. Together with `--project` it is refused with `claim_with_project` (exit code 4). |
 | `--prebuilt [dir]` | Ship an already-built artifact instead of building on the platform. Without an argument it picks the first existing of `dist/`, `build/`, `public/`, `out/`, `_site/`. `.gitignore` and `.layeroignore` rules are **not applied** — see the note below. |
@@ -93,7 +116,7 @@ survive later runs and can be edited by hand.
 npx layero@latest deploy
 # → the project's production address (the live public address; printed in the output)
 
-# CI mode: no confirmation
+# A project with a connected repository: publish the upload live (CI)
 npx layero@latest deploy --prod --yes
 ```
 
@@ -109,14 +132,13 @@ than 26 July 2026) — see
 assemble the address from a template: take it from the `url` field of the
 `ready` event.
 
-**How `--prod` differs from `--promote`** (relevant for git projects; for
-direct CLI uploads the apex moves anyway):
+**How `--prod` differs from `--promote`** (relevant for projects with a
+repository; for a project without one the live address moves anyway):
 
-- `--prod` = "put it on the default branch". After that the apex is the
-  business of either auto-promote (if enabled in Settings) or your manual
-  "Promote" click.
-- `--promote` = "once it builds, point the apex at this deploy". Works for any
-  branch — the short path for "hot-fix from a feature branch → production".
+- `--prod` — the platform points the live address at this upload by itself
+  once the build is ready.
+- `--promote` — the CLI points it after the build, with a separate request. The
+  result is the same.
 
 :::danger[`--branch` is refused in `layero deploy`]
 Archive uploads are **always** filed under the reserved `cli` environment, so a
@@ -201,7 +223,7 @@ npx layero@latest deploy --json
 Each stdout line is a JSON object with an `event` field:
 
 ```jsonl
-{"event":"detected","framework":"vite","build_cmd":"npm run build","output_dir":"dist","confident":true}
+{"event":"detected","framework":"vite","build_cmd":"npm run build","output_dir":"dist","confident":true,"sources":{"framework":"detected","build_cmd":"package.json","output_dir":"framework default"}}
 {"event":"project_created","project_id":"...","slug":"my-site","organization":"alice"}
 {"event":"packing","files":124,"bytes":2401234,"sha256":"..."}
 {"event":"uploading"}
@@ -220,11 +242,14 @@ Errors arrive with a stable `code` and `next_action`:
 > `auth_required` event → click the link → poll); a separate `layero login` is
 > not needed.
 
-In the `ready` event, `url` is the **live public site**. For a CLI project
-that is the production address (direct uploads auto-promote); for a deploy
-into a named branch it is that branch's preview address. Show the user `url` —
-it works straight away. `dashboard_url` is the management page, **not** the
-site. On the legacy `preview_url` / `edge_ready` fields see the
+In the `ready` event, `url` is the **live public site**. For a project without
+a repository that is the project's address (direct uploads are published at
+once); for a project with a repository and no `--prod` — the address of the
+`cli` environment. `ready` arrives once the address already answers with the
+site (`edge_ready: true`): the CLI waits for that itself, up to 90 seconds — a
+container app needs time to start. `edge_ready: false` means the app never
+answered — see `npx layero@latest logs --runtime`. `dashboard_url` is the
+management page, **not** the site. More in the
 [JSON events schema](./json-events).
 
 JSON mode turns on automatically when the CLI runs inside Cursor / Claude Code

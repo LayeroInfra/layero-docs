@@ -8,7 +8,7 @@ description: Полный список команд layero — init, login, proj
 
 | Команда | Что делает |
 |---|---|
-| `layero init` | Авто-детект фреймворка, скаффолд `.layero/project.json` + блок для AI-агентов в `AGENTS.md` / `CLAUDE.md` / `.cursorrules`. |
+| `layero init` | Дописать блок для AI-агентов в `AGENTS.md` / `CLAUDE.md` / `.cursorrules` и создать заготовку `.layero/project.json`. Запускать необязательно: `deploy` привязывает папку сам. |
 | `layero login` | Авторизоваться через браузер (по коду на почту или через Яндекс ID) — device-flow. |
 | `layero logout` | Удалить сохранённый токен. |
 | `layero whoami` | Показать текущий аккаунт. |
@@ -21,8 +21,9 @@ description: Полный список команд layero — init, login, proj
 | `layero sources repos <connection_id>` | Репозитории, видимые подключению. |
 | `layero envs list` | Окружения (ветки) проекта с адресами. |
 | `layero link <id_or_slug>` | Привязать cwd к существующему проекту. |
-| `layero deploy` | Авто-детект фреймворка, упаковать cwd, задеплоить (preview по умолчанию). |
-| `layero deploy --prod` | Задеплоить в production (с подтверждением). |
+| `layero deploy` | Упаковать cwd и задеплоить: платформа соберёт и опубликует. У проекта без репозитория каждый деплой заменяет живой сайт. |
+| `layero deploy --dry-run` | Показать план сборки и выйти: ничего не загружает, вход не нужен. |
+| `layero deploy --prod` | Проект с подключённым репозиторием: выложить загрузку на живой адрес (с подтверждением). |
 | `layero deploy --org <slug>` | Создать новый проект в указанной команде вместо личной. |
 | `layero deploy --json` | Machine-readable стрим событий — для агентов и CI. |
 | `layero deploy --claim` | Деплой без аккаунта: временный проект на 72 часа и ссылка, по которой человек заберёт сайт. |
@@ -59,9 +60,9 @@ npx layero@latest init
 
 Что делает:
 
-1. Читает `package.json` и характерные конфиги (`next.config.*`, `vite.config.*`, `astro.config.*` и т.д.) — определяет фреймворк.
-2. Создаёт `.layero/project.json` со значениями `framework_hint` / `build_cmd` / `output_dir`. Если файл уже есть — не трогает.
-3. Дописывает блок «Deploying with Layero» в `AGENTS.md`, `CLAUDE.md` и/или `.cursorrules` (выбирает существующие; если ни одного нет — создаёт `AGENTS.md`).
+1. Смотрит на папку тем же детектом, что `deploy --dry-run`, и печатает событие `detected` — с `hint` и `next_action`, если приложение не узнано (подпапка монорепо, фронт и бэк рядом, свой скрипт сборки, сервер без известного фреймворка).
+2. Создаёт `.layero/project.json` с `analytics_enabled` и `env_vars`. Догадку детекта (`framework_hint` / `build_cmd` / `output_dir`) **не записывает**: поля этого файла CLI читает как ваш выбор. Если файл уже есть, не трогает его.
+3. Дописывает блок «Deploying with Layero» в `AGENTS.md`, `CLAUDE.md` и/или `.cursorrules` (выбирает существующие, а если нет ни одного, создаёт `AGENTS.md`). Фреймворк назван в блоке, только если детект в нём уверен.
 
 Блок огорожен маркерами `<!-- layero:start -->` / `<!-- layero:end -->` — повторный `init` обновит его в месте, не дублируя.
 

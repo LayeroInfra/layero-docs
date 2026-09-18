@@ -79,7 +79,12 @@ Two values are easy to mix up:
 ```
 
 If the build log says `static framework: skipping install/build` and the site
-is empty, the project needs `generic`, not a different output path.
+is empty, the project needs `generic`, not a different output path. Since
+18.09.2026 the platform says so itself: with `static` and a `buildCommand` in
+`layero.json` the log shows `[config] ВНИМАНИЕ: buildCommand из layero.json …
+НЕ выполняется` ("is NOT run"), and if the output is missing the failure starts
+with «Сборка НЕ запускалась» ("the build did NOT run") and names the command
+that was not run.
 
 ## Runtime applications
 

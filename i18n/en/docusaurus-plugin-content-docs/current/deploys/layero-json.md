@@ -286,14 +286,14 @@ fix lives:
 | Symptom | Fix |
 |---|---|
 | `собранный сайт не содержит index.html в '.'` · `сборка отработала, но папки 'dist' нет. После сборки в каталоге есть: …` · `[output] в 'dist' нет index.html` | `outputDirectory` — the folder that holds `index.html` after the build. The error lists what is on disk — take the path from there. |
-| The log says `static framework: skipping install/build`, and the output folder is missing although `buildCommand` and `outputDirectory` are correct | The build never ran: `framework: "static"` means "no install and no build". Use `"framework": "generic"`. The output path was never the problem. |
+| `Сборка НЕ запускалась: проект собирается как статический сайт (фреймворк «static») …` ("the build did NOT run") · the log says `[config] ВНИМАНИЕ: buildCommand из layero.json (…) НЕ выполняется` or `static framework: skipping install/build` | The build never ran: `framework: "static"` means "no install and no build". Use `"framework": "generic"`. The output path was never the problem. |
 | `npm error Missing script: "build"` · `не знаем, чем собирать этот проект: команда сборки не задана` | `buildCommand` with a script that exists. No build needed at all — `"framework": "static"`. If it is a server or a bot — see the next row. |
 | A Node or Python server is published as a static site: files are served, nothing runs | `runtime` + `startCommand`, plus `port` if needed. Without a file: `deploy -t node_web`. |
 | `launch/boot: container failed to start in time`, with `ERR_MODULE_NOT_FOUND /app/…` in the log or the app listening on `127.0.0.1` | `startCommand`: a path relative to `/app`, a file that exists after the build, address `0.0.0.0`, port `$PORT`. A different port — `port`. |
 | `ERR_UNKNOWN_BUILTIN_MODULE` · `EBADENGINE` · `Node.js 18 снят с поддержки и закрыт для новых сборок` | `"nodeVersion": "22"` — but look at the `[config] node=…` line first: if `.nvmrc` or `engines.node` sets the version, fix it there. |
 | `npm error code EUSAGE` · `ERR_PNPM_…` | First the lockfile and `packageManager` in the repository, then `installCommand`. |
 | `/bin/sh: 1: run: not found` | The command is a fragment. Write the whole command: `npm run build`, not `run build`. |
-| `Can't resolve '@scope/shared'` in a workspace | Deploy from the workspace root, not with `--root apps/web`: otherwise the neighbour package is not uploaded. The file needs three keys: `"framework": "generic"`, a `buildCommand` that builds dependencies first (`pnpm --filter @scope/shared build && pnpm --filter @scope/web build`), and `outputDirectory: "apps/web/dist"`. Without `framework` the workspace root is guessed as `static` and the build never runs. |
+| `Can't resolve '@scope/shared'` in a workspace | Deploy from the workspace root, not with `--root apps/web`: otherwise the neighbour package is not uploaded. The file needs three keys: `"framework": "generic"`, a `buildCommand` that builds dependencies first (`pnpm --filter @scope/shared build && pnpm --filter @scope/web build`), and `"outputDirectory": "apps/web/dist"`. Set `framework` explicitly: before 0.11.0 the CLI recorded the workspace root in the project as `static`, and the build never ran. |
 | Frontend and backend in one repository, but only a static site is published | The [`frontend` + `backend`](#full-stack-frontend-and-backend-in-one-repository) blocks. |
 
 ### What the file does not fix
@@ -347,8 +347,10 @@ the dashboard) — for a one-off fix and for anything the file has no key for.
 
 ## How to verify in the log
 
-There is no dry run: the only proof that Layero understood the project is the
-log of a real build. After every change, find two things in it.
+Before a deploy, `npx layero@latest deploy --dry-run` shows the plan: the
+framework, the command, the folder and where each value comes from — values
+from this file are marked `layero.json`. The final proof is the log of a real
+build. After every change, find two things in it.
 
 **1. The applied value, marked with its source.** A static build:
 

@@ -99,20 +99,25 @@ so the agent can react without parsing prose.
 {"event":"ready","url":"https://my-site.layero.app/","dashboard_url":"https://app.layero.ru/projects/...","deploy_id":"..."}
 ```
 
-`url` is the live public site and is reachable straight away — show that one
-to the user. `dashboard_url` is the management page, not the site.
-`preview_url` and `edge_ready` are legacy fields from the CDN era; do not gate
-showing the link on them (see the [JSON events schema](./json-events)).
+`url` is the live public site (for a project without a repository the upload
+is published at once). `ready` arrives once the address already answers with
+the site (`edge_ready: true`): the CLI waits for that itself, up to 90 seconds.
+Show that one to the user. `dashboard_url` is the management page, not the
+site (see the [JSON events schema](./json-events)).
 
 ### When detection is wrong
 
-The `detected` event is a quick local guess: it does not read `layero.json`
-and can be confidently wrong. `framework: "static"` for a folder with no
-`index.html` at its root means "nothing was recognised", not "this is a static
-site". A server is fixed with `-t node_web`, a monorepo subfolder with
-`--root apps/web`, everything else with one field in
-[`layero.json`](../deploys/layero-json.md): that page has the symptom-to-fix
-table and the log lines that show the value was applied.
+The `detected` event is advice, not a decision: the CLI does not save it to
+the project, and the platform detects the framework from the uploaded files.
+Values from `layero.json` are already reflected in it. `confident: false`
+means "the folder was not recognised" — then the event carries `hint` and
+`next_action`: a monorepo subfolder → `--root apps/web`, frontend and backend
+side by side → the `frontend` and `backend` blocks of `layero.json`, a custom
+build script → `"framework": "generic"`, a server → `-t node_web`.
+`npx layero@latest deploy --dry-run` shows the plan without deploying.
+Everything else takes one field in [`layero.json`](../deploys/layero-json.md):
+that page has the symptom-to-fix table and the log lines that show the value
+was applied.
 
 ### Error codes
 
