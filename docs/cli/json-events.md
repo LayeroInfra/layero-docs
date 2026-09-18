@@ -327,7 +327,7 @@ CLI упаковал директорию в tar.gz.
 ### `claimable`
 
 Деплой без аккаунта (`layero deploy --claim`, либо автоматически: нет токена,
-среда агентская — не терминал и не CI, — и передан `--yes`). Платформа
+среда агентская — не терминал и не CI, — передан `--yes` и проект новый). Платформа
 завела временный проект и выдала токен на него; сайт живёт 72 часа. Событие
 приходит **до** `ready`: после `ready` агент не читает, а без ссылки сайт
 исчезнет вместе со сроком.
@@ -344,6 +344,13 @@ CLI упаковал директорию в tar.gz.
 `~/.layero/config.json`; повторный `layero deploy` в той же папке обновляет
 тот же сайт до истечения срока. В CI автоматически не включается: раннер без
 `LAYERO_TOKEN` получает `auth_required`.
+
+Песочница создаёт только **новый** проект. Если передан `--project` или папка
+привязана к проекту аккаунта (`.layero/project.json` без поля `claim`), а
+токена нет, CLI начинает вход: событие `auth_required` с `url` и `user_code`.
+До 0.10.5 в агентской среде с `--yes` здесь включалась песочница, и платформа
+отвечала `username_required`. Токен песочницы из `~/.layero/config.json`
+идёт только в свой проект.
 
 ### `claim_status`
 
@@ -593,6 +600,7 @@ CLI упаковал директорию в tar.gz.
 | `connection_not_found` | `layero sources repos` с id, которого нет в организации | `layero sources list` |
 | `hook_not_found` | `layero hooks delete` с id, которого у проекта нет (уже удалён?) | `layero hooks list` |
 | `claimable_unavailable` | Деплой без аккаунта на платформе не включён (API ответил 404/501/503), исчерпан лимит заявок (429) либо платформа не вернула код заявки | Войти: `layero login` — или `LAYERO_TOKEN` |
+| `claim_with_project` | `layero deploy --claim --project <проект>`: песочница создаёт новый проект и в существующий не выкатывает. Ничего не создано и не загружено | Для существующего проекта войти: `layero login` — и повторить без `--claim`; новый сайт без аккаунта — `--claim` без `--project` |
 | `claim_unknown` | `layero claim status`/`accept` без кода и без заявки в `.layero/project.json`, либо заявка с таким кодом истекла или код неверный | Передать код; новый проект без аккаунта — `layero deploy --claim` |
 | `internal` | Непредвиденная ошибка CLI (сеть, неожиданное исключение) | Перезапустить с `--debug` |
 
@@ -614,7 +622,7 @@ CLI упаковал директорию в tar.gz.
 | `1` | прочее | `plan_limit`, `forbidden`, `confirmation_required`, `repeated_failure`, `cli_deploys_disabled`, `username_required` и всё, что не попало в классы ниже |
 | `2` | нужен вход | `auth_required`, `auth_expired`, `auth_timeout` |
 | `3` | не найдено | `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `no_runs`, `data_key_unknown` |
-| `4` | неверный ввод | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect` |
+| `4` | неверный ввод | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect` |
 | `5` | удалённая ошибка | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, любой `deploy_<status>` и `http_5xx` |
 
 ## Cold-start template для агента
