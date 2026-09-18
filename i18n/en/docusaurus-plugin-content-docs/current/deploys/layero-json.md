@@ -293,7 +293,7 @@ fix lives:
 | `ERR_UNKNOWN_BUILTIN_MODULE` · `EBADENGINE` · `Node.js 18 снят с поддержки и закрыт для новых сборок` | `"nodeVersion": "22"` — but look at the `[config] node=…` line first: if `.nvmrc` or `engines.node` sets the version, fix it there. |
 | `npm error code EUSAGE` · `ERR_PNPM_…` | First the lockfile and `packageManager` in the repository, then `installCommand`. |
 | `/bin/sh: 1: run: not found` | The command is a fragment. Write the whole command: `npm run build`, not `run build`. |
-| `Can't resolve '@scope/shared'` in a workspace | Build root = workspace root, and a `buildCommand` that builds dependencies first: `pnpm --filter @scope/shared build && pnpm --filter @scope/web build`, plus `outputDirectory: "apps/web/dist"`. |
+| `Can't resolve '@scope/shared'` in a workspace | Deploy from the workspace root, not with `--root apps/web`: otherwise the neighbour package is not uploaded. The file needs three keys: `"framework": "generic"`, a `buildCommand` that builds dependencies first (`pnpm --filter @scope/shared build && pnpm --filter @scope/web build`), and `outputDirectory: "apps/web/dist"`. Without `framework` the workspace root is guessed as `static` and the build never runs. |
 | Frontend and backend in one repository, but only a static site is published | The [`frontend` + `backend`](#full-stack-frontend-and-backend-in-one-repository) blocks. |
 
 ### What the file does not fix

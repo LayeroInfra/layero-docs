@@ -291,7 +291,7 @@ Layero скажет в логе сборки: иначе вы правили б�
 | `ERR_UNKNOWN_BUILTIN_MODULE` · `EBADENGINE` · `Node.js 18 снят с поддержки и закрыт для новых сборок` | `"nodeVersion": "22"` — но сначала посмотрите строку `[config] node=…`: если версию задаёт `.nvmrc` или `engines.node`, правьте там. |
 | `npm error code EUSAGE` · `ERR_PNPM_…` | Сначала lock-файл и `packageManager` в репозитории, потом `installCommand`. |
 | `/bin/sh: 1: run: not found` | Команда записана обрывком. Нужна целая: `npm run build`, а не `run build`. |
-| `Can't resolve '@scope/shared'` в воркспейсе | Корень сборки — корень воркспейса, `buildCommand` сначала собирает зависимости: `pnpm --filter @scope/shared build && pnpm --filter @scope/web build`, плюс `outputDirectory: "apps/web/dist"`. |
+| `Can't resolve '@scope/shared'` в воркспейсе | Деплойте из корня воркспейса, а не с `--root apps/web`: иначе соседний пакет не загрузится. В файле нужны три поля: `"framework": "generic"`, `buildCommand`, который сначала собирает зависимости (`pnpm --filter @scope/shared build && pnpm --filter @scope/web build`), и `outputDirectory: "apps/web/dist"`. Без `framework` корень воркспейса определяется как `static`, и сборка не запускается вовсе. |
 | Фронт и бэк в одном репозитории, а опубликована только статика | Блоки [`frontend` + `backend`](#фуллстек-фронт-и-бэк-в-одном-репозитории). |
 
 ### Чего файл не лечит
