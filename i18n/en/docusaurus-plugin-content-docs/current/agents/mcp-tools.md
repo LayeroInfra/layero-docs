@@ -96,10 +96,15 @@ confirmation.
 
 ## Sign-in
 
-The server requires sign-in: a connection without a token gets `401` with
-`WWW-Authenticate`, and a client that supports OAuth (Claude Code, Cursor,
-Codex, VS Code) opens the browser itself — all that is left is to click
-"Allow access". The authorization server is `api.layero.ru`, the resource
+**What works without sign-in.** The documentation is always available:
+`search_docs`, `check_copy` and `refactor_site` do not touch the account and
+answer without a token — connect the server and ask about the platform right
+away.
+
+Every other tool works with the account: the first such call without a token
+gets `401` with `WWW-Authenticate`, and a client that supports OAuth (Claude
+Code, Cursor, Codex, VS Code) opens the browser itself — all that is left is
+to click "Allow access". The authorization server is `api.layero.ru`, the resource
 metadata is `https://mcp.layero.ru/.well-known/oauth-protected-resource`. For
 CI and environments without a browser — the header
 `Authorization: Bearer $LAYERO_TOKEN`; how to issue a token is on

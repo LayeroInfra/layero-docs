@@ -45,8 +45,10 @@ The MCP tools are described on [MCP tools](./mcp-tools.md).
 
 ## Sign-in: OAuth in the client
 
-The MCP server requires a Layero account. Clients that support OAuth (Claude
-Code, Cursor, Codex) **open the browser themselves** on the first tool call —
+`search_docs`, `check_copy` and `refactor_site` work without sign-in — the
+documentation is always available, right after connecting. Every other tool
+works with a Layero account. Clients that support OAuth (Claude Code, Cursor,
+Codex) **open the browser themselves** on the first call of such a tool —
 confirm the sign-in, and the connection appears in the client automatically.
 No token and no config editing needed.
 
