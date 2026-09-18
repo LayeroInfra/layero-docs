@@ -17,6 +17,12 @@ Cloudflare, Mintlify отдают `.md` рядом с HTML), и `llms.txt` на 
 содержимого) не экспортируется — отдавать текст того, чего нет на сайте,
 нельзя.
 
+Оглавления разделов. У каталога с `link: generated-index` в `_category_.json`
+(`/cli`, `/runtime`, `/deploys`…) исходника нет — страницу рисует Docusaurus.
+`llms.txt` на такие адреса ссылается, и `/runtime.md` отдавал 404. Для них
+Markdown собирается из того же, из чего собрана страница: подпись и описание
+раздела плюс список его страниц.
+
 Плюс `build/sitemap.md` и `build/en/sitemap.md`: список страниц с
 описаниями из frontmatter, по разделам.
 
@@ -35,6 +41,11 @@ ROOT = Path(__file__).resolve().parents[1]
 SOURCES = {
     "ru": (ROOT / "docs", ""),
     "en": (ROOT / "i18n/en/docusaurus-plugin-content-docs/current", "en"),
+}
+# Отдельные страницы вне docs/ (`/contacts`): llms.txt перечисляет и их.
+PAGES = {
+    "ru": ROOT / "src/pages",
+    "en": ROOT / "i18n/en/docusaurus-plugin-content-pages",
 }
 BASE = "https://docs.layero.ru"
 
@@ -72,7 +83,10 @@ def export(lang: str, build: Path) -> tuple[int, list[tuple[str, str, str, str]]
     out_root = build / prefix if prefix else build
     written = 0
     pages: list[tuple[str, str, str, str]] = []  # (section, route, title, description)
-    for f in sorted(src.rglob("*")):
+    files = [(f, src) for f in sorted(src.rglob("*"))]
+    if PAGES[lang].is_dir():
+        files += [(f, PAGES[lang]) for f in sorted(PAGES[lang].rglob("*"))]
+    for f, base in files:
         if f.suffix not in (".md", ".mdx"):
             continue
         # README.md в каталогах — заглушки GitBook («# cli»), Docusaurus их не
@@ -80,7 +94,7 @@ def export(lang: str, build: Path) -> tuple[int, list[tuple[str, str, str, str]]
         # вместо оглавления раздела одно слово.
         if f.name.lower() == "readme.md":
             continue
-        rel = f.relative_to(src)
+        rel = f.relative_to(base)
         raw = f.read_text(encoding="utf-8")
         meta, body = parse_frontmatter(raw)
         route = route_for(rel, meta)
@@ -122,6 +136,57 @@ def section_labels(lang: str) -> dict[str, str]:
             elif en_cat.is_file():
                 labels[key] = json.loads(en_cat.read_text(encoding="utf-8")).get("label", label)
     return labels
+
+
+def category_meta(lang: str) -> dict[str, tuple[str, str, str]]:
+    """{каталог: (маршрут, подпись, описание)} для разделов с generated-index."""
+    en: dict[str, str] = {}
+    if lang == "en":
+        cj = ROOT / "i18n/en/docusaurus-plugin-content-docs/current.json"
+        en = {k: v["message"] for k, v in json.loads(cj.read_text(encoding="utf-8")).items()}
+    labels = section_labels(lang)
+    out: dict[str, tuple[str, str, str]] = {}
+    for cat in (ROOT / "docs").glob("*/_category_.json"):
+        meta = json.loads(cat.read_text(encoding="utf-8"))
+        link = meta.get("link") or {}
+        if link.get("type") != "generated-index" or not link.get("slug"):
+            continue
+        key = cat.parent.name
+        desc = link.get("description", "")
+        if lang == "en":
+            desc = en.get(
+                f"sidebar.docsSidebar.category.{meta.get('label', key)}.link.generated-index.description",
+                desc)
+        out[key] = (link["slug"].strip("/"), labels.get(key, key), desc)
+    return out
+
+
+def export_category_indexes(lang: str, build: Path,
+                            pages: list[tuple[str, str, str, str]]) -> int:
+    prefix = SOURCES[lang][1]
+    out_root = build / prefix if prefix else build
+    written = 0
+    taken = {r for _, r, _, _ in pages}
+    for key, (route, label, desc) in sorted(category_meta(lang).items()):
+        target = out_root / (route + ".md")
+        # Маршрут занят настоящей страницей (index.md со slug) — её и оставляем.
+        # Сверка по списку экспорта, а не по диску: иначе повторный прогон по
+        # той же сборке принимал бы собственный прошлый файл за страницу.
+        if route in taken or not (out_root / route / "index.html").is_file():
+            continue
+        url = f"{BASE}/{prefix + '/' if prefix else ''}"
+        lines = [f"# {label}", ""]
+        if desc:
+            lines += [f"> {desc}", ""]
+        lines += [f"<!-- {url}{route}/ -->", ""]
+        for section, r, title, d in sorted(pages):
+            if section != key:
+                continue
+            tail = f": {d}" if d else ""
+            lines.append(f"- [{title}]({url}{r}/){tail}")
+        target.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+        written += 1
+    return written
 
 
 def positions() -> dict[str, float]:
@@ -171,8 +236,9 @@ def main() -> int:
             print("  ⚠ build/en отсутствует — английский Markdown не собран")
             continue
         n, pages = export(lang, build)
+        idx = export_category_indexes(lang, build, pages)
         sm = write_sitemap(lang, build, pages)
-        print(f"  {lang}: страниц .md — {n}, {sm.relative_to(build)}")
+        print(f"  {lang}: страниц .md — {n}, оглавлений разделов — {idx}, {sm.relative_to(build)}")
         if n == 0:
             print(f"  ✗ {lang}: ни одна страница не экспортирована — маршруты не совпали со сборкой", file=sys.stderr)
             return 1

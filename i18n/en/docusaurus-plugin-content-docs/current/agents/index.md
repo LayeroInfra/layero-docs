@@ -48,6 +48,12 @@ without the CLI at all — with the MCP tool `publish_site`.
 How the CLI talks to an agent — events, error codes, what counts as the site
 address — is on [Deploying from AI agents](../cli/agents.md).
 
+**When detection is wrong.** The first deploy goes without `layero.json`. If
+the build failed or a server got published as a static site, the agent fixes
+one field per symptom using the table on the
+[`layero.json`](../deploys/layero-json.md) page — and does not deploy a third
+time with the same error.
+
 ### (c) There is a site on Layero
 
 The site is already published and the task is to understand what is going on

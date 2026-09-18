@@ -31,8 +31,8 @@ Layero определяет фреймворк автоматически по �
 | **Create React App** | dep `react-scripts` | `build` |
 | **Eleventy (11ty)** | dep `@11ty/eleventy` или `eleventy.config.*` | `_site` |
 | **Hugo** | `hugo.toml` или `config.toml` | `public` |
-| **Static** | только HTML в корне, нет `package.json` | `.` |
-| **Generic** | fallback (Manual Mode) | `dist` |
+| **Static** | только HTML в корне, нет `package.json`. **Сборка не запускается вовсе** | `.` |
+| **Generic** | свой build-скрипт: известного фреймворка нет, исполняются ваши `buildCommand` и `outputDirectory` | `dist` |
 
 Команда сборки по умолчанию — `npm run build` (или `yarn build` /
 `pnpm build` в зависимости от lock-файла). Для Hugo вызывается
@@ -46,10 +46,12 @@ Layero определяет фреймворк автоматически по �
 layero deploy --type vite
 ```
 
-Доступные значения: `nextjs`, `nuxt`, `remix`, `sveltekit`, `gatsby`,
-`astro`, `docusaurus`, `storybook`, `vitepress`, `vite`, `angular`,
-`cra`, `eleventy`, `hugo`, `static`, `generic`. Принимаются также
-популярные алиасы — `next`, `react-router`, `rr7`, `ng`, `11ty`.
+Статические пресеты флага: `vite`, `vitepress`, `next` (`nextjs`), `astro`,
+`cra`, `sveltekit`, `nuxt`, `gatsby`, `docusaurus`, `storybook`, `eleventy`
+(`11ty`), `hugo`, `static`, `generic`. Тот же флаг принимает тип рантайма —
+`node_web`, `python_web`, `ssr_next` — для приложений, которые Layero
+запускает, а не раздаёт файлами; см. [`layero deploy`](../cli/deploy.md).
+Остальные фреймворки из таблицы задаются полем `framework` в `layero.json`.
 
 Через [`layero.json`](../deploys/layero-json) в корне репозитория:
 
@@ -62,8 +64,21 @@ layero deploy --type vite
 }
 ```
 
-`static` — без сборки, в S3 уезжает то, что лежит в корне (минус
-правила игнорирования). Удобно для готового HTML.
+Два значения легко перепутать:
+
+- **`static` — сборка не запускается вовсе.** Ни установки, ни сборки:
+  `buildCommand` с ним игнорируется, публикуется то, что лежит в корне (минус
+  правила игнорирования). Удобно для готового HTML.
+- **`generic` — свой build-скрипт.** Известного фреймворка нет, но проект
+  надо собрать: Layero исполнит `buildCommand` и возьмёт результат из
+  `outputDirectory`.
+
+```json title="layero.json — свой скрипт сборки"
+{ "framework": "generic", "buildCommand": "node build.mjs", "outputDirectory": "public" }
+```
+
+Если в логе сборки стоит `static framework: skipping install/build`, а сайт
+пустой, — проекту нужен `generic`, а не другой путь к папке.
 
 ## Runtime-приложения
 

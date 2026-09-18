@@ -52,8 +52,16 @@ The CLI reads `package.json` and the characteristic configs:
 | `react-scripts` in deps | cra | `npm run build` | `build` |
 | `.html` in the root, no `package.json` | static | `true` (no-op) | `.` |
 
-If detection gets it wrong, edit `.layero/project.json` by hand or pass
-`--type` explicitly.
+If detection gets it wrong, pass `--type` explicitly: a static preset
+(`--type vite`) or a runtime kind for a server (`-t node_web`,
+`-t python_web`). If the app lives in a monorepo subfolder — `--root apps/web`.
+To make the fix travel with the code, put a
+[`layero.json`](../deploys/layero-json.md) into the repository — that page also
+has the symptom-to-fix table.
+
+Local detection is a quick check: it does not read `layero.json` and can be
+confidently wrong. What the platform actually understood is in the
+`[config] …` lines of the build log.
 
 These values are stored in `.layero/project.json` after the first deploy. They
 survive later runs and can be edited by hand.
@@ -67,13 +75,15 @@ survive later runs and can be edited by hand.
 | `--branch <name>` | **Refused** with `branch_unsupported` (exit code 4): archive uploads always land in the `cli` environment (see below), so the flag cannot give you a preview. Only meaningful for `layero promote --branch`. |
 | `--claim` | Deploy without an account: a temporary project for 72 hours and a `claim_url` for a human to take the site over. Turns on by itself when there is no token, the run is non-interactive (an agent, not CI), `--yes` is passed and the project is **new**: no `--project`, and the folder is not linked to an account project. An existing project without a token means signing in (`auth_required`), not a sandbox. Together with `--project` it is refused with `claim_with_project` (exit code 4). |
 | `--prebuilt [dir]` | Ship an already-built artifact instead of building on the platform. Without an argument it picks the first existing of `dist/`, `build/`, `public/`, `out/`, `_site/`. `.gitignore` and `.layeroignore` rules are **not applied** — see the note below. |
-| `--type <preset>` | Override auto-detection: `vite`, `next`, `astro`, `cra`, `sveltekit`, `nuxt`, `gatsby`, `docusaurus`, `static`. |
+| `-t`, `--type <preset>` | Override auto-detection. A **static preset** says what to build with: `vite`, `vitepress`, `next`, `astro`, `cra`, `sveltekit`, `nuxt`, `gatsby`, `docusaurus`, `storybook`, `eleventy`, `hugo`, `static` (no build runs at all), `generic` (your own build script: `buildCommand` and `outputDirectory` from [`layero.json`](../deploys/layero-json.md) are executed). A **runtime kind** says the app has to run in a container instead of being served as files: `node_web`, `python_web`, `ssr_next`, `streamlit`, `gradio`, `flask`; aliases — `express`, `fastapi`, `django`, `node`, `python`. An unknown value is refused with `invalid_type`. |
+| `--root <dir>` | Monorepo: the subdirectory of the repository that the builder treats as the app root, e.g. `--root apps/web`. **Saved on the project** — push and hook builds use the same value. `layero.json` has no key for this. |
 | `--name <name>` | Project name. Only on the first deploy. |
 | `--project <id_or_slug>` | Deploy into a specific project, ignoring `./.layero/project.json`. Handy for CI. |
 | `--org <slug>` | Create the project in a given Layero organization (on the first deploy). |
 | `--yes`, `-y` | Skip the `--prod` / `--promote` confirmation and interactive questions. |
 | `--json` | JSON lines on stdout (for AI agents and CI). |
 | `--config` | Legacy alias for the current behaviour (auto-detection + `.layero/project.json`). |
+| `--confirm-repeated-failure` | Proceed although recent deploys keep failing with the **same** error: the platform stops such repeats until you confirm you know what changed. A flag for a person, not for an agent. |
 
 ## Where a deploy lands
 

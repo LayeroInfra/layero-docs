@@ -104,6 +104,16 @@ to the user. `dashboard_url` is the management page, not the site.
 `preview_url` and `edge_ready` are legacy fields from the CDN era; do not gate
 showing the link on them (see the [JSON events schema](./json-events)).
 
+### When detection is wrong
+
+The `detected` event is a quick local guess: it does not read `layero.json`
+and can be confidently wrong. `framework: "static"` for a folder with no
+`index.html` at its root means "nothing was recognised", not "this is a static
+site". A server is fixed with `-t node_web`, a monorepo subfolder with
+`--root apps/web`, everything else with one field in
+[`layero.json`](../deploys/layero-json.md): that page has the symptom-to-fix
+table and the log lines that show the value was applied.
+
 ### Error codes
 
 The full canonical list is in the [JSON events schema](./json-events). In

@@ -32,8 +32,8 @@ The order of checks matters — the first match wins:
 | **Create React App** | dep `react-scripts` | `build` |
 | **Eleventy (11ty)** | dep `@11ty/eleventy` or `eleventy.config.*` | `_site` |
 | **Hugo** | `hugo.toml` or `config.toml` | `public` |
-| **Static** | only HTML in the root, no `package.json` | `.` |
-| **Generic** | fallback (Manual Mode) | `dist` |
+| **Static** | only HTML in the root, no `package.json`. **No build runs at all** | `.` |
+| **Generic** | your own build script: no known framework, your `buildCommand` and `outputDirectory` are executed | `dist` |
 
 The default build command is `npm run build` (or `yarn build` / `pnpm build`,
 depending on the lockfile). Hugo is built with `hugo --gc --minify`, Nuxt with
@@ -47,10 +47,12 @@ Through the CLI:
 layero deploy --type vite
 ```
 
-Accepted values: `nextjs`, `nuxt`, `remix`, `sveltekit`, `gatsby`, `astro`,
-`docusaurus`, `storybook`, `vitepress`, `vite`, `angular`, `cra`, `eleventy`,
-`hugo`, `static`, `generic`. Common aliases work too — `next`,
-`react-router`, `rr7`, `ng`, `11ty`.
+Static presets of the flag: `vite`, `vitepress`, `next` (`nextjs`), `astro`,
+`cra`, `sveltekit`, `nuxt`, `gatsby`, `docusaurus`, `storybook`, `eleventy`
+(`11ty`), `hugo`, `static`, `generic`. The same flag accepts a runtime kind —
+`node_web`, `python_web`, `ssr_next` — for apps that Layero runs rather than
+serves as files; see [`layero deploy`](../cli/deploy.md). The other frameworks
+from the table are set with the `framework` field in `layero.json`.
 
 Through [`layero.json`](../deploys/layero-json) in the repository root:
 
@@ -63,8 +65,21 @@ Through [`layero.json`](../deploys/layero-json) in the repository root:
 }
 ```
 
-`static` means no build at all: whatever sits in the root goes to S3, minus
-the ignore rules. Handy for ready-made HTML.
+Two values are easy to mix up:
+
+- **`static` — no build runs at all.** No install and no build:
+  `buildCommand` is ignored with it, and whatever sits in the root is
+  published (minus the ignore rules). Handy for ready-made HTML.
+- **`generic` — your own build script.** There is no known framework, but the
+  project has to be built: Layero executes `buildCommand` and takes the result
+  from `outputDirectory`.
+
+```json title="layero.json — your own build script"
+{ "framework": "generic", "buildCommand": "node build.mjs", "outputDirectory": "public" }
+```
+
+If the build log says `static framework: skipping install/build` and the site
+is empty, the project needs `generic`, not a different output path.
 
 ## Runtime applications
 

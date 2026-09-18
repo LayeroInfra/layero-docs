@@ -34,9 +34,40 @@ For those Layero runs a user **container**.
 `flask` is a legacy name kept for compatibility — it is an alias of
 `python_web`. New projects get `python_web`.
 
-The preset is chosen in the project dashboard (**Project → Runtime type**).
 Each preset uses a ready-made Dockerfile template — you do not build your own
 image.
+
+### Setting the type by hand
+
+Usually you do not have to: the type is detected (see below). If Layero took a
+server for a static site, there are three ways:
+
+- **`layero.json` in the repository** — the value travels with the code:
+
+  ```json title="layero.json"
+  { "runtime": "node_web", "startCommand": "node dist/server.js", "port": 3000 }
+  ```
+
+  All keys are on the [`layero.json`](../deploys/layero-json.md) page.
+- **A CLI flag** — one-off, no file: `npx layero@latest deploy -t node_web`
+  (or `-t python_web`, `-t ssr_next`).
+- **The dashboard** — **Project → Runtime type**.
+
+### What the app has to do
+
+- **Start command.** For a Node app Layero takes the `start` script from
+  `package.json`. No `start` script — set `startCommand`. Paths in the command
+  are relative to `/app`, and the file must exist after the build.
+- **Address and port.** The app listens on `0.0.0.0` and on the port from
+  `$PORT`: `uvicorn main:app --host 0.0.0.0 --port $PORT`. A server on
+  `127.0.0.1` is unreachable from outside the container, and the launch fails.
+  If the app listens on its own port, put it into `port`.
+- **An answer to `GET /`.** The launch probe expects a response without a 5xx.
+  A long-polling bot with no HTTP server cannot pass it.
+
+After the `ready` event the first request may get a 404 placeholder for up to
+a minute while the container starts. A 404 that outlives a minute is a real
+failure: read `npx layero@latest logs --runtime`.
 
 ### What is detected automatically
 
@@ -52,7 +83,8 @@ point is looked up in `app.py`, `main.py` or `manage.py`.
 Restify, Polka, Feathers, Sails, h3, Elysia, json-server.
 
 If your framework is not on the list but the app listens on an HTTP port, it
-still runs: pick `node_web` or `python_web` by hand in the project settings.
+still runs: set `node_web` or `python_web`
+[by hand](#setting-the-type-by-hand).
 The list drives auto-detection; it is not a restriction.
 
 ## Cold start
