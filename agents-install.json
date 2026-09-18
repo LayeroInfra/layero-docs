@@ -4,7 +4,7 @@
   "clients": [
     { "id": "cli",         "label": "CLI",              "command": "npx layero@latest deploy" },
     { "id": "skill",       "label": "Agent Skill",      "command": "npx skills add LayeroInfra/layero-agents" },
-    { "id": "any-mcp",     "label": "Любой агент",      "command": "npx -y add-mcp https://mcp.layero.ru/mcp" },
+    { "id": "any-mcp",     "label": "Agents",      "command": "npx -y add-mcp https://mcp.layero.ru/mcp" },
     { "id": "claude-code", "label": "Claude Code",      "command": "claude plugin marketplace add LayeroInfra/layero-agents && claude plugin install layero@layero" },
     { "id": "cursor",      "label": "Cursor",           "command": "npx -y add-mcp https://mcp.layero.ru/mcp", "deeplink": "https://cursor.com/en/install-mcp?name=layero&config=eyJ1cmwiOiJodHRwczovL21jcC5sYXllcm8ucnUvbWNwIn0%3D" },
     { "id": "codex",       "label": "Codex CLI",        "command": "codex mcp add layero --url https://mcp.layero.ru/mcp" }

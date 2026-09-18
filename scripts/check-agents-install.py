@@ -47,8 +47,8 @@ TEXT = {
         "head": "| Client | Command |",
         "deeplink": " — or the [install button]({deeplink})",
         "ci": "In CI: `{command}`",
-        # Единственный русский лейбл в каноне. Остальные — имена продуктов.
-        "labels": {"Любой агент": "Any agent"},
+        # Русских лейблов в каноне нет: все подписи — имена продуктов.
+        "labels": {},
     },
 }
 
