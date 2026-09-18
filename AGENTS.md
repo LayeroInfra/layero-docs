@@ -70,12 +70,12 @@ curl -sI https://docs.layero.ru/build-id.txt
    коды ошибок уже были отдельным инцидентом (семь штук).
 2. **MUST** — `npx layero` только с `@latest`. Без него `npx` не ходит
    в реестр и пинует читателя на старую версию навсегда.
-   Ловит `../core/cli/check-npx-pin.py`.
+   Ловит `../cli/check-npx-pin.py`.
 3. **MUST** — правя список, правь пример рядом. Копируют пример,
    а не перечень; расхождение между ними случалось трижды за сутки.
 4. **MUST NOT** — ссылаться на инструмент MCP или код ошибки, не сверив
    с живым источником: `../mcp/check-tool-names.py`,
-   `../core/cli/check-error-codes.py`.
+   `../cli/check-error-codes.py`.
 5. **MUST** — правка русской страницы сопровождается решением по `i18n/en`:
    либо переведено, либо явно помечено как отложенное. Молча разъехавшиеся
    локали — отдельный класс долга.
@@ -93,9 +93,9 @@ curl -sI https://docs.layero.ru/build-id.txt
 ## Проверки перед выкаткой текстов
 
 ```bash
-python3 ../core/cli/check-error-codes.py     # коды ошибок ↔ конструкторы
-python3 ../core/cli/check-npx-pin.py         # `npx layero` ↔ `@latest`
-python3 ../core/cli/check-typography.py      # неразрывные пробелы, тире, кавычки
+python3 ../cli/check-error-codes.py     # коды ошибок ↔ конструкторы
+python3 ../cli/check-npx-pin.py         # `npx layero` ↔ `@latest`
+python3 ../cli/check-typography.py      # неразрывные пробелы, тире, кавычки
 python3 ../mcp/check-tool-names.py           # имена инструментов ↔ живой tools/list
 python3 scripts/check-agents-install.py      # команды установки ↔ agents-install.json (в make check)
 ```

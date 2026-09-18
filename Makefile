@@ -35,11 +35,11 @@ typecheck:
 build:
 	npm run build
 
-# Кросс-репозиторные: скрипты живут в core и mcp.
+# Кросс-репозиторные: скрипты живут в соседних cli (LayeroInfra/cli) и mcp.
 check-texts:
-	python3 ../core/cli/check-error-codes.py
-	python3 ../core/cli/check-npx-pin.py
-	python3 ../core/cli/check-typography.py
+	python3 ../cli/check-error-codes.py
+	python3 ../cli/check-npx-pin.py
+	python3 ../cli/check-typography.py
 	python3 ../mcp/check-tool-names.py
 
 check-agents-install:
