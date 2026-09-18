@@ -543,6 +543,7 @@ CLI упаковал директорию в tar.gz.
 | `repeated_failure_declined` | То же, но в интерактивном терминале на вопрос «Всё равно выкатить?» ответили «нет» | Исправить ошибку и запустить `layero deploy` заново |
 | `no_deploy` / `no_deploys` | У проекта ещё нет деплоев | Сначала `layero deploy` |
 | `rollback_unsupported` | У деплоя нет раздаваемого артефакта: runtime-проект либо вычищенная по ретенции статика | Пересобрать нужный коммит через `layero deploy` |
+| `rollback_noop` | Цель отката уже на живом адресе — например, второй `layero rollback` подряд. Ничего не изменено, выход `4` | Точечно — `layero promote <sha>`; список — `layero deploys list` |
 | `env_not_found` | Переменной нет | `layero env list` |
 | `nothing_to_set` | `layero env set` вызван без пары `KEY=value` | `layero env set KEY=value` |
 | `bad_format` | Аргумент не разобран | Формат — в сообщении |
@@ -613,7 +614,7 @@ CLI упаковал директорию в tar.gz.
 | `1` | прочее | `plan_limit`, `forbidden`, `confirmation_required`, `repeated_failure`, `cli_deploys_disabled`, `username_required` и всё, что не попало в классы ниже |
 | `2` | нужен вход | `auth_required`, `auth_expired`, `auth_timeout` |
 | `3` | не найдено | `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `no_runs`, `data_key_unknown` |
-| `4` | неверный ввод | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `sql_missing`, `branch_unsupported`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect` |
+| `4` | неверный ввод | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect` |
 | `5` | удалённая ошибка | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, любой `deploy_<status>` и `http_5xx` |
 
 ## Cold-start template для агента

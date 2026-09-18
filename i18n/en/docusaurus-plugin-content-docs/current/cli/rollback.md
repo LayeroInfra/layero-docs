@@ -45,6 +45,11 @@ layero rollback --yes        # no confirmation
 The command shows a plan and, once confirmed, restores both the environment's
 active deploy and — if the apex is served by this branch — the public address.
 
+A second `layero rollback` in a row changes nothing: the rollback target is
+already live. The CLI answers with the `rollback_noop` error and exit code `4`.
+To go further back, pick a build explicitly: `layero deploys list`, then
+`layero promote <sha>`.
+
 ## When you want promote instead
 
 If you need to go back not to the previous deploy but to a specific older one,
