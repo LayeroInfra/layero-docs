@@ -19,21 +19,22 @@ line per tool.
 | Tool | What it does |
 |---|---|
 | `whoami` | Who is connected: user, organisation, token expiry. |
-| `my_projects` | The list of projects with addresses and source (repository or CLI). |
+| `my_projects` | The list of projects with addresses and source (repository or CLI); the `repo` argument keeps the projects of one repository. |
 | `list_sources` | Git providers (GitHub, GitVerse, GitLab, GitFlic, SourceCraft) and the organisation's connections. |
 | `import_repo` ⚠️ | Create a project from a repository: GitHub through the App installation, the others through the organisation's connection. Once linked, it applies the detected settings and starts the first build itself — what the dashboard's "Start deploy" button does; the result carries `setup` (`applied` / `pending` / `failed`), `first_deploy_id` and an honest `next_action`. `deploy=false` leaves the project in the setup wizard. Provider not connected — the answer is `needs_connection` with the dashboard address; the provider token is connected by the person, not the agent. An app in a monorepo subfolder takes the `root_directory` argument (`apps/web`): one project builds one folder. A repository that is already linked answers `already_linked` with the list of projects (address, folder, branch); a second project from the same repository is only created with a different folder. |
 | `project_create` ⚠️ | An empty project with no repository — an address reserved for a later `publish_site` or `npx layero@latest deploy`. |
+| `project_settings` ⚠️ | Read or change a project's build settings: app folder, install and build commands, output folder, project type. Shows where every effective value comes from and the `layero.json` warnings. The way out when detection was wrong: change the setting, then `retry_deploy` with `redeploy=true`. |
 
 ## Site and deploys
 
 | Tool | What it does |
 |---|---|
-| `site_status` | Site state: latest deploy, address, repository, branch and app folder. `answered_by` tells the site's own answer from a platform screen: an API server with no `/` route answers its own 404 and counts as up; the `path` argument checks a specific route. When there has been no build yet it says so instead of passing a missing build off as a successful one. |
+| `site_status` | Site state: latest deploy, address, repository, branch and app folder. `answered_by` tells the site's own answer from a platform screen: an API server with no `/` route answers its own 404 and counts as up; the `path` argument checks a specific route, and `served_fallback` warns that a static site answered it with the home page. `wait_s` (up to 120 s) waits for a running build; without it `poll_after_s` suggests the polling interval. When there has been no build yet it says so instead of passing a missing build off as a successful one. |
 | `list_environments` | The project's environments — one per branch — with addresses and the state of the latest build. |
 | `list_deploys` | The project's build history: status, source (git or upload), time in the queue and build duration. |
 | `deploy_logs` | Build and application logs. `npm http` lines are hidden by default and counted in `noise_hidden`; `include_noise=true` shows everything. |
 | `diagnose_deploy` | Why a build failed — with a log breakdown and the next step. `build_facts` says what the build used: framework, install and build commands, output folder, Node version, and where each value came from. |
-| `retry_deploy` ⚠️ | Restart a failed build. |
+| `retry_deploy` ⚠️ | Restart a build: a failed one as it is; `redeploy=true` rebuilds the latest commit of a repository project without a push. |
 | `cancel_deploy` ⚠️ | Cancel a running build. |
 | `rollback` ⚠️ | Roll production back to a previous build. |
 | `publish_site` ⚠️ | Publish ready static output (a folder with `index.html`) without the CLI; creates the project if it does not exist. `publish_landing` is a deprecated alias of `publish_site`. |
