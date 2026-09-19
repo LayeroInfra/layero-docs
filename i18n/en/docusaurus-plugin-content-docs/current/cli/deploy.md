@@ -287,7 +287,7 @@ build runs on Layero's side after unpacking.
 
 ## Limits
 
-- Maximum archive size — **200 MB**.
+- Maximum archive size — **500 MB**.
 - `layero deploy` is bounded by backend timeouts:
   | Stage | Limit |
   |---|---|
