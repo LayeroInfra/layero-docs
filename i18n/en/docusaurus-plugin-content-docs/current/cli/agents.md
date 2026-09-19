@@ -65,6 +65,13 @@ When the user says "deploy with layero", the agent either:
 
 Both paths lead to the same command: `npx layero@latest deploy`.
 
+**No account yet, or the person is away from the keyboard.**
+`npx layero@latest deploy --claim --yes --json` publishes the folder with no
+sign-in at all. The site lives for 72 hours; the `claimable` event carries
+`claim_url` — the agent hands it to the person, and only the person can take
+the site into an account. In an agent environment with `--yes` and no token
+this mode switches on by itself.
+
 ## JSON mode
 
 When the CLI runs inside an AI agent it switches to JSON-lines mode
