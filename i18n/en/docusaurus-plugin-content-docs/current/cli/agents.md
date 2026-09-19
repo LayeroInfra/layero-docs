@@ -67,10 +67,13 @@ Both paths lead to the same command: `npx layero@latest deploy`.
 
 **No account yet, or the person is away from the keyboard.**
 `npx layero@latest deploy --claim --yes --json` publishes the folder with no
-sign-in at all. The site lives for 72 hours; the `claimable` event carries
+sign-in at all. The site lives for 1 hour; the `claimable` event carries
 `claim_url` — the agent hands it to the person, and only the person can take
 the site into an account. In an agent environment with `--yes` and no token
-this mode switches on by itself.
+this mode switches on by itself. Only static sites and SPAs go out this way: a
+server app (SSR, fullstack, container) needs an account — the CLI refuses with
+`claim_static_only` before uploading anything. Such a site gets a random
+address and is closed to search engines.
 
 ## JSON mode
 

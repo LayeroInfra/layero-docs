@@ -378,7 +378,7 @@ The error arrives as an `error` event right after `data_probe`.
 A deploy without an account (`layero deploy --claim`, or automatically: no
 token, an agent environment — not a terminal and not CI — `--yes`, and the
 project is new). The platform created a temporary project and a token for it; the site lives for
-72 hours. The event arrives **before** `ready`: after `ready` an agent stops
+1 hour, gets a random address and is closed to search engines. The event arrives **before** `ready`: after `ready` an agent stops
 reading, and without this link the site disappears with its deadline.
 
 | field | type | note |
@@ -660,6 +660,7 @@ Do not write handling for codes that are not on this list.
 | `connection_not_found` | `layero sources repos` with an id the organization does not have | `layero sources list` |
 | `hook_not_found` | `layero hooks delete` with an id the project does not have (already deleted?) | `layero hooks list` |
 | `claimable_unavailable` | Deploying without an account is not enabled on the platform (the API answered 404/501/503), the claim quota is exhausted (429), or the platform returned no claim code | Sign in: `layero login` — or `LAYERO_TOKEN` |
+| `claim_static_only` | `layero deploy --claim` (or the automatic mode without a login) in the folder of a server app — SSR, fullstack, container. Without an account only static sites and SPAs go out. Nothing was created or uploaded | Sign in (`npx layero@latest login`) and deploy from the account with the same `deploy` without `--claim` |
 | `claim_with_project` | `layero deploy --claim --project <project>`: a sandbox creates a new project and never deploys into an existing one. Nothing was created or uploaded | For an existing project sign in: `layero login` — and retry without `--claim`; a new site without an account — `--claim` without `--project` |
 | `claim_unknown` | `layero claim status`/`accept` without a code and without a claim in `.layero/project.json`, or the claim with that code expired or the code is wrong | Pass the code; a new project without an account — `layero deploy --claim` |
 | `internal` | An unexpected CLI error (network, unhandled exception) | Re-run with `--debug` |
@@ -684,7 +685,7 @@ error code.
 | `1` | other | `plan_limit`, `forbidden`, `confirmation_required`, `repeated_failure`, `cli_deploys_disabled`, `username_required` and anything not in the classes below |
 | `2` | sign-in needed | `auth_required`, `auth_expired`, `auth_timeout` |
 | `3` | not found | `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `no_runs`, `data_key_unknown` |
-| `4` | invalid input | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect` |
+| `4` | invalid input | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `claim_static_only`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect` |
 | `5` | remote failure | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `deploy_watch_lost`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, any `deploy_<status>` and `http_5xx` |
 
 ## Cold-start template for an agent

@@ -26,7 +26,7 @@ description: The full list of layero commands — init, login, projects, deploy,
 | `layero deploy --prod` | A project with a connected repository: publish the upload at the live address (with confirmation). |
 | `layero deploy --org <slug>` | Create the new project in the given team instead of your personal organization. |
 | `layero deploy --json` | A machine-readable event stream — for agents and CI. |
-| `layero deploy --claim` | Deploy without an account: a temporary project for 72 hours and a link for a human to take the site over. |
+| `layero deploy --claim` | Deploy without an account: a temporary site for 1 hour (static sites and SPAs only) and a link for a human to take the site over. |
 | `layero claim status` / `claim accept <code>` | State of a claimable project's claim; open the page where a human accepts it. |
 | `layero deploys list` | Show recent deploys of the current project. |
 | `layero promote` | Point the production apex at a specific ready deploy. |
