@@ -59,6 +59,7 @@ CLI продолжит поллить каждые 2 секунды. Когда 
 | `next_action` | string? | один конкретный шаг: `npx layero@latest deploy --root apps/web`, текст `layero.json` и т. п. |
 | `candidates` | string[]? | папки приложений, найденные ниже текущей |
 | `ssr_warning` | string? | Nuxt/SvelteKit соберутся сервером, а не статикой |
+| `layero_warnings` | string[]? | ключи `layero.json`, которые платформа не применит, с верным именем. Например, `"type": "vite"` не работает — нужно `"framework": "vite"` (с CLI 0.11.4) |
 
 `framework`, `buildCommand` и `outputDirectory` из `layero.json` здесь уже
 учтены (`sources` = `layero.json`).
@@ -71,7 +72,7 @@ CLI продолжит поллить каждые 2 секунды. Когда 
 
 | поле | тип | примечание |
 |---|---|---|
-| `framework`, `build_cmd`, `output_dir`, `confident`, `sources`, `hint`, `next_action`, `candidates` | | как в `detected`, плюс настройки привязанного проекта (`sources` = `project settings`) |
+| `framework`, `build_cmd`, `output_dir`, `confident`, `sources`, `hint`, `next_action`, `candidates`, `layero_warnings` | | как в `detected`, плюс настройки привязанного проекта (`sources` = `project settings`) |
 | `runtime_kind` | string \| null | тип контейнера, если приложение запускается в контейнере: `node_web`, `python_web`, `ssr_next`, … |
 | `root` | string \| null | подпапка приложения (`--root` или настройка проекта) |
 | `project` | object \| null | `id`, `slug`, `project_type`, `repo` привязанного проекта |
@@ -152,7 +153,9 @@ CLI упаковал директорию в tar.gz.
 
 ### `setup_applied`
 
-Применили настройки проекта (`framework_hint` / `build_cmd` / `output_dir`) на первом деплое. Без полей.
+Настройки проекта приняты. Записано только то, что названо явно (`--type`,
+свой `.layero/project.json`): чем собирать и куда класть результат, иначе
+решает сборщик по архиву на каждой сборке. Без полей.
 
 ### `repeated_failure_guard`
 
@@ -534,7 +537,7 @@ CLI упаковал директорию в tar.gz.
 
 | событие | поля | смысл |
 |---|---|---|
-| `setup_applied` | `project`, `framework`, `build_cmd` (string \| null), `output_dir` (string \| null), `layero_found` (boolean) | Настройки применены. Пустые поля не заглушка: чем собирать, решит сборщик по репозиторию |
+| `setup_applied` | `project`, `framework`, `build_cmd` (string \| null), `output_dir` (string \| null), `layero_found` (boolean) | Мастер завершён. Фреймворк, команда и папка — то, что увидел детект, для сведения: в проект они не записаны (с CLI 0.11.4), сборщик определяет их по репозиторию на каждой сборке |
 | `deploy_started` | `project`, `deploy_id`, `url` | Первая сборка запущена; следить — `layero deploys list --project <slug>` |
 | `setup_pending` | `project`, `url`, `hint` | `--no-deploy`: проект оставлен в мастере, сборок не будет, пока настройку не завершат по `url` |
 | `setup_failed` | `project`, `reason`, `url`, `hint` | Детект, настройка или запуск сборки не удались. Проект **создан**, выход 0 — сказать человеку завершить в панели по `url` |

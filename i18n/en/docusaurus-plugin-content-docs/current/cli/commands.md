@@ -157,10 +157,12 @@ has no outgoing webhooks at all), the CLI says so with `webhook_unavailable`
 and the URL to register by hand — the repository is connected either way, only
 push-triggered builds wait for the webhook.
 
-Once linked, the command finishes the setup wizard itself: it takes the
-detection hint (framework, build command, output directory), applies it and
-starts the first build — exactly what the dashboard's "Start deploy" button
-does. Events `setup_applied` and `deploy_started`; from there, `layero deploys
+Once linked, the command finishes the setup wizard itself and starts the
+first build. It does not write the framework, build command or output
+directory into the project: the builder detects them from the repository on
+every build, so a framework change in the repository is picked up by itself,
+and `layero.json` overrides them. Only a decision is written: the app folder
+of a monorepo and the package manager from `layero.json`. Events `setup_applied` and `deploy_started`; from there, `layero deploys
 list --project <slug>`. With `--no-deploy` the project stays in the wizard
 (event `setup_pending` with the dashboard URL) and nothing builds until setup
 is completed there. If detection or setup fails, the project is still created

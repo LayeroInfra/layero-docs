@@ -64,6 +64,7 @@ to the project (since 0.11.0). Only what a person names is sent: `--type`,
 | `next_action` | string? | one concrete step: `npx layero@latest deploy --root apps/web`, the text of a `layero.json`, etc. |
 | `candidates` | string[]? | app folders found below the current one |
 | `ssr_warning` | string? | Nuxt/SvelteKit will build a server, not static files |
+| `layero_warnings` | string[]? | `layero.json` keys the platform will not apply, with the right name. For example, `"type": "vite"` does nothing — write `"framework": "vite"` (since CLI 0.11.4) |
 
 `framework`, `buildCommand` and `outputDirectory` from `layero.json` are
 already applied here (`sources` = `layero.json`).
@@ -76,7 +77,7 @@ order is the builder's: `layero.json` > project settings > detection.
 
 | field | type | note |
 |---|---|---|
-| `framework`, `build_cmd`, `output_dir`, `confident`, `sources`, `hint`, `next_action`, `candidates` | | as in `detected`, plus the settings of a linked project (`sources` = `project settings`) |
+| `framework`, `build_cmd`, `output_dir`, `confident`, `sources`, `hint`, `next_action`, `candidates`, `layero_warnings` | | as in `detected`, plus the settings of a linked project (`sources` = `project settings`) |
 | `runtime_kind` | string \| null | the app runs in a container |
 | `root` | string \| null | the app's subfolder (`--root` or the project setting) |
 | `project` | object \| null | `id`, `slug`, `project_type`, `repo` of the linked project |
@@ -157,8 +158,10 @@ project's previous type.
 
 ### `setup_applied`
 
-Project settings (`framework_hint` / `build_cmd` / `output_dir`) were applied
-on the first deploy. No fields.
+Project settings accepted. Only what was named explicitly (`--type`, your own
+`.layero/project.json`) is written; otherwise the builder decides from the
+archive on every build what to build with and where the result goes. No
+fields.
 
 ### `repeated_failure_guard`
 
@@ -547,7 +550,7 @@ and starts the build.
 
 | event | fields | meaning |
 |---|---|---|
-| `setup_applied` | `project`, `framework`, `build_cmd` (string \| null), `output_dir` (string \| null), `layero_found` (boolean) | Settings applied. Empty fields are not placeholders: the builder decides from the repository |
+| `setup_applied` | `project`, `framework`, `build_cmd` (string \| null), `output_dir` (string \| null), `layero_found` (boolean) | Setup finished. The framework, command and folder are what detection saw, for information: they are not written into the project (since CLI 0.11.4) — the builder detects them from the repository on every build |
 | `deploy_started` | `project`, `deploy_id`, `url` | First build started; follow it with `layero deploys list --project <slug>` |
 | `setup_pending` | `project`, `url`, `hint` | `--no-deploy`: the project stays in the wizard; nothing builds until setup is finished at `url` |
 | `setup_failed` | `project`, `reason`, `url`, `hint` | Detection, setup or the build start failed. The project **is created**, exit 0 — tell the person to finish in the dashboard at `url` |

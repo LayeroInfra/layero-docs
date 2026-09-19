@@ -439,7 +439,7 @@ the deploy page — but not all of them, and not always.
 | what's in the file | what Layero does |
 |---|---|
 | invalid JSON (a trailing comma, a comment) | the file is disabled **entirely**, and the build proceeds as if there were no file. A static build prints a note, a container build prints nothing |
-| an unknown field name | skips it with an `unknown keys ignored` note — and the build stays green. Lost unnoticed this way: `static`, `headers`, `type`, `dir`, `build_cmd`, `output_dir`, `start_cmd`, `install_cmd`, `rootDirectory` |
+| an unknown field name | skips it with an `unknown keys ignored` note — and the build stays green. Lost unnoticed this way: `static`, `headers`, `type`, `dir`, `build_cmd`, `output_dir`, `start_cmd`, `install_cmd`, `rootDirectory`. `type` is written by analogy with the `--type` flag: it is not applied, and the note names the right key — `framework` or `runtime` (`deploy --dry-run` warns about it before the deploy) |
 | an empty value | reports it, skips the field |
 | an unknown name in `framework` (for example `"node"`) | warns and detects the framework itself |
 | a `framework` that isn't in the repository | warns and applies it anyway |
