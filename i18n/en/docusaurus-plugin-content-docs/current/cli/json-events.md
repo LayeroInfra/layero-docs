@@ -604,6 +604,7 @@ Do not write handling for codes that are not on this list.
 | `prebuilt_no_dir` | The `--prebuilt` directory does not exist | Pass it explicitly: `--prebuilt ./dist` |
 | `prebuilt_no_index` | The `--prebuilt` directory has no `index.html` | Point it at the folder containing the built `index.html` |
 | `deploy_not_started` | The build never started | Re-run `layero deploy`; if it repeats, `npx layero@latest diagnose` |
+| `deploy_watch_lost` | The CLI lost its connection to the build log (several network failures in a row). The build itself keeps running on the platform | Do **not** deploy again. Result: `npx layero@latest deploys list --json`; log: `npx layero@latest logs --deploy <id>` |
 | `deploy_failed` | The build never reached `ready` | `npx layero@latest diagnose --deploy <id>` — the command in `next_action`; works in a sandbox without an account too |
 | `repeated_failure` | Consecutive builds keep failing with the **same** error, so the platform refused to ship another one blindly. The error text is in `message` and in the `repeated_failure_guard` event | Read the error and fix its cause. Re-running unchanged fails the same way. If you already fixed it — `layero deploy --confirm-repeated-failure` |
 | `repeated_failure_declined` | Same, but the interactive prompt «ship anyway?» was answered no | Fix the error and run `layero deploy` again |
@@ -680,7 +681,7 @@ error code.
 | `2` | sign-in needed | `auth_required`, `auth_expired`, `auth_timeout` |
 | `3` | not found | `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `no_runs`, `data_key_unknown` |
 | `4` | invalid input | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect` |
-| `5` | remote failure | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, any `deploy_<status>` and `http_5xx` |
+| `5` | remote failure | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `deploy_watch_lost`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, any `deploy_<status>` and `http_5xx` |
 
 ## Cold-start template for an agent
 
