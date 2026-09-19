@@ -69,6 +69,29 @@ description: SSR Next.js, любой Node-сервер (Express, NestJS, Fastify
 пока контейнер стартует. 404, который держится дольше минуты, — настоящий
 отказ: смотрите `npx layero@latest logs --runtime`.
 
+### Что платформа добавляет к Python-приложению
+
+Образ `python_web` сначала ставит зависимости из `requirements.txt` (или
+выполняет вашу команду установки — `installCommand` в `layero.json`), а затем
+отдельным шагом добавляет `gunicorn>=21.2` и `uvicorn[standard]>=0.30`.
+Поэтому в логе сборки видна их установка, даже если в `requirements.txt` их
+нет. Это не ошибка: на них работают команды запуска по умолчанию.
+
+| Приложение | Команда запуска по умолчанию |
+|---|---|
+| ASGI (FastAPI, Starlette и др.) | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
+| WSGI (Flask и др.) | `gunicorn main:app --bind 0.0.0.0:$PORT`; число воркеров зависит от памяти инстанса |
+| Django | `uvicorn <проект>.asgi:application …` или `gunicorn <проект>.wsgi:application …` |
+
+Вместо `main` подставляется первый найденный модуль из списка `main`, `app`,
+`application`, `server`, `asgi`, `wsgi`. aiohttp и Tornado запускаются
+как `python main.py`, Sanic — своим сервером. Свою команду задают через
+`startCommand` в `layero.json`. Серверы при этом всё равно ставятся, и своя
+команда установки их тоже не убирает. Если в `requirements.txt` закреплена
+версия `gunicorn` или `uvicorn` ниже этих минимумов, сборка поставит более
+новую. Streamlit и Gradio запускаются своими серверами, и к ним `gunicorn`
+и `uvicorn` не добавляются.
+
 ### Что определяется автоматически
 
 Тип угадывается по зависимостям — руками выбирать обычно не нужно.

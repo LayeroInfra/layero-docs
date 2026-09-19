@@ -119,3 +119,30 @@ The username is set once, during onboarding. More in
 - **Build command** — taken from the project (`build_cmd`), `npm run build` by
   default. The output directory is determined by the framework (see
   [Supported frameworks](./frameworks)).
+
+## The Layero label in HTML
+
+After a static site is built, the platform inserts one line before `</body>`
+in every HTML file:
+
+```html
+<script defer src="/_layero/footer-<hash>.js" data-layero-footer></script>
+```
+
+The script itself goes to the `/_layero/` folder. In the visitor's browser it
+draws a thin strip reading «Сделано на Layero» ("Made with Layero") — a
+footer below all the page content. It does not cover the content and picks
+its colour to match the bottom of the page.
+
+This is not a build error: nothing is written to the repository, the line
+exists only in the files the platform serves.
+
+- **Where there is no label.** HTML without `</body>`, files that are not
+  UTF-8, site verification files for Yandex Webmaster, Google Search Console
+  and Bing, `node_modules` and folders whose names start with a dot. HTML
+  served by a container (SSR, a Node or Python server) is not changed. The
+  frontend of a fullstack project does get the label.
+- **How to configure it.** Dashboard → project → **Settings → Layero Label**:
+  automatic colour, your own colour, or off. Turning the label off needs the
+  Pro plan ([plans](../billing/plans)). The change takes effect with the
+  next deploy.

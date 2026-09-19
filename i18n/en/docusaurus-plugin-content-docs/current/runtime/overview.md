@@ -69,6 +69,29 @@ After the `ready` event the first request may get a 404 placeholder for up to
 a minute while the container starts. A 404 that outlives a minute is a real
 failure: read `npx layero@latest logs --runtime`.
 
+### What the platform adds to a Python app
+
+The `python_web` image first installs the dependencies from `requirements.txt`
+(or runs your install command — `installCommand` in `layero.json`), then adds
+`gunicorn>=21.2` and `uvicorn[standard]>=0.30` in a separate step. That is why
+the build log shows them being installed even when `requirements.txt` does not
+list them. This is not an error: the default start commands run on them.
+
+| App | Default start command |
+|---|---|
+| ASGI (FastAPI, Starlette, etc.) | `uvicorn main:app --host 0.0.0.0 --port $PORT` |
+| WSGI (Flask, etc.) | `gunicorn main:app --bind 0.0.0.0:$PORT`; the number of workers depends on the instance memory |
+| Django | `uvicorn <project>.asgi:application …` or `gunicorn <project>.wsgi:application …` |
+
+`main` is replaced with the first module found among `main`, `app`,
+`application`, `server`, `asgi`, `wsgi`. aiohttp and Tornado start as
+`python main.py`, Sanic with its own server. Set your own command with
+`startCommand` in `layero.json`. The servers are installed anyway, and your own
+install command does not remove them either. If `requirements.txt` pins
+`gunicorn` or `uvicorn` below these minimums, the build installs a newer
+version. Streamlit and Gradio run their own servers, and `gunicorn` and
+`uvicorn` are not added to them.
+
 ### What is detected automatically
 
 The type is inferred from your dependencies, so you rarely need to pick it by
