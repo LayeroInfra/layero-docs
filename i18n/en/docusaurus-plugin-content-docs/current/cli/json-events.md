@@ -552,6 +552,7 @@ and starts the build.
 |---|---|---|
 | `setup_applied` | `project`, `framework`, `build_cmd` (string \| null), `output_dir` (string \| null), `layero_found` (boolean) | Setup finished. The framework, command and folder are what detection saw, for information: they are not written into the project (since CLI 0.11.4) — the builder detects them from the repository on every build |
 | `deploy_started` | `project`, `deploy_id`, `url` | First build started; follow it with `layero deploys list --project <slug>` |
+| `queued` | `waited_s` | The build is waiting for a free builder; printed every 15 s until the first `stage`. Not a failure — keep waiting |
 | `setup_pending` | `project`, `url`, `hint` | `--no-deploy`: the project stays in the wizard; nothing builds until setup is finished at `url` |
 | `setup_failed` | `project`, `reason`, `url`, `hint` | Detection, setup or the build start failed. The project **is created**, exit 0 — tell the person to finish in the dashboard at `url` |
 
