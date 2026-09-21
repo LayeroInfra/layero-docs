@@ -375,9 +375,8 @@ The error arrives as an `error` event right after `data_probe`.
 
 ### `claimable`
 
-A deploy without an account (`layero deploy --claim`, or automatically: no
-token, an agent environment — not a terminal and not CI — `--yes`, and the
-project is new). The platform created a temporary project and a token for it; the site lives for
+A deploy without an account (`layero deploy --claim`; only with the explicit
+flag). The platform created a temporary project and a token for it; the site lives for
 1 hour, gets a random address and is closed to search engines. The event arrives **before** `ready`: after `ready` an agent stops
 reading, and without this link the site disappears with its deadline.
 
@@ -389,25 +388,31 @@ reading, and without this link the site disappears with its deadline.
 | `claim_url` | string | the link a human uses to take the project into their account. Only a person signed in to the dashboard can accept a claim — neither the CLI nor an agent does it |
 | `expires_at` | string | ISO-8601 — when the site and the token stop working |
 
-The claim code is saved in `.layero/project.json` (`claim`), the token in
-`~/.layero/config.json`; another `layero deploy` in the same directory updates
+The token, the claim code and the link are saved in `~/.layero/config.json`
+(readable by you only); `.layero/project.json` gets only the folder's link:
+that file goes to git, and a claim code in a public repository would let
+anyone take the site (since CLI 0.11.8; a code in `project.json` from older
+versions moves to the config on the next deploy). Another `layero deploy` in the same directory updates
 the same site until the deadline and prints `claimable` again with the same
 link. `npx layero@latest diagnose` and `logs` in that folder use the sandbox
-token — no login needed. It never turns on by itself in CI: a runner
-without `LAYERO_TOKEN` gets `auth_required`.
+token — no login needed. Taking the site into an account clears the
+environment variables, deploy hooks and build settings set up without an
+account: the published files stay, the next build takes its settings from the
+project files.
 
 A sandbox only ever creates a **new** project. When `--project` is passed or
-the folder is linked to an account project (`.layero/project.json` without a
-`claim` field) and there is no token, the CLI starts signing in: an
-`auth_required` event with `url` and `user_code`. Before 0.10.5 an agent
-environment with `--yes` turned the sandbox on here, and the platform answered
-`username_required`. A sandbox token from `~/.layero/config.json` is only
-used for its own project.
+the folder is linked to a project this machine holds no claim for, and there is
+no token, the CLI starts signing in: an `auth_required` event with `url` and
+`user_code`. The same happens without `--claim` in a new folder: before 0.11.8
+an agent environment with `--yes` turned the mode on by itself, and the folder
+went to the open internet without a person deciding so. A sandbox token from
+`~/.layero/config.json` is only used for its own project.
 
 ### `claim_status`
 
-The result of `layero claim status [code]`. Without a code it reads
-`.layero/project.json`.
+The result of `layero claim status [code]`. Without a code it takes the
+claim of the folder's project from `~/.layero/config.json` (for folders of
+older CLI versions, from `.layero/project.json`).
 
 | field | type |
 |---|---|
@@ -662,7 +667,7 @@ Do not write handling for codes that are not on this list.
 | `claimable_unavailable` | Deploying without an account is not enabled on the platform (the API answered 404/501/503), the claim quota is exhausted (429), or the platform returned no claim code | Sign in: `layero login` — or `LAYERO_TOKEN` |
 | `claim_static_only` | `layero deploy --claim` (or the automatic mode without a login) in the folder of a server app — SSR, fullstack, container. Without an account only static sites and SPAs go out. Nothing was created or uploaded | Sign in (`npx layero@latest login`) and deploy from the account with the same `deploy` without `--claim` |
 | `claim_with_project` | `layero deploy --claim --project <project>`: a sandbox creates a new project and never deploys into an existing one. Nothing was created or uploaded | For an existing project sign in: `layero login` — and retry without `--claim`; a new site without an account — `--claim` without `--project` |
-| `claim_unknown` | `layero claim status`/`accept` without a code and without a claim in `.layero/project.json`, or the claim with that code expired or the code is wrong | Pass the code; a new project without an account — `layero deploy --claim` |
+| `claim_unknown` | `layero claim status`/`accept` without a code and without a claim for the folder's project, or the claim with that code expired or the code is wrong | Pass the code; a new project without an account — `layero deploy --claim` |
 | `internal` | An unexpected CLI error (network, unhandled exception) | Re-run with `--debug` |
 
 :::note[The deploy code is built from the status]
