@@ -655,6 +655,8 @@ CLI упаковал директорию в tar.gz.
 | `connection_not_found` | `layero sources repos` с id, которого нет в организации | `layero sources list` |
 | `hook_not_found` | `layero hooks delete` с id, которого у проекта нет (уже удалён?) | `layero hooks list` |
 | `claimable_unavailable` | Деплой без аккаунта на платформе не включён (API ответил 404/501/503), исчерпан лимит заявок (429) либо платформа не вернула код заявки | Войти: `layero login` — или `LAYERO_TOKEN` |
+| `sandbox_claimed` | Повторный `layero deploy` в папке песочницы, а сайт уже забрали в аккаунт: токен песочницы отозван. Токен и заявка забыты, привязка папки к проекту осталась — проект тот же | Войти тем аккаунтом, что забрал сайт (`npx layero@latest login`), и повторить тот же `deploy` |
+| `sandbox_expired` | Повторный `layero deploy` в папке песочницы, а её срок (час) вышел и песочница удалена. Токен, заявка и привязка папки убраны | Новый сайт без аккаунта — `npx layero@latest deploy --claim`; чтобы сайт жил дольше часа — войти и выкатить в аккаунт |
 | `claim_static_only` | `layero deploy --claim` (или авто-режим без входа) в папке серверного приложения — SSR, фуллстек, контейнер. Без аккаунта выкладываются только статика и SPA. Ничего не создано и не загружено | Войти (`npx layero@latest login`) и выкатить из аккаунта тем же `deploy` без `--claim` |
 | `claim_with_project` | `layero deploy --claim --project <проект>`: песочница создаёт новый проект и в существующий не выкатывает. Ничего не создано и не загружено | Для существующего проекта войти: `layero login` — и повторить без `--claim`; новый сайт без аккаунта — `--claim` без `--project` |
 | `claim_unknown` | `layero claim status`/`accept` без кода и без заявки для проекта папки, либо заявка с таким кодом истекла или код неверный | Передать код; новый проект без аккаунта — `layero deploy --claim` |
@@ -676,8 +678,8 @@ CLI упаковал директорию в tar.gz.
 |---|---|---|
 | `0` | успех | — |
 | `1` | прочее | `plan_limit`, `forbidden`, `confirmation_required`, `repeated_failure`, `cli_deploys_disabled`, `username_required` и всё, что не попало в классы ниже |
-| `2` | нужен вход | `auth_required`, `auth_expired`, `auth_timeout` |
-| `3` | не найдено | `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `no_runs`, `data_key_unknown` |
+| `2` | нужен вход | `auth_required`, `auth_expired`, `auth_timeout`, `sandbox_claimed` |
+| `3` | не найдено | `sandbox_expired`, `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `no_runs`, `data_key_unknown` |
 | `4` | неверный ввод | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `claim_static_only`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect` |
 | `5` | удалённая ошибка | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `deploy_watch_lost`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, любой `deploy_<status>` и `http_5xx` |
 
