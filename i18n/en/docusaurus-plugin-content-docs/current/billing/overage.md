@@ -6,7 +6,7 @@ description: How to pay for usage above the limits on Pro — how to turn it on,
 
 # Overage billing
 
-:::caution Draft
+:::caution[Draft]
 The rules below are not in effect yet: nothing is charged or capped above
 the plan right now. Before they take effect we will announce it and
 publish a new edition of the offer.

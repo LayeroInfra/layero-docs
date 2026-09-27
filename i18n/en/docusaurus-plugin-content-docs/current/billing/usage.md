@@ -6,7 +6,7 @@ description: What the Usage page counts, how the billing period works, the Free 
 
 # Usage and limits
 
-:::caution Draft
+:::caution[Draft]
 This is a draft of the pricing grid. Limits and overage prices are **not yet
 enforced in production**: the Usage page shows them, but nothing is capped or
 charged. The numbers and rules may change before they take effect — we will
