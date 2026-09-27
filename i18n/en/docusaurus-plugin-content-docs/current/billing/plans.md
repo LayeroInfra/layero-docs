@@ -62,7 +62,8 @@ projects.
 
 ## How to pay
 
-Payment is by card via ЮKassa (YooKassa), billed monthly with auto-renewal.
+Payment goes through ЮKassa (YooKassa): card, SBP, T-Pay, SberPay, ЮMoney or Alfa Pay —
+you pick the method when you link it. Billed monthly with auto-renewal.
 Upgrade in the dashboard: **Account settings → Plan → Upgrade to Pro**.
 
 ## Changing plans
