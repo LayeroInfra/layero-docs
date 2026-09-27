@@ -156,28 +156,41 @@ organizations, each of them gets 1,000 build minutes.
 
 ## What happens when a limit runs out
 
-### Pro
+The sequence is the same for every metric; only the reaction at 100% differs.
 
-Sites and apps keep working, and traffic is never cut off. The rest depends
-on whether [overage billing](./overage) is on:
+1. **80% of the limit** — a banner on the Usage page and an email to the
+   organization owner. Nothing is limited.
+2. **100%** — the reaction from the table below. Whatever is already running
+   is left alone: a build in progress finishes, a responding app is not
+   stopped, sites are always served.
+3. **While the limit is exhausted** — the banner stays, and the dashboard
+   and CLI show the reason for each refusal with a link to the plan.
+4. **New period** — counters reset and the restrictions lift by themselves.
+   Earlier: upgrade to Pro (from Free) or turn on
+   [overage billing](./overage) (on Pro) — it takes effect immediately.
 
-- **off** (the default) — once build minutes or files for the period run
-  out, new builds do not start until the next period, and a deploy that
-  would go over the files limit is rejected. Traffic, requests, memory and
-  CPU are not limited;
-- **on** — everything keeps working, and usage above the limit is paid at
-  the prices from the table, up to the cap you set.
+| Metric | Free | Pro, overage off | Pro, overage on |
+|---|---|---|---|
+| Builds per period | new builds do not start | unlimited | unlimited |
+| Build minutes | new builds do not start | new builds do not start | builds run, minutes above the limit at ₽1 each |
+| Files per period | a deploy that would exceed the limit is rejected | same | the deploy runs, files above the limit at ₽1.5 per 1,000 |
+| Files per deploy | the deploy is rejected as a whole | same | same — this is a cap, not a quota |
+| Outbound traffic | sites keep responding; on a multiple overrun — slower delivery and a banner | sites keep responding, no limit | traffic above the limit at ₽8 per GB |
+| Requests to sites | same as traffic | sites keep responding, no limit | requests above the limit at ₽130 per million |
+| App memory | a running app is not stopped; a sleeping one is not woken until the new period — visitors see a "limit reached" page instead | apps keep running, no limit | above the limit at ₽0.05 per GB·min |
+| App CPU | same as memory | apps keep running, no limit | above the limit at ₽0.13 per minute |
 
-### Free
+What "rejected" means: the deploy stays in the list with a "refused" status
+and a reason, the repository webhook gets the same refusal, and the CLI and
+dashboard show it as text. Nothing already published disappears.
 
-There is no paid overage. When a limit runs out:
+On Pro with overage billing on there is also a **cap** — the amount you
+allowed to be charged per period. At the cap, builds stop starting again,
+while sites and apps keep working; see [Overage billing](./overage#the-cap).
 
-- **builds and build minutes** — new builds do not start until the next
-  period;
-- **files** — a deploy that would go over the limit is rejected;
-- **traffic and requests** — sites keep responding; if the limit is
-  exceeded many times over, we will contact you;
-- **memory and CPU** — apps go to sleep until the next period.
+Traffic and requests are **never switched off automatically**: those are
+your visitors. We can only switch a site off manually, in case of abuse,
+after warning you by email.
 
 ## What to do if usage grows
 
