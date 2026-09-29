@@ -6,21 +6,19 @@ description: The HTTP layer over your Layero project database — tables, functi
 
 # Data API
 
-:::warning[Section in testing]
+:::info[Beta]
 
-Databases and Data API are not yet open to everyone: the section is in a
-closed pilot on a handful of accounts. If the panel menu has no "Databases"
-item, you don't have access yet, and you won't be able to create a database
-either from the panel or from the CLI.
+Data API is in beta. Everything described on these pages already works, but
+names, buttons, and endpoint responses are still changing. A page may lag
+behind the product by a few days; if you notice a discrepancy, write to us in
+the dashboard chat — it helps.
 
-**To join the pilot**, write to us in the "💬" chat in the bottom-right corner
-of the [panel](https://app.layero.ru) — we'll enable it manually. There is no
-other way to get access right now.
-
-Everything described on these pages already works — but names, buttons, and
-endpoint responses are still changing. A page may lag behind the product by a
-few days; if you notice a discrepancy, write to us in the same chat, it
-helps.
+**Data API isn't open to everyone yet**, even to those who already have
+[databases](../database/index.md). If the "API", "Authentication", and
+"Files" items on the database page are grey and marked "Soon", your
+organization doesn't have access yet. Write to us in the "💬" chat in the
+bottom-right corner of the [dashboard](https://app.layero.ru) — we'll enable
+it manually.
 
 :::
 

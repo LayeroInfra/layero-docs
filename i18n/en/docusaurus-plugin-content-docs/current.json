@@ -67,12 +67,12 @@
     "message": "How an AI agent works with Layero: the three paths, installing the skill and MCP, the MCP tools.",
     "description": "The generated-index page description for category 'AI-агенты' in sidebar 'docsSidebar'"
   },
-  "sidebar.docsSidebar.category.Data API (в тестировании)": {
+  "sidebar.docsSidebar.category.Data API (бета)": {
     "message": "Data API (beta)",
-    "description": "The label for category 'Data API (в тестировании)' in sidebar 'docsSidebar'"
+    "description": "The label for category 'Data API (бета)' in sidebar 'docsSidebar'"
   },
-  "sidebar.docsSidebar.category.База данных (в тестировании)": {
-    "message": "Database (beta)",
-    "description": "The label for category 'База данных (в тестировании)' in sidebar 'docsSidebar'"
+  "sidebar.docsSidebar.category.Базы данных (бета)": {
+    "message": "Databases (beta)",
+    "description": "The label for category 'Базы данных (бета)' in sidebar 'docsSidebar'"
   }
 }

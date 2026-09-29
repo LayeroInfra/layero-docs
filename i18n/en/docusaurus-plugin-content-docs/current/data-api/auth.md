@@ -6,11 +6,10 @@ description: Sign-up and sign-in for an application on Data API, the authenticat
 
 # User Sign-In
 
-:::warning[Section in testing]
+:::info[Beta]
 
-Data API is not yet open to everyone — a closed pilot is underway. How to
-get access and what to expect from these pages is written up in
-["What Data API Is"](./index.md).
+Data API is in beta and isn't open to everyone yet. How to get access and
+what to expect from these pages is covered in [What Data API Is](./index.md).
 
 :::
 

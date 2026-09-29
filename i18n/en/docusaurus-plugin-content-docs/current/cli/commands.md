@@ -32,6 +32,12 @@ description: The full list of layero commands — init, login, projects, deploy,
 | `layero promote` | Point the production apex at a specific ready deploy. |
 | `layero promote <sha>` | Point the apex at a specific deploy by `commit_sha` — the working way to roll back, see [Rollback](./rollback). |
 | `layero hooks list/create/delete` | Deploy hooks — URL tokens that start a build on POST (CMS, cron, external CI). |
+| `layero db list` | The organization's databases: name, slug, placement, Postgres version, Data API, storage used, paid-until date. |
+| `layero db create <name>` | Create a shared database from the plan. The connection string is printed once. |
+| `layero db connect <database>` | Connect a project to the database — the connection string goes into its environment variables. |
+| `layero db disconnect <database>` | Disconnect a project from the database: the variable goes away with the next deploy. |
+| `layero db sql <database> "SQL"` | Run a query or a script in the database. |
+| `layero data env` | The [Data API](/data-api) URL and public key for the frontend. |
 | `layero token set <jwt>` | Set the token by hand (for CI). |
 
 The full flag list for a command:
@@ -239,3 +245,27 @@ npx layero@latest promote --yes                  # no confirmation (CI)
 `layero deploy --promote` is the short path — "build it and ship it to
 production straight away", equivalent to
 `layero deploy … && layero promote <last-sha>`.
+
+## `layero db`
+
+The organization's databases from the terminal — so you don't have to switch
+to the browser mid-task, and so an agent in CI can do the same.
+
+```bash
+npx layero@latest db list                            # which databases exist
+npx layero@latest db create crm                      # create one
+npx layero@latest db connect crm                     # connect the current project
+npx layero@latest db sql crm "select count(*) from entries"
+```
+
+With a single organization the CLI uses it; with several, your personal one.
+For a team organization pass `--org <slug>`. A database is addressed by name, slug or id.
+
+:::warning[The connection string is printed once]
+The CLI won't print it a second time. If you lose it, you can view or reset the
+password in the dashboard: the database card menu → **Connect**. It's safer to
+save the `db create` output right away.
+:::
+
+Commands, output, JSON events and the limits of `db sql` are covered in
+[Databases from the CLI](../database/cli.md).

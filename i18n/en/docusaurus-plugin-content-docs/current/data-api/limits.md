@@ -6,11 +6,10 @@ description: What's not supported in Data API and where the boundaries are.
 
 # What's Missing
 
-:::warning[Section in testing]
+:::info[Beta]
 
-Data API is not yet open to everyone — a closed pilot is underway. How to
-get access and what to expect from these pages is written up in
-["What Data API Is"](./index.md).
+Data API is in beta and isn't open to everyone yet. How to get access and
+what to expect from these pages is covered in [What Data API Is](./index.md).
 
 :::
 
@@ -41,7 +40,7 @@ own code on our side.
 | Concurrent connections per database | 4 per gateway process, two processes — so 8; beyond that, a `db_too_busy` refusal |
 | File in storage | up to 50 MB |
 | Daily request limit | set per database; unlimited if not set |
-| Databases per organization | 10 (write to us if you need more) |
+| Databases per organization | one shared, as many dedicated as you need; see [database limits](../database/limits.md) |
 | Accepted origins per database | 50 |
 
 The dedicated `db_too_busy` code means "you are overloaded," not "the
