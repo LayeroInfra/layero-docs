@@ -8,17 +8,16 @@ description: Creating a Layero database from the dashboard and from the CLI — 
 
 :::info[Beta]
 
-The section isn't open to all organizations yet. How to get access and what
-to expect from the beta — on the ["Databases"](./index.md) page.
+Databases are in beta: everything described here works, but the interface
+and some features are still changing. More on the [Databases](./index.md)
+page.
 
 :::
 
 ## From the dashboard
 
 1. Open [app.layero.ru](https://app.layero.ru) and pick an organization.
-2. In the left menu — **Databases**, in the "Services" group. No such
-   item — the organization doesn't have access yet, see
-   ["Databases"](./index.md).
+2. In the left menu — **Databases**, in the "Services" group.
 3. Click **Create database**. The "New database" dialog opens.
 4. **Name** — anything, up to 60 characters. It's only visible in the
    dashboard and can be changed at any time.
@@ -155,8 +154,6 @@ More — ["Working in the dashboard"](./panel.md#extensions).
 
 | What you see | What it means |
 |---|---|
-| No "Databases" item in the menu | The organization doesn't have access yet. Message us in the dashboard chat |
-| "The section isn't open for your organization yet" | Same thing |
 | No Shared CPU tile | The organization already has a shared database. Create the next one as dedicated |
 | "the organization already has a Shared CPU database" | The CLI's response to a second shared database — same thing |
 | The Shared CPU tile opens the Pro checkout | A shared database is only included in Pro. A dedicated one can be ordered on Free too |

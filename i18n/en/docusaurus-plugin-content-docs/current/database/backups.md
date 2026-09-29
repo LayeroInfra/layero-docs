@@ -8,8 +8,9 @@ description: Layero database backups — schedule and retention for a shared dat
 
 :::info[Beta]
 
-The section isn't open to all organizations yet. How to get access and what
-to expect from the beta is covered on the [Databases](./index.md) page.
+Databases are in beta: everything described here works, but the interface
+and some features are still changing. More on the [Databases](./index.md)
+page.
 
 :::
 
@@ -17,19 +18,28 @@ Backups live on the database page, in the **Backups** section. The header
 shows whether they're enabled; below it is a summary: schedule, retention,
 cost, and the list of finished backups.
 
+**Backups are off by default — for every database.** Turn them on right
+after creating the database: without a backup there's nothing to restore
+deleted data from.
+
 ## Shared database
 
 | What | How it works |
 |---|---|
-| Enabled | yes, from the moment the database is created |
+| By default | off |
 | How often | once a day, by default at 03:00 Moscow time. The hour can be changed |
 | How long they're kept | 1 to 7 days, your choice |
 | Where they're stored | in separate storage, not on the database server |
 | Storage space | they don't count toward the database quota |
 | Price | included in the plan |
 
-Settings are changed with the **Change settings** button: the backup time
-(Moscow time) and the retention period in days.
+How to turn them on:
+
+1. **Backups → Enable**.
+2. Pick the backup time (Moscow time) and the retention period in days.
+3. **Save**.
+
+After that, settings are changed with the **Change settings** button.
 
 ## Dedicated database
 
@@ -110,5 +120,4 @@ irreversibly. If you might need a backup, download it **before** deleting.
 If a database is deleted for non-payment, we try to save a backup before
 deleting it, but we don't guarantee it — see
 [If payment fails](./pricing.md#if-payment-fails). It's safer not to let it
-come to that: keep backups enabled and download a fresh one from time to
-time.
+come to that: turn backups on and download a fresh one from time to time.

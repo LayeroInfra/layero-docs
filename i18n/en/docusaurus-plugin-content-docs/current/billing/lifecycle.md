@@ -1,14 +1,17 @@
 ---
 sidebar_position: 2
 title: Expiry & renewal of Pro
-description: What happens to your projects, domains, and settings when a Pro subscription ends, and how everything is restored after you pay again. Nothing is deleted when it ends.
+description: What happens to your projects, domains, settings, and shared database when a Pro subscription ends, and how everything is restored after you pay again. Projects aren't deleted.
 ---
 
 # Expiry & renewal of Pro
 
-Short answer: **nothing is deleted when Pro ends.** The account moves to
+Short answer: **projects aren't deleted when Pro ends.** The account moves to
 Free, and whatever exceeds the Free limits is temporarily **suspended**
 (not erased). After you pay again, everything is restored automatically.
+
+There's one exception — the [shared database](../database/pricing.md#if-pro-isnt-renewed):
+after the grace period, access to it closes and its data is deleted.
 
 ## What happens when Pro ends
 
@@ -20,6 +23,11 @@ Free gets suspended:
   on Pro, the **5 oldest** stay active and the rest become "suspended".
 - **Custom domains.** These are a Pro capability, so all linked custom
   domains are suspended.
+- **The shared database.** It's part of Pro and keeps working until the end
+  of the [grace period](#grace-period). After that, access to the database
+  closes and its data will be deleted — download a backup in advance.
+  Dedicated databases are paid for separately and don't depend on the
+  subscription.
 
 ### A suspended project is not a deleted one
 
@@ -47,7 +55,8 @@ automatic deletion exists — suspended projects are kept indefinitely,
 waiting for you to return to Pro.
 
 A project is deleted only if **you** delete it (or [delete the whole
-account](#delete-your-account)). Subscription expiry has nothing to do with data deletion.
+account](#delete-your-account)). Subscription expiry has nothing to do with deleting
+projects. The shared database is the exception, see above.
 
 ## Grace period
 

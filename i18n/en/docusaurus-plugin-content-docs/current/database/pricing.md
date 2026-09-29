@@ -8,8 +8,9 @@ description: How much Layero databases cost — a shared database in the Pro pla
 
 :::info[Beta]
 
-The section isn't open to all organizations yet. How to get access and what
-to expect from the beta is covered on the [Databases](./index.md) page.
+Databases are in beta: everything described here works, but the interface
+and some features are still changing. More on the [Databases](./index.md)
+page.
 
 :::
 
@@ -36,11 +37,25 @@ page retells them and gives examples.
 | Price | included in Pro |
 | How many | one per organization |
 | Storage | 0.5 GB, can't buy more |
-| Backups | once a day, kept for up to 7 days, included in the plan |
+| Backups | included in the plan: once a day, kept for up to 7 days. Off by default |
 
 When space runs low, there are two ways out: clean up the database or move
 it to a dedicated instance — see
 [below](#moving-from-a-shared-to-a-dedicated-database).
+
+### If Pro isn't renewed
+
+The shared database lives as long as the Pro subscription is active. If the
+subscription isn't renewed, the database keeps working until the end of the
+subscription's grace period: usually 7 days, 30 for an annual subscription.
+If you cancelled the subscription yourself or paid once without auto-renewal,
+there's no grace period. Details —
+[Expiry & renewal of Pro](../billing/lifecycle.md#grace-period).
+
+After the grace period, access to the database closes and its data will be
+deleted. To keep it, [download a backup](./backups.md#download-a-backup)
+before the grace period ends, or move the database to a dedicated one — that
+doesn't depend on the subscription.
 
 ## Dedicated database
 
@@ -220,6 +235,10 @@ are in section 10 of the [database terms](https://layero.ru/databases-terms).
 
 **Do I need Pro for a dedicated database?** No. A dedicated database is paid
 for separately and is available on any plan.
+
+**What happens to the shared database if I don't renew Pro?** After the
+subscription's grace period, access to it closes and the data will be
+deleted — see [If Pro isn't renewed](#if-pro-isnt-renewed).
 
 **Can I have two shared databases?** No, there's one shared database per
 organization. Create the second and any further ones as dedicated.

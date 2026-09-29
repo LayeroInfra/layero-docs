@@ -8,8 +8,9 @@ description: Layero database limits — how many databases, storage and what hap
 
 :::info[Beta]
 
-The section isn't open to all organizations yet. How to get access and what
-to expect from the beta is covered on the [Databases](./index.md) page.
+Databases are in beta: everything described here works, but the interface
+and some features are still changing. More on the [Databases](./index.md)
+page.
 
 :::
 
@@ -139,6 +140,7 @@ For data exports and anything that hits these limits, connect directly with
 
 | | Shared database | Dedicated database |
 |---|---|---|
+| By default | off | off |
 | How often | once a day, you choose the hour | once a day, at night |
 | How long they're kept | 1 to 7 days | 1 to 14 backups |
 | Price | included in Pro | paid option |

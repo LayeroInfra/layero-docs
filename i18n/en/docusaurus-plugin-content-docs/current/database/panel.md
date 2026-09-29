@@ -8,8 +8,9 @@ description: What's on a Layero database page — overview, monitoring, tables, 
 
 :::info[Beta]
 
-The section isn't open to all organizations yet. How to get access and what
-to expect from the beta is covered on the [Databases](./index.md) page.
+Databases are in beta: everything described here works, but the interface
+and some features are still changing. More on the [Databases](./index.md)
+page.
 
 :::
 

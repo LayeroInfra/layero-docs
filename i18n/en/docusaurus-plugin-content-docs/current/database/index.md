@@ -17,9 +17,8 @@ Databases are in beta. Everything described in this section already works, but t
 may lag behind the dashboard by a few days. If you notice a discrepancy,
 let us know — it helps.
 
-**The section isn't open to all organizations yet.** If the
-[dashboard](https://app.layero.ru) menu has no **Databases** item, message
-us in the "💬" chat in the bottom-right corner — we'll enable access manually.
+The section is open to all organizations: the **Databases** item is in the
+[dashboard](https://app.layero.ru) menu, in the "Services" group.
 
 :::
 
@@ -32,10 +31,11 @@ us in the "💬" chat in the bottom-right corner — we'll enable access manuall
 | Space | 0.5 GB | 8 to 2,000 GB, the disk can be increased |
 | Plan | Pro only | any, no subscription needed |
 | Price | included in Pro | from 600 ₽ per month |
+| Without a Pro subscription | access closes after the grace period, data is deleted | doesn't depend on the subscription |
 | How many | one per organization | as many as you need |
 | Wait time | under a minute | 7–13 minutes |
 | PostgreSQL version | 18 | 14–18, your choice |
-| Backups | once a day, up to 7 days, free | paid option, 1–14 backups |
+| Backups | free: once a day, up to 7 days | paid option: 1–14 backups |
 | Create from the CLI | yes | dashboard only |
 
 **A shared database** is for getting started: click and go. It's enough
@@ -69,8 +69,8 @@ limits — ["Limits"](./limits.md).
 - **Access by address** — from outside, only addresses on your list can
   connect to the database.
 - **[Data API](../data-api/index.md)** — the database over HTTP for your
-  frontend, without your own server. It's opened separately and to an even
-  smaller circle for now.
+  frontend, without your own server. Data API isn't open to everyone yet — how to
+  get access is described in its section.
 
 ## Where to start
 
