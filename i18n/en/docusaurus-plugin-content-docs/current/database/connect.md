@@ -86,6 +86,11 @@ The mode is the same for shared and dedicated databases: both connect
 through the shared entry point `db.layero.ru`, and encryption terminates at
 our certificate.
 
+⚠️ **Except a database you brought yourself.** We know neither who signed
+that server's certificate nor whether you have its root, so there is nothing
+to verify against. Its connection string is shown exactly as you saved it,
+and the mode switch in the dashboard is disabled for it.
+
 ⚠️ `verify-full` has a cost worth knowing about upfront: the mode requires
 the client to have the root certificate in the place where the library
 looks for it. libpq looks for it at `~/.postgresql/root.crt` and doesn't
