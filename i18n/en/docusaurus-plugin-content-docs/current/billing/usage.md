@@ -6,16 +6,16 @@ description: What the Usage page counts, how the billing period works, the Free 
 
 # Usage and limits
 
-:::caution[Draft]
-This is a draft of the pricing grid. Limits and overage prices are **not yet
-enforced in production**: the Usage page shows them, but nothing is capped or
-charged. The numbers and rules may change before they take effect — we will
-announce that in advance.
+:::caution[Pilot]
+Usage restrictions are being introduced only for the `valya` organization.
+For other organizations, the new usage limits are displayed without
+enforcement; existing plan restrictions remain in place. Overage billing is
+unavailable, and no overage charges are made.
 :::
 
 The **Usage** page in the dashboard shows how much of each resource the
 organization has used in the current billing period and how much is left
-before the plan limit. How to pay for usage above the limit on Pro is
+before the plan limit. Planned billing for usage above the limit on Pro is
 covered in [Overage billing](./overage).
 
 ## In short
@@ -23,10 +23,9 @@ covered in [Overage billing](./overage).
 - Limits are counted **per organization**: each organization has its own.
 - On Pro the period is counted from the subscription payment date; on
   Free — from the day the organization was created.
-- Numbers update every hour and become final after about a day.
-- On Free a limit is hard: you cannot pay for usage above it. On Pro you
-  can pay for usage above the limit if you turn on
-  [overage billing](./overage); it is off by default.
+- Charts update hourly. Restriction decisions use fresher facts, although
+  traffic and request counts arrive with a delay.
+- Extra usage and overage charges are not available yet, including on Pro.
 
 ## Where to look
 
@@ -67,7 +66,7 @@ Limits are still separate for each organization.
 ## How the numbers update
 
 - Every hour the platform rolls up usage for yesterday and today.
-- Traffic and requests arrive with a delay of up to 15 minutes, app run
+- Traffic and requests arrive with a delay of up to 20 minutes, app run
   time — up to a minute.
 - A day becomes final 26 hours after it ends: after that its numbers no
   longer change. Overage money is counted only from final days.
@@ -83,8 +82,8 @@ Time from start to finish of every build: from the repository, from the
 CLI, from the dashboard and from a deploy hook. A build belongs to the day
 it was started.
 
-- Minutes of builds that failed with an error count neither towards the
-  limit nor towards overage.
+- Minutes of failed builds count towards the limit if the build already used
+  resources. Overage billing rules will be published separately.
 - Cancelled builds, including ones superseded by a newer push, are counted
   for now. This rule is still being settled.
 
@@ -115,22 +114,13 @@ All HTTP requests through the platform: pages, images, scripts, styles,
 requests to server apps, including ones from bots. Opening a page with 30
 images and scripts is 31 requests.
 
-### App memory and CPU
+### App run minutes
 
-Counted only while the app is awake, per minute and by actual use rather
-than by the allocated limit.
-
-- **Memory** — how much memory the app actually used, times the minutes it
-  ran. The total is in GB·minutes.
-- **CPU** — the share of a core in use, times the minutes it ran. The total
-  is in minutes.
-
-Example: an app uses 300 MB and runs 4 hours a day. Over a month that is
-about 0.29 GB × 240 minutes × 30 days ≈ 2,100 GB·min: over the Free limit,
-within Pro.
-
-An app with no requests goes to sleep and stops using memory and CPU.
-Memory and CPU are counted from 27 September 2026.
+Counted by the minute while an app is awake. An app with no requests goes
+to sleep and stops using run minutes. Each minute is multiplied by the
+configuration factor relative to 0.25 vCPU and 256 MB: ×1 for the base
+configuration, ×4 for 1 vCPU and 1 GB. Actual memory and CPU use remain
+visible in charts but are not separate usage limits.
 
 ### Not included
 
@@ -140,7 +130,7 @@ Memory and CPU are counted from 27 September 2026.
 
 ## Limits
 
-| Metric | Free | Pro | Above the limit on Pro |
+| Metric | Free | Pro | Planned rule above the Pro limit |
 |---|---|---|---|
 | Builds per period | 100 | unlimited | — |
 | Build minutes | 300 | 1,000 | 1 ₽ per minute |
@@ -148,56 +138,43 @@ Memory and CPU are counted from 27 September 2026.
 | Files per period | 50,000 | 500,000 | 1.5 ₽ per 1,000 |
 | Outbound traffic | 15 GB | 100 GB | 8 ₽ per GB |
 | Requests to sites | 300 k | 3 M | 130 ₽ per million |
-| App memory | 1,500 GB·min | 12,000 GB·min | 0.05 ₽ per GB·min |
-| App CPU | 360 min | 3,000 min | 0.13 ₽ per minute |
+| App run minutes (× configuration factor) | 6,000 min | 48,000 min | 0.02 ₽ per minute |
 
 Each organization has its own limits. If you are on Pro and have three
 organizations, each of them gets 1,000 build minutes.
 
 ## What happens when a limit runs out
 
-The sequence is the same for every metric; only the reaction at 100% differs.
+In the `valya` pilot, the owner receives one email and a warning on the
+Projects page at **90%**. The warning names the metric and estimates when
+the limit will be reached. If there is too little data, no time is invented.
 
-1. **80% of the limit** — a banner on the Usage page and an email to the
-   organization owner. Nothing is limited.
-2. **100%** — the reaction from the table below. Whatever is already running
-   is left alone: a build in progress finishes, a responding app is not
-   stopped, sites are always served.
-3. **While the limit is exhausted** — the banner stays, and the dashboard
-   and CLI show the reason for each refusal with a link to the plan.
-4. **New period** — counters reset and the restrictions lift by themselves.
-   Earlier: upgrade to Pro (from Free) or turn on
-   [overage billing](./overage) (on Pro) — it takes effect immediately.
+At **100%**, the action depends on the metric:
 
-| Metric | Free | Pro, overage off | Pro, overage on |
-|---|---|---|---|
-| Builds per period | new builds do not start | unlimited | unlimited |
-| Build minutes | new builds do not start | new builds do not start | builds run, minutes above the limit at ₽1 each |
-| Files per period | a deploy that would exceed the limit is rejected | same | the deploy runs, files above the limit at ₽1.5 per 1,000 |
-| Files per deploy | the deploy is rejected as a whole | same | same — this is a cap, not a quota |
-| Outbound traffic | sites keep responding; on a multiple overrun — slower delivery and a banner | sites keep responding, no limit | traffic above the limit at ₽8 per GB |
-| Requests to sites | same as traffic | sites keep responding, no limit | requests above the limit at ₽130 per million |
-| App memory | a running app is not stopped; a sleeping one is not woken until the new period — visitors see a "limit reached" page instead | apps keep running, no limit | above the limit at ₽0.05 per GB·min |
-| App CPU | same as memory | apps keep running, no limit | above the limit at ₽0.13 per minute |
+| Metric | Action |
+|---|---|
+| Build minutes | New builds and builds already in progress stop; published sites remain available. |
+| Files per period | A deploy cannot start saving files if it would exceed the quota. |
+| Outbound traffic or requests | Access to the organization's projects is suspended. |
+| App run minutes | New starts and wakeups are denied; an already running app keeps responding. |
+
+Restrictions lift in a new period or after upgrading to a plan with enough
+quota. The app run minute start restriction requires a complete, verified
+measurement period before it can be enabled.
 
 What "rejected" means: the deploy stays in the list with a "refused" status
 and a reason, the repository webhook gets the same refusal, and the CLI and
 dashboard show it as text. Nothing already published disappears.
 
-On Pro with overage billing on there is also a **cap** — the amount you
-allowed to be charged per period. At the cap, builds stop starting again,
-while sites and apps keep working; see [Overage billing](./overage#the-cap).
-
-Traffic and requests are **never switched off automatically**: those are
-your visitors. We can only switch a site off manually, in case of abuse,
-after warning you by email.
+Extra usage with a monetary cap will follow a separate billing review.
+It is unavailable for now.
 
 ## What to do if usage grows
 
 1. Open the "By project" table on the Usage page: it shows which project
    uses up the limit.
-2. If the growth is expected and you are on Free, move to Pro. On Pro you can turn on
-   [overage billing](./overage) so that builds do not stop at the limit.
+2. If the growth is expected and you are on Free, move to Pro. Extra usage
+   is not yet available on Pro.
 3. If the usage is unexpected, the cause is usually one of these:
    - **many builds** — preview branches built on every push; limit which
      branches are built in the project settings;
@@ -205,6 +182,6 @@ after warning you by email.
      of pages into its output; check the build output folder;
    - **traffic** — the build output folder has heavy images or video;
    - **requests** — bots and monitoring that poll the site every minute;
-   - **app memory** — the app never sleeps because external monitoring or
+   - **app run minutes** — the app never sleeps because external monitoring or
      a cron job keeps waking it up.
 4. Still unclear — write to support and include a link to the project.
