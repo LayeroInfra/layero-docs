@@ -15,6 +15,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'deploy.sh'
+      - 'scripts/selectel-ci-publish.py'
       - '.github/workflows/deploy-docs.yml'
 
 concurrency:
@@ -97,9 +98,18 @@ jobs:
           BUILD_ID: ${{ github.sha }}
           # Вторая точка публикации (Selectel ru-6). Секретов нет — шаг внутри
           # deploy.sh молча пропускается.
+
+        run: bash deploy.sh
+
+      - name: Publish and verify current Selectel origin
+        env:
+          BUILD_ID: ${{ github.sha }}
           SELECTEL_S3_ACCESS_KEY: ${{ secrets.SELECTEL_S3_ACCESS_KEY }}
           SELECTEL_S3_SECRET_KEY: ${{ secrets.SELECTEL_S3_SECRET_KEY }}
-        run: bash deploy.sh
+        run: |
+          python3 -m venv "$RUNNER_TEMP/docs-selectel-venv"
+          "$RUNNER_TEMP/docs-selectel-venv/bin/pip" install -q boto3==1.40.61 botocore==1.40.61
+          "$RUNNER_TEMP/docs-selectel-venv/bin/python" scripts/selectel-ci-publish.py --build build
 
       - name: Verify
         env:
