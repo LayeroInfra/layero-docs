@@ -86,6 +86,11 @@ python3 scripts/export-md.py --build "$BUILD_DIR"
 BUILD_ID="${BUILD_ID:-$(git rev-parse --short HEAD 2>/dev/null || date -u +%Y%m%dT%H%M%SZ)}"
 printf '%s\n' "$BUILD_ID" > "$BUILD_DIR/build-id.txt"
 
+# Вторая точка публикации — Selectel ru-6 (T-20261013-6): тот же файл под тем же
+# ключом и с теми же заголовками. Без ключа в окружении ничего не делает.
+# shellcheck source=scripts/selectel-publish.sh
+source "$(dirname "${BASH_SOURCE[0]}")/scripts/selectel-publish.sh"
+
 echo "==> Uploading $BUILD_DIR to s3://$BUCKET/ (профиль: ${YC_PROFILE:-активный})"
 cd "$BUILD_DIR"
 failed=0
@@ -108,7 +113,8 @@ while IFS= read -r -d '' path; do
   # «upload: <файл> to s3://…». Чёрный список слов («error», «denied») здесь
   # не годится — путь `errors/index.html` попал бы в отказы, будучи залитым.
   case "$out" in
-    upload:*) uploaded=$((uploaded + 1)) ;;
+    upload:*) uploaded=$((uploaded + 1))
+              selectel_put "$key" "$BUCKET" "$key" "$ct" "$cc" ;;
     *)  failed=$((failed + 1))
         echo "  ✘ $key: $(printf '%s' "$out" | head -1)" >&2 ;;
   esac
@@ -238,3 +244,7 @@ for endpoint in ("https://api.indexnow.org/IndexNow", "https://yandex.com/indexn
 PY
 
 echo "Done. https://docs.layero.ru/"
+
+# Последним: первая точка уже раздаёт эту сборку, поэтому отказ второй не
+# отменяет выкатку, но обязан быть виден — иначе хранилища тихо разойдутся.
+selectel_report || { echo "✘ Selectel отстал от этой сборки (см. выше)" >&2; exit 1; }
