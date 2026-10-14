@@ -24,7 +24,7 @@ concurrency:
 jobs:
   deploy:
     runs-on: [self-hosted, layero-builder]
-    # 15m was chronically tight: install + ru/en build + yc + deploy + the
+    # 15m was chronically tight: install + ru/en build + deploy + the
     # 36-retry CDN-propagation Verify routinely lands at ~14–15m and the
     # 2026-06-25 docs deploy was killed at 15m16s. Give real headroom.
     timeout-minutes: 25
@@ -55,48 +55,11 @@ jobs:
       - name: Build (ru + en)
         run: npm run build
 
-      - name: Install yc CLI
-        run: |
-          curl -sSL https://storage.yandexcloud.net/yandexcloud-yc/install.sh | bash -s -- -i "$HOME/yandex-cloud" -n
-          echo "$HOME/yandex-cloud/bin" >> "$GITHUB_PATH"
-
-      - name: Configure yc
-        env:
-          YC_CDN_SA_KEY: ${{ secrets.YC_CDN_SA_KEY }}
-        run: |
-          # 🚨 Профиль и файл ключа ДОЛЖНЫ быть уникальны для каждого workflow.
-          # Все раннеры живут на одной builder-VM под пользователем layero, то
-          # есть делят $HOME. Пока и core, и frontend, и docs, и mcp писали
-          # ключ в ~/yc-sa-key.json и настраивали профиль "ci", параллельные
-          # деплои разных репозиториев ПОДМЕНЯЛИ друг другу облачную личность:
-          # деплой api успел настроить профиль, деплой фронта переписал тот же
-          # файл ключом cdn-SA, и api пошёл в Lockbox уже не под тем аккаунтом
-          # → PermissionDenied (прод-случай 28.07 22:38). Отдельный
-          # DOCKER_CONFIG нужен по той же причине: `configure-docker` пишет
-          # credential helper с именем профиля в общий ~/.docker/config.json.
-          export DOCKER_CONFIG="$HOME/.docker-ci-docs"
-          mkdir -p "$DOCKER_CONFIG"
-          echo "DOCKER_CONFIG=$DOCKER_CONFIG" >> "$GITHUB_ENV"
-          install -m 600 /dev/null "$HOME/yc-sa-key-docs.json"
-          printf '%s' "$YC_CDN_SA_KEY" > "$HOME/yc-sa-key-docs.json"
-          yc config profile create ci-docs 2>/dev/null || yc config profile activate ci-docs
-          yc --profile ci-docs config set service-account-key "$HOME/yc-sa-key-docs.json"
-          yc --profile ci-docs config set cloud-id b1ger5mmajemr152soru
-          yc --profile ci-docs config set folder-id b1g5p8gs03eoj1fvu0qc
-          yc --profile ci-docs storage bucket get layero-docs >/dev/null
-          yc --profile ci-docs cdn resource get bc8r7guaub3kynogbziz >/dev/null
-
       - name: Deploy docs
         env:
-          CDN_RESOURCE_ID: bc8r7guaub3kynogbziz
-          # 🚨 Профиль передаётся ЯВНО: раннеры всех репозиториев делят $HOME,
-          # и активный профиль в момент заливки мог поставить сосед. 18.08 так
-          # и вышло — каждый PutObject ответил 403, а выкатка отчиталась
-          # успехом, не выложив ни одного файла.
-          YC_PROFILE: ci-docs
           BUILD_ID: ${{ github.sha }}
-          # Вторая точка публикации (Selectel ru-6). Секретов нет — шаг внутри
-          # deploy.sh молча пропускается.
+          # Единственная точка публикации с 14.10 — бакет в Selectel ru-6
+          # (T-20261013-6). Без ключа deploy.sh отказывается выкладывать.
           SELECTEL_S3_ACCESS_KEY: ${{ secrets.SELECTEL_S3_ACCESS_KEY }}
           SELECTEL_S3_SECRET_KEY: ${{ secrets.SELECTEL_S3_SECRET_KEY }}
         run: bash deploy.sh

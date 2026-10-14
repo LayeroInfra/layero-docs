@@ -47,7 +47,8 @@ make check-texts  # тексты ↔ код; скрипты живут в core �
 Push в `main` → workflow **Deploy docs** (`deploy-docs.yml`, self-hosted
 раннер `layero-builder`) → `deploy.sh`: сборка обеих локалей, `llms.txt`,
 Markdown-копии страниц (`/<route>.md`, `sitemap.md`), заливка в бакет
-`layero-docs`, purge CDN, IndexNow. Шаг Verify сверяет `build-id.txt` на
+`layero-docs` в Selectel ru-6 (с 14.10; ключ — секреты `SELECTEL_S3_*`, без них
+выкладка отказывает), IndexNow. Шаг Verify сверяет `build-id.txt` на
 живом адресе с SHA коммита.
 
 ```bash

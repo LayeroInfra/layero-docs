@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Layero docs → s3://layero-docs/ + YC CDN purge.
+# Layero docs → bucket layero-docs in Selectel ru-6 (since 14.10, T-20261013-6; YC with CDN before).
 # Аналог frontend/landing/deploy.sh, но рекурсивная синхронизация (Docusaurus build).
 set -euo pipefail
 
@@ -7,29 +7,8 @@ cd "$(dirname "$0")"
 
 BUCKET="${BUCKET:-layero-docs}"
 
-# 🚨 ПРОФИЛЬ `yc` ПЕРЕДАЁТСЯ ЯВНО, и это не украшение. Раннеры всех
-# репозиториев живут на одной VM под пользователем `layero`, то есть делят
-# `$HOME` и список профилей: активный профиль в момент заливки мог поставить
-# сосед. Workflow заводит отдельный `ci-docs` ровно поэтому — а скрипт до
-# 18.08 звал `yc` без `--profile` и уходил под чужой личностью.
-#
-# Цена промаха измерена: 18.08 весь накопленный backlog пошёл разом на один
-# узел, каждый PutObject ответил 403 AccessDenied, и выкатка отчиталась
-# УСПЕХОМ, не выложив ни одного файла.
-# ⚠️ `if`, а не `&&`: под `set -e` ложное условие последней команды роняет
-# скрипт целиком — то есть локальный запуск без YC_PROFILE падал бы на ровном
-# месте. И раскрытие через `${a[@]+…}`: на bash 3.2 пустой массив под `set -u`
-# это «unbound variable».
-YC_PROFILE="${YC_PROFILE:-}"
-yc_args=()
-if [[ -n "$YC_PROFILE" ]]; then
-  yc_args=(--profile "$YC_PROFILE")
-fi
-yc_() { yc ${yc_args[@]+"${yc_args[@]}"} "$@"; }
 BUILD_DIR="${BUILD_DIR:-build}"
 
-CDN_RESOURCE_ID="${CDN_RESOURCE_ID:-$(yc_ cdn resource list --format json 2>/dev/null \
-  | python3 -c "import json,sys; print(next((r['id'] for r in json.load(sys.stdin) if r.get('cname')=='docs.layero.ru'), ''))" 2>/dev/null || true)}"
 
 if [[ ! -d "$BUILD_DIR" ]]; then
   echo "==> Building Docusaurus (locales: ru + en)"
@@ -86,12 +65,11 @@ python3 scripts/export-md.py --build "$BUILD_DIR"
 BUILD_ID="${BUILD_ID:-$(git rev-parse --short HEAD 2>/dev/null || date -u +%Y%m%dT%H%M%SZ)}"
 printf '%s\n' "$BUILD_ID" > "$BUILD_DIR/build-id.txt"
 
-# Вторая точка публикации — Selectel ru-6 (T-20261013-6): тот же файл под тем же
-# ключом и с теми же заголовками. Без ключа в окружении ничего не делает.
 # shellcheck source=scripts/selectel-publish.sh
 source "$(dirname "${BASH_SOURCE[0]}")/scripts/selectel-publish.sh"
 
-echo "==> Uploading $BUILD_DIR to s3://$BUCKET/ (профиль: ${YC_PROFILE:-активный})"
+selectel_enabled || { echo "✘ SELECTEL_S3_ACCESS_KEY/SELECTEL_S3_SECRET_KEY не заданы — выкладывать некуда" >&2; exit 1; }
+echo "==> Uploading $BUILD_DIR to Selectel: $BUCKET"
 cd "$BUILD_DIR"
 failed=0
 uploaded=0
@@ -102,29 +80,18 @@ while IFS= read -r -d '' path; do
   key="${path#./}"
   ct=$(content_type "$key")
   cc=$(cache_control "$key")
-  # 🚨 КОД ВОЗВРАТА `yc storage s3 cp` ВРАТЬ УМЕЕТ. Проверено мутацией
-  # 18.08: заливка в несуществующий бакет печатает «upload failed … NoSuchBucket»
-  # и выходит с НУЛЁМ. То есть проверка «if yc …; then» ловит ровно ничего —
-  # ровно поэтому 403 на каждом файле и оставался незамеченным. Судим по
-  # выводу, а не по коду.
-  out=$(yc_ storage s3 cp "$key" "s3://$BUCKET/$key" \
-          --content-type "$ct" --cache-control "$cc" 2>&1) || true
-  # ⚠️ Судим по ПОЛОЖИТЕЛЬНОМУ признаку: успешная заливка печатает
-  # «upload: <файл> to s3://…». Чёрный список слов («error», «denied») здесь
-  # не годится — путь `errors/index.html` попал бы в отказы, будучи залитым.
-  case "$out" in
-    upload:*) uploaded=$((uploaded + 1))
-              selectel_put "$key" "$BUCKET" "$key" "$ct" "$cc" ;;
-    *)  failed=$((failed + 1))
-        echo "  ✘ $key: $(printf '%s' "$out" | head -1)" >&2 ;;
-  esac
+  selectel_put "$key" "$BUCKET" "$key" "$ct" "$cc"
+  if [[ "$(tail -1 "$SELECTEL_OUTCOMES")" == ok ]]; then
+    uploaded=$((uploaded + 1))
+  else
+    failed=$((failed + 1))
+  fi
 done < <(find . -type f -print0)
 cd - >/dev/null
 
 echo "==> Выложено файлов: $uploaded, отказов: $failed"
 if (( failed > 0 )); then
   echo "✘ выкатка НЕ состоялась: $failed файлов не залилось (см. выше)." >&2
-  echo "  Частая причина — чужой профиль yc: передайте YC_PROFILE." >&2
   exit 1
 fi
 if (( uploaded == 0 )); then
@@ -136,20 +103,13 @@ fi
 # Любая проверка выше опирается на поведение чужой утилиты; эта — на факт.
 echo "==> Сверяю выложенное: build-id.txt"
 probe=$(mktemp)
-yc_ storage s3 cp "s3://$BUCKET/build-id.txt" "$probe" >/dev/null 2>&1 || true
+_selectel_curl -o "$probe" "$SELECTEL_S3_ENDPOINT/$BUCKET/build-id.txt" 2>/dev/null || true
 if [[ "$(tr -d '[:space:]' < "$probe")" != "$BUILD_ID" ]]; then
   echo "✘ в бакете НЕ эта сборка: ждали $BUILD_ID, лежит «$(tr -d '[:space:]' < "$probe")»" >&2
   rm -f "$probe"
   exit 1
 fi
 rm -f "$probe"
-
-if [[ -n "$CDN_RESOURCE_ID" ]]; then
-  echo "==> Purging CDN cache (resource $CDN_RESOURCE_ID)"
-  yc_ cdn cache purge --resource-id "$CDN_RESOURCE_ID" --path '/*' >/dev/null || true
-else
-  echo "==> CDN resource not found yet — skipping cache purge (first deploy?)"
-fi
 
 # IndexNow — мгновенное уведомление Яндекса и Bing об обновлённых URL.
 # Shared key между layero.ru и docs.layero.ru. Key-файл лежит в static/ и
@@ -245,6 +205,4 @@ PY
 
 echo "Done. https://docs.layero.ru/"
 
-# Последним: первая точка уже раздаёт эту сборку, поэтому отказ второй не
-# отменяет выкатку, но обязан быть виден — иначе хранилища тихо разойдутся.
-selectel_report || { echo "✘ Selectel отстал от этой сборки (см. выше)" >&2; exit 1; }
+selectel_report >/dev/null || true   # счёт уже сверен выше; здесь только убираем временный файл
