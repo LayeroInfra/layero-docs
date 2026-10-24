@@ -18,28 +18,24 @@ Backups live on the database page, in the **Backups** section. The header
 shows whether they're enabled; below it is a summary: schedule, retention,
 cost, and the list of finished backups.
 
-**Backups are off by default — for every database.** Turn them on right
-after creating the database: without a backup there's nothing to restore
-deleted data from.
+**A shared database has backups on from the moment it's created** — once a
+day, kept for 7 days. You can turn them off, but then there's nothing to
+restore deleted data from. For a dedicated database, backups are a paid
+option and off by default.
 
 ## Shared database
 
 | What | How it works |
 |---|---|
-| By default | off |
+| By default | on |
 | How often | once a day, by default at 03:00 Moscow time. The hour can be changed |
 | How long they're kept | 1 to 7 days, your choice |
 | Where they're stored | in separate storage, not on the database server |
 | Storage space | they don't count toward the database quota |
 | Price | included in the plan |
 
-How to turn them on:
-
-1. **Backups → Enable**.
-2. Pick the backup time (Moscow time) and the retention period in days.
-3. **Save**.
-
-After that, settings are changed with the **Change settings** button.
+The backup hour and the retention period change with **Change settings**. If
+backups were turned off, bring them back with **Backups → Enable**.
 
 ## Dedicated database
 
