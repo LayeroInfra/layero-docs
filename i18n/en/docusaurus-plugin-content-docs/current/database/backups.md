@@ -99,6 +99,20 @@ pg_restore --no-owner --no-privileges -d postgresql://localhost/restored backup.
 This is also the way to move off Layero or to keep your own copy just in
 case.
 
+### Your own dump of a shared database
+
+You can take a dump with your own tools too — plain `pg_dump` to an SQL file:
+
+```bash
+pg_dump "$DATABASE_URL" -f backup.sql
+```
+
+Archive formats (`-Fc`, `-Fd`, `-Ft`) and the `-C` flag fail on a shared
+database with `permission denied for table pg_db_role_setting`: this
+server-wide catalog holds role settings of every database, so it is closed to
+neighbours. If you need an archive format, download a backup from the
+dashboard.
+
 ## Backup types in the list
 
 A shared database's list can contain backups of two types:
