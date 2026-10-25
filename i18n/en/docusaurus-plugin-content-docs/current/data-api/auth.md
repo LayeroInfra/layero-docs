@@ -28,12 +28,15 @@ for the database.
 
 ## Role of a signed-in user
 
-A signed-in user runs under the `authenticated` role, an anonymous one under
-`anon`. The signed-in role **inherits** from the anonymous one: signing in
+A signed-in user runs under the database's signed-in role, an anonymous one
+under its anonymous role. Each database has its own role names —
+`<organization>_<database>_auth` and `_anon`, returned by `layero.role('auth')`
+and `layero.role('anon')`. There are no roles named `authenticated` and `anon`
+as on Supabase. The signed-in role **inherits** from the anonymous one: signing in
 only adds access.
 
 Policies have access to `auth.uid()` and `auth.role()` — the same names as
-Supabase, so migrated policies work without editing:
+Supabase, so the conditions of migrated policies work without editing:
 
 ```sql
 CREATE POLICY entries_own ON public.entries
@@ -41,10 +44,11 @@ CREATE POLICY entries_own ON public.entries
     USING (owner_id = auth.uid());
 ```
 
-🚨 A policy of `TO authenticated USING (true)` migrated from Supabase means
-"anyone who is signed in." Check that this is really what you meant: before
-we had a dedicated signed-in role, such a policy exposed the table to
-anyone holding a public key.
+🚨 A `TO authenticated` or `TO anon` policy from a Supabase migration fails
+here with `role "authenticated" does not exist`. The error names this
+database's actual role. Replace the role with `TO PUBLIC` and a condition on
+`auth.uid()`, as in the example above, or substitute the name through
+`layero.role()` — see [Pitfalls](./pitfalls.md).
 
 ## Signing in from the Layero panel: no second password
 
@@ -70,7 +74,7 @@ the gateway address:
 ```
 
 The token is placed in `authorization: Bearer …` alongside the public key —
-after that it's like any regular sign-in: the `authenticated` role,
+after that it's like any regular sign-in: the signed-in role,
 `auth.uid()`, policies.
 
 This doesn't extend permissions: access is still decided by grants and RLS,

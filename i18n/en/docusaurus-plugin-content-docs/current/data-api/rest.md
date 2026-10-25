@@ -40,7 +40,9 @@ A fresh database exposes zero tables over the API. For a table to become
 visible, the role needs a grant, and the table needs an RLS policy:
 
 ```sql
-GRANT SELECT ON public.entries TO layero.role('anon');
+DO $$ BEGIN
+    EXECUTE format('GRANT SELECT ON public.entries TO %I', layero.role('anon'));
+END $$;
 ALTER TABLE public.entries ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY entries_read_own ON public.entries

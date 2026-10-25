@@ -38,10 +38,16 @@ own code on our side.
 | What | Value |
 |---|---|
 | Concurrent connections per database | 4 per gateway process, two processes — so 8; beyond that, a `db_too_busy` refusal |
-| File in storage | up to 50 MB |
-| Daily request limit | set per database; unlimited if not set |
+| Requests to one database per day | Free — 50,000, Pro — 1,000,000; beyond that, a `quota_exceeded` refusal (429) until 00:00 UTC |
+| Sign-in users per database | Free — 10,000, Pro — 100,000; beyond that, new sign-ups are closed, existing users keep working |
+| File in storage | up to 50 MB on any plan |
+| File storage per database | Free — 1 GB, Pro — up to 100 GB |
 | Databases per organization | one shared, as many dedicated as you need; see [database limits](../database/limits.md) |
 | Accepted origins per database | 50 |
+
+Every request counts: tables, functions, files, and outbound calls. Sites
+and direct Postgres connections to the database are not affected by the
+daily limit.
 
 The dedicated `db_too_busy` code means "you are overloaded," not "the
 platform is overloaded": neighboring databases keep working fine.

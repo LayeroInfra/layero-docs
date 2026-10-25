@@ -33,10 +33,12 @@ SELECT rolname FROM pg_roles WHERE rolname ~ '^u_.*_anon$' LIMIT 1;
 
 ```sql
 -- Так правильно
-GRANT SELECT ON public.entries TO layero.role('anon');
+DO $$ BEGIN
+    EXECUTE format('GRANT SELECT ON public.entries TO %I', layero.role('anon'));
+END $$;
 ```
 
-Функция `layero.role('anon'|'auth'|'svc')` есть в каждой базе с включённым API.
+Функция `layero.role('anon'|'auth'|'svc')` есть в каждой базе с включённым API. В `GRANT` и `CREATE POLICY` имя роли должно быть идентификатором, а не выражением, поэтому вызов оборачивается в `DO` и `format('%I')`: `GRANT … TO layero.role('anon')` Postgres не разберёт.
 Проверить выданное можно так:
 
 ```sql

@@ -31,7 +31,9 @@ BEGIN
     RETURN jsonb_build_object('ok', true);
 END $$;
 
-GRANT EXECUTE ON FUNCTION api.submit(text, jsonb) TO layero.role('anon');
+DO $$ BEGIN
+    EXECUTE format('GRANT EXECUTE ON FUNCTION api.submit(text, jsonb) TO %I', layero.role('anon'));
+END $$;
 ```
 
 ```js

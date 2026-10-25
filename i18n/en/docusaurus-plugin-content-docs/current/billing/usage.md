@@ -135,7 +135,9 @@ Memory and CPU are counted from 27 September 2026.
 ### Not included
 
 - **Databases** — billed separately, see [Databases](../database/create).
-- **Data API and domains** — not limited.
+- **Domains** — not limited.
+- **Data API** — has its own per-database limits, see
+  [What's missing](../data-api/limits.md).
 - **Build storage** — free.
 
 ## Limits

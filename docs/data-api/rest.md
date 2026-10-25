@@ -39,7 +39,9 @@ curl "https://data.layero.ru/moya-baza/rest/v1/entries?id=eq.42&select=*" \
 грант, а таблице — политика RLS:
 
 ```sql
-GRANT SELECT ON public.entries TO layero.role('anon');
+DO $$ BEGIN
+    EXECUTE format('GRANT SELECT ON public.entries TO %I', layero.role('anon'));
+END $$;
 ALTER TABLE public.entries ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY entries_read_own ON public.entries

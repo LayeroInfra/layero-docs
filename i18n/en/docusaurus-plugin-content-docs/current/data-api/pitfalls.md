@@ -34,11 +34,15 @@ product's own queries kept answering "table not exposed."
 
 ```sql
 -- This is correct
-GRANT SELECT ON public.entries TO layero.role('anon');
+DO $$ BEGIN
+    EXECUTE format('GRANT SELECT ON public.entries TO %I', layero.role('anon'));
+END $$;
 ```
 
 The function `layero.role('anon'|'auth'|'svc')` exists in every database
-with the API enabled. You can check what's been granted like this:
+with the API enabled. In `GRANT` and `CREATE POLICY` the role name must be an
+identifier, not an expression, so the call is wrapped in `DO` with
+`format('%I')`: Postgres will not parse `GRANT … TO layero.role('anon')`. You can check what's been granted like this:
 
 ```sql
 SELECT layero.role('anon'), has_table_privilege(layero.role('anon'), 'public.entries', 'SELECT');
