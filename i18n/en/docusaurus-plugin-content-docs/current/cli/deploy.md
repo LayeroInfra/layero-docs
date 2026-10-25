@@ -27,7 +27,7 @@ What happens:
 2. It walks the current directory, applies the ignore rules (below), packs
    everything into a tar.gz in a temporary directory and computes the sha256
    on the fly.
-3. The archive is uploaded to Yandex Object Storage through a presigned URL.
+3. The archive is uploaded to the platform’s object storage through a presigned URL.
 4. The backend creates a deploy and starts the build.
 5. The CLI polls the deploy logs (`/deploys/{id}/logs`) until the status is
    `ready` or `failed`, printing them to the terminal.

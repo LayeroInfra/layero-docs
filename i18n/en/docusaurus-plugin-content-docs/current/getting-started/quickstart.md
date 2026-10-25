@@ -67,7 +67,7 @@ The CLI will:
    not set yet.
 2. Pack the directory into a tar.gz, honouring `.gitignore` and
    `.layeroignore` (see [`layero deploy`](../cli/deploy)).
-3. Upload the archive to Yandex Object Storage.
+3. Upload the archive to the platform’s object storage.
 4. Start the build on the platform side.
 5. Stream the logs to your terminal and print the address at the end.
 

@@ -38,10 +38,10 @@ The container starts on the first request and stops when idle.
 
 | | |
 |---|---|
-| Hosting | Yandex Cloud, `ru-central1` region |
-| Serving | Own edge (nginx) in `ru-central1`; the user zone `*.layero.app` resolves straight to the platform load balancer |
-| Certificates | Let's Encrypt via YC Certificate Manager |
-| Artifact storage | Yandex Object Storage |
+| Hosting | Build and hosting servers in Russia |
+| Serving | Own edge (nginx); the user zone `*.layero.app` resolves straight to the platform load balancer |
+| Certificates | Automatic HTTPS on project addresses; custom domains require DNS verification |
+| Artifact storage | S3-compatible object storage |
 | Build environment | Node.js 20 / 22 / 24 (default 22), Python 3.10–3.13 (default 3.12), git — see [Node.js and Python versions](./deploys/runtime-versions.md) |
 
 ## Where to go next
