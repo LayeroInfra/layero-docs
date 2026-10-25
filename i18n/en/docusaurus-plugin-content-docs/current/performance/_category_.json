@@ -3,6 +3,6 @@
   "position": 9,
   "link": {
     "type": "generated-index",
-    "description": "Site speed audit: Core Web Vitals, Lighthouse, Coach, the waterfall and how the score is built."
+    "description": "Site speed audit: how a run works, the Lighthouse score, Core Web Vitals, comparing runs and schedules."
   }
 }

@@ -48,7 +48,7 @@
     "description": "The label for category Производительность in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Производительность.link.generated-index.description": {
-    "message": "Auditing site speed: Core Web Vitals, Lighthouse, Coach, and waterfall traces.",
+    "message": "Site speed audit: how a run works, the Lighthouse score, Core Web Vitals, comparing runs and schedules.",
     "description": "The generated-index page description for category Производительность in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Команды и интеграции": {

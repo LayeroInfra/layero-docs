@@ -1,105 +1,180 @@
 ---
 sidebar_position: 1
 title: How we measure speed
-description: What the Layero performance audit measures — Core Web Vitals, Lighthouse and Coach, how to read the metrics and what the final score is built from.
+description: How the Layero performance audit works — where and how the page is opened, which metrics we collect, how the Lighthouse score is calculated, how runs are compared and why the numbers differ from PageSpeed Insights.
 ---
 
 # How we measure speed
 
-The performance audit opens your site in a real browser, several times in a
-row, in a stable network and device profile — and records **what the user
-saw and when**. From that recording we build the speed metrics, the loading
-screenshots (filmstrip) and the list of every network request (waterfall).
+The performance audit answers one question: **how fast does your site load
+for a visitor in Russia**. To answer it honestly, we open the page in a real
+browser, in a data center in Russia, on the published version of your site —
+and record what appeared on screen and when.
 
-Each run is repeated several times, and the report shows the **median** — so
-one-off spikes (a backgrounded tab, a stray GC pause) don't skew the picture.
+This page explains how a run works, what every number in the report means and
+when two runs of the same page can be compared.
 
-## Why these metrics matter
+:::tip In short
 
-Speed isn't a "nice to have" — it directly affects the business:
+- The headline number is the **Lighthouse score**, from 0 to 100. It is built
+  from five loading metrics with the same formula PageSpeed Insights uses.
+- The page is opened **in Russia**, so the network is the one your audience
+  has. PageSpeed Insights opens it from data centers abroad.
+- Every run loads the page **several times**; the report shows the median
+  of each metric.
+- We only say "got worse" when the difference is **larger than the noise**.
 
-- **Bounce rate.** The slower a page loads, the more people leave before it
-  finishes. Every extra second costs conversions.
-- **Search.** Core Web Vitals are an official Google ranking factor. A slow
-  site indexes worse and ranks lower.
-- **Trust.** Shifting layout and frozen clicks read as "the site is broken,"
-  even when everything technically works.
+:::
 
-That's why the overview gives a verdict up front — *fast / could be better /
-has problems* — and the metrics below break it down.
+## How a run works
 
-## Colors and zones
+1. **You pick a branch, a page and a device.** The run opens whatever is
+   published on the branch right now, at its public address. You can enter a
+   path (`/pricing?sort=price`) or a full address, including one on a
+   connected domain.
+2. **The browser loads the page several times.** We use Chrome and repeat the
+   load so a one-off delay in a single pass doesn't skew the result. During
+   the passes we record a video of the load, every network request and the
+   main-thread activity.
+3. **Lighthouse checks the page separately.** It scores four categories and
+   lists what is worth fixing.
+4. **We build the report.** Each metric is the median across the passes; the
+   score and recommendations come from Lighthouse. A run usually takes under
+   two minutes.
 
-Every metric has three zones, based on Google's thresholds:
+If you order the same page on the same deploy and device within 10 minutes,
+no new run starts: the code hasn't changed, and new numbers would differ only
+by noise. We show the finished run instead. If needed, start a fresh one
+manually.
 
-| Color | Zone | Meaning |
+### Devices
+
+| | Desktop | Phone |
 |---|---|---|
-| 🟢 Green | good | within norm, nothing to do |
-| 🟡 Yellow | could be better | acceptable, but there's headroom |
-| 🔴 Red | poor | the user notices this, worth fixing |
+| Screen | wide, like a laptop | a mid-range smartphone |
+| Network | no artificial throttling | a slow mobile network |
+| Lighthouse profile | desktop | mobile |
 
-## Headline scores
+The device sets the profile for the **whole** report: the browser passes and
+Lighthouse run under the same conditions. That's why phone and desktop runs
+are never compared with each other — they are two separate series.
 
-These are the "single-number" scores (0–100) — a good place to start.
+## The Lighthouse score
 
-### Lighthouse
+The Lighthouse score is a weighted sum of five lab metrics. Each metric is
+first mapped to a 0–100 score on a curve built from real-world sites, then
+multiplied by its weight:
 
-Google's auditor — the same "canonical" score you see in PageSpeed Insights
-and Search Console. We run Lighthouse in the same profile as the other
-metrics and show four categories:
+| Metric | Weight |
+|---|---|
+| Total Blocking Time (TBT) | 30% |
+| Largest Contentful Paint (LCP) | 25% |
+| Cumulative Layout Shift (CLS) | 25% |
+| First Contentful Paint (FCP) | 10% |
+| Speed Index (SI) | 10% |
 
-- **Performance** — load speed;
-- **Accessibility** — usability for people with impairments (contrast, alt, ARIA);
-- **Best practices** — modern web practices (HTTPS, security, correct APIs);
-- **SEO** — basic search optimization (meta tags, indexability, mobile-friendliness).
+| Score | Meaning |
+|---|---|
+| 90–100 | good |
+| 50–89 | needs improvement |
+| 0–49 | poor |
 
-### Coach
+The practical takeaway: **TBT, LCP and CLS move the score the most**.
+Speeding up FCP by half a second helps, but the score grows less than from
+the same gain in TBT.
 
-The audit engine's built-in analyst. It checks the page against a set of best
-practices and scores 0–100 in three categories:
+Besides Performance, Lighthouse scores Accessibility, Best Practices and SEO —
+they are on the report's "Lighthouse" tab but don't count toward the headline
+score.
 
-- **Performance** — render-blocking resources, caching, compression, asset size;
-- **Best practice** — correct markup and headers;
-- **Privacy** — third-party trackers and data sharing.
+## Metrics
 
-Coach complements Lighthouse: it doesn't just assign a score, it lists the
-**specific issues** by priority — what to fix first.
+The thresholds are Google's: within "good" a visitor doesn't notice a
+problem, in "poor" they almost certainly do.
 
-## Core Web Vitals
+| Metric | What it measures | Good | Poor |
+|---|---|---|---|
+| **LCP** — Largest Contentful Paint | when the largest element of the first screen rendered: the hero image or headline | up to 2.5 s | over 4 s |
+| **CLS** — Cumulative Layout Shift | how much the layout moves while loading | up to 0.1 | over 0.25 |
+| **TBT** — Total Blocking Time | how long the page couldn't respond to clicks because the main thread was busy | up to 200 ms | over 600 ms |
+| **FCP** — First Contentful Paint | when the first text or image appeared | up to 1.8 s | over 3 s |
+| **TTFB** — Time to First Byte | time from the request to the first byte of the server's response | up to 0.8 s | over 1.8 s |
+| **SI** — Speed Index | how quickly the visible part of the screen fills in | up to 3.4 s on phone, 1.3 s on desktop | over 5.8 s and 2.3 s |
 
-Google's key metrics — how a real user **perceives** the load.
+TBT is the lab stand-in for INP (Interaction to Next Paint, the delay in
+responding to a visitor's action). Real responsiveness can only be measured on
+live visitors, while TBT shows how long the main thread was busy and couldn't
+have answered a click.
 
-- **LCP** (Largest Contentful Paint) — when the largest visible element (the
-  hero image or heading) rendered. Good ≤ 2.5 s.
-- **CLS** (Cumulative Layout Shift) — how much the layout "jumps" during
-  load. 0 is ideal, good ≤ 0.1.
-- **TBT** (Total Blocking Time) — total time the page couldn't respond to
-  clicks because the main thread was busy. Good ≤ 200 ms. This is the lab
-  proxy for INP/FID.
+## What else is in the report
 
-## Detailed loading metrics
+- **What to fix first** — the three Lighthouse recommendations with the
+  largest expected gain in seconds.
+- **Load video** — screen frames over time with event marks: first paint,
+  main content, visually complete.
+- **Waterfall** — every network request on a timeline, with connection
+  phases and long main-thread tasks. This is where you see which file holds up
+  everything else.
+- **Page composition** and **third-party services** — weight by file type
+  and domain, plus counters, widgets and other external scripts.
+- **Advice** — detailed best-practice checks: caching, compression,
+  render-blocking resources, privacy.
+- **HAR** — the full request log, which opens in the browser's developer
+  tools.
 
-When the verdict isn't enough and you need to see *where* the time goes:
+## Why the numbers differ from PageSpeed Insights
 
-- **TTFB** (Time to First Byte) — from request to the server's first response
-  byte. Depends on the backend and network. Good ≤ 0.8 s.
-- **FCP** (First Contentful Paint) — when the first content (text or image)
-  appeared on screen. Good ≤ 1.8 s.
-- **Speed Index** — how quickly the visible area fills in. Lower is better.
-- **Requests and weight** — how many resources and bytes the page loaded.
-  Fewer and lighter means faster.
+The score uses the same formula, but the conditions are different — on
+purpose.
 
-## Assets and waterfall
+- **Location.** PageSpeed Insights loads the page from Google's data centers
+  abroad. We load it from Russia: latency to Russian and foreign servers is
+  the same as your audience's.
+- **Lab, not live visitors.** PageSpeed Insights also shows Chrome field
+  data — real visits over 28 days. Our audit is a lab test: one page, a known
+  device, a known network. In exchange you can repeat it at any moment and
+  compare it with the previous deploy.
+- **Variance.** Even on the same code the score moves by a few points from
+  run to run. One run gives you a pointer; draw conclusions from the trend
+  over several.
 
-- **Assets** — a breakdown of every resource: by content type, by domain,
-  the heaviest files and the response codes. Click a response-code bar to see
-  exactly which requests returned it.
-- **Waterfall** — a timeline of every network request: when each started,
-  the connection phases (DNS, TLS, wait, download) and long CPU tasks. Hover a
-  request bar to see its timings.
+## How we compare runs
 
-## Where the data comes from
+The report and the run list compare a run with the previous run of **the
+same page, on the same device, on the same branch, but on the previous
+deploy**. Comparing two runs of one deploy is pointless: the difference
+between them is just noise.
 
-All metrics are captured on the deployed site at its real public address —
-exactly what your visitors see. You can start a new audit any time from the
-project's "Performance" tab.
+- **Got worse** — the score dropped by 3 points or more, or the main content
+  (LCP) started appearing one and a half times slower.
+- **Got better** — the score rose by 3 points or more.
+- **No change** — the difference is smaller: within measurement noise.
+
+We refine the threshold with repeated runs of the same pages, so it may shift
+slightly over time.
+
+:::note Run under load
+
+If our server was busy with other work during the run, the numbers may have
+come out worse than they really are. Such a run is marked and left out of
+comparisons. You can repeat it for free — the retry doesn't count toward the
+monthly limit.
+
+:::
+
+## Schedule
+
+A page can be measured on a schedule: every 3 or 6 hours, daily or weekly.
+Daily and weekly runs happen at night Moscow time — the server is idle then
+and the numbers are more accurate. Every run measures whatever is published on
+the branch at that moment. Runs from one schedule are grouped under its name
+in the run list, so you can see how speed changed from deploy to deploy.
+
+## Limits
+
+- The audit is available on the Pro plan. The limit is 500 runs a month per
+  organization, manual and scheduled combined; it resets on the 1st.
+- You can only measure addresses of your own project: branch addresses, the
+  project address and domains connected to it.
+- The audit measures a single page load without signing in. Actions after the
+  load — clicks, navigation, forms — are not part of the run.
