@@ -26,7 +26,7 @@ Database menu sections:
 |---|---|
 | — | **Overview**, **Monitoring**, **Settings** |
 | Database | **Tables**, **SQL editor**, **Functions**, **Roles**, **Policies**, **Extensions**, **Backups** |
-| Services | **API**, **Authentication**, **Files** — this is the [Data API](../data-api/index.md) |
+| Services | **Data API**, **Авторизация** (sign-in), **Файлы** (files) — this is the [Data API](../data-api/index.md) |
 
 ## Database list
 

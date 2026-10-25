@@ -39,9 +39,7 @@ curl "https://data.layero.ru/moya-baza/rest/v1/entries?id=eq.42&select=*" \
 грант, а таблице — политика RLS:
 
 ```sql
-DO $$ BEGIN
-    EXECUTE format('GRANT SELECT ON public.entries TO %I', layero.role('anon'));
-END $$;
+GRANT SELECT ON public.entries TO anon;
 ALTER TABLE public.entries ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY entries_read_own ON public.entries
@@ -49,12 +47,10 @@ CREATE POLICY entries_read_own ON public.entries
     USING (owner_id = auth.uid());
 ```
 
-🚨 **Имя роли берите из `layero.role()`, а не из `pg_roles`.** Имя содержит
-идентификатор базы, вписать его буквально нельзя, и соблазн найти по шаблону
-(`rolname ~ '^u_.*_anon$'`) выглядит естественным. Он неверен: список ролей
-общий на весь сервер, шаблон совпадает с ролями чужих арендаторов, и права
-уезжают не туда. Функция `layero.role('anon'|'auth'|'svc')` есть в каждой базе
-с включённым API и возвращает **вашу** роль.
+🚨 **Роли — `anon`, `authenticated`, `service_role`, как в Supabase.** Не ищите
+«свою» роль шаблоном (`rolname ~ '^u_.*_anon$'`): список ролей общий на весь
+сервер, шаблон совпадает с ролями чужих арендаторов, и права уезжают не туда.
+Имя роли именно этой базы, если оно нужно, отдаёт `layero.role('anon'|'auth'|'svc')`.
 
 Проверьте выданное не на глаз: панель выполнит запрос **от роли ключа** — от
 `anon`, от вошедшего пользователя или от секретного ключа — и откатит
@@ -64,7 +60,8 @@ CREATE POLICY entries_read_own ON public.entries
 
 | Ответ | Что это значит |
 |---|---|
-| `unknown_table` | таблицы нет в каталоге **роли, под которой открыт запрос** — имя этой роли названо в тексте отказа. Почти всегда это грант, ушедший не той роли |
+| `unknown_table` (404) | такой таблицы нет — проверьте имя и схему |
+| `42501` (401 гостю, 403 вошедшему) | таблица есть, но этому ключу не открыта: нет гранта. В `hint` — как открыть (панель или `layero data grant`) |
 | `no_table_grant` | таблица есть, но у роли нет нужного права; в `hint` лежит готовый `GRANT` |
 | `permission_denied` / `42501` | отказ самой базы |
 | пустой массив | грант есть, а политика RLS не пускает ни одной строки |

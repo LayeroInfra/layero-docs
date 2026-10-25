@@ -16,37 +16,29 @@ what to expect from these pages is covered in [What Data API Is](./index.md).
 Collected from incident write-ups. Each item cost someone anywhere from ten
 minutes to half an hour, and none of them are visible from the code.
 
-## 1. Get the role only through `layero.role()`
+## 1. Roles in migrations — by the Supabase name, not by pattern
 
-The role name contains the database identifier, so you can't write it into a
-migration literally. Looking it up by pattern feels natural:
+Write `TO anon`, `TO authenticated`, `TO service_role` — these roles exist in
+every database. Never look up "your" role by pattern:
 
 ```sql
--- 🚨 DON'T DO THIS
+-- 🚨 DON'T
 SELECT rolname FROM pg_roles WHERE rolname ~ '^u_.*_anon$' LIMIT 1;
 ```
 
-The role list is shared across the entire database server. The pattern will
-match roles belonging to other tenants, and the `GRANT` will end up **in
-someone else's database**: once, table privileges for one product ended up
-on another organization's role, and it was only noticed because the
-product's own queries kept answering "table not exposed."
+The role list is shared across the whole database server. The pattern matches
+other tenants' roles, and the `GRANT` ends up **in someone else's database**:
+once, a product's table permissions went to a role of another organization.
 
 ```sql
--- This is correct
-DO $$ BEGIN
-    EXECUTE format('GRANT SELECT ON public.entries TO %I', layero.role('anon'));
-END $$;
+-- Right
+GRANT SELECT ON public.entries TO anon;
 ```
 
-The function `layero.role('anon'|'auth'|'svc')` exists in every database
-with the API enabled. In `GRANT` and `CREATE POLICY` the role name must be an
-identifier, not an expression, so the call is wrapped in `DO` with
-`format('%I')`: Postgres will not parse `GRANT … TO layero.role('anon')`. You can check what's been granted like this:
-
-```sql
-SELECT layero.role('anon'), has_table_privilege(layero.role('anon'), 'public.entries', 'SELECT');
-```
+This database's own role name, if you need it, is returned by
+`layero.role('anon'|'auth'|'svc')`; in a `GRANT` substitute it through `DO`
+and `format('%I')`:
+`DO $$ BEGIN EXECUTE format('GRANT SELECT ON public.entries TO %I', layero.role('anon')); END $$;`
 
 ## 2. `INSERT … RETURNING` goes through the **read** policy
 

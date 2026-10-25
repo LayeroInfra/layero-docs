@@ -59,14 +59,14 @@ between roles inside the database itself.
 
 | Key | Role in the database | Where it lives |
 |---|---|---|
-| `pk_live_…` — public | anonymous, `…_anon` | in the frontend bundle, visible to every visitor |
-| `sk_live_…` — secret | service, `…_svc` | only on your server |
+| `pk_live_…` — public | `anon` | in the frontend bundle, visible to every visitor |
+| `sk_live_…` — secret | `service_role` | only on your server |
 
 The key is passed in the `apikey` header (as with Supabase) or as
 `authorization: Bearer …`. A signed-in application user puts their token in
 `authorization`, while the key stays in `apikey` — the request then runs
-under the signed-in role (`…_auth`). Each database's own role names are
-returned by `layero.role('anon'|'auth'|'svc')`.
+as `authenticated`. The roles are the same as in Supabase — policies and grants
+from its migrations work as written.
 
 🚨 **A key does not grant rights.** It selects a role, and what that role can
 access is decided by grants and RLS policies inside the database itself. A

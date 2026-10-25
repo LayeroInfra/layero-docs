@@ -26,29 +26,40 @@ Surface: `/auth/v1/{token,signup,recover,verify,resend,authorize,callback}`,
 sign-in, PKCE, and external providers are available — enabled in the panel
 for the database.
 
-## Role of a signed-in user
+## Roles — as in Supabase
 
-A signed-in user runs under the database's signed-in role, an anonymous one
-under its anonymous role. Each database has its own role names —
-`<organization>_<database>_auth` and `_anon`, returned by `layero.role('auth')`
-and `layero.role('anon')`. There are no roles named `authenticated` and `anon`
-as on Supabase. The signed-in role **inherits** from the anonymous one: signing in
-only adds access.
-
-Policies have access to `auth.uid()` and `auth.role()` — the same names as
-Supabase, so the conditions of migrated policies work without editing:
+Every database has the roles `anon`, `authenticated` and `service_role`, so
+policies and grants from Supabase migrations work as written:
 
 ```sql
 CREATE POLICY entries_own ON public.entries
-    FOR SELECT TO PUBLIC
+    FOR SELECT TO authenticated
     USING (owner_id = auth.uid());
+GRANT SELECT ON public.entries TO authenticated;
 ```
 
-🚨 A `TO authenticated` or `TO anon` policy from a Supabase migration fails
-here with `role "authenticated" does not exist`. The error names this
-database's actual role. Replace the role with `TO PUBLIC` and a condition on
-`auth.uid()`, as in the example above, or substitute the name through
-`layero.role()` — see [Pitfalls](./pitfalls.md).
+A signed-in user runs as `authenticated`, a guest as `anon`, the secret key as
+`service_role`. Policies can use `auth.uid()`, `auth.role()` and `auth.jwt()` —
+the same names as in Supabase.
+
+How we differ:
+
+- **No table privileges by default.** A new table is closed until you
+  `GRANT` it (or set an access level in the dashboard). Without a grant the
+  request answers `401`/`403` with code `42501` and a hint on how to open it.
+- **A signed-in user also gets what is open to guests:** a `TO anon` policy
+  applies to signed-in users too.
+- **`service_role` does not bypass RLS.** The secret key sees rows only
+  through `TO service_role` policies; add `USING (true)` for the server to see
+  everything.
+
+## Email confirmation
+
+As in Supabase, newly enabled sign-in confirms email: `signUp` returns no
+session until the person follows the link in the email. Without confirmation
+anyone can register someone else's address. Switch it off in «Авторизация» →
+«Подтверждать почту». Databases where sign-in was enabled before 26.10.2026
+keep their previous setting — check it in the same place.
 
 ## Signing in from the Layero panel: no second password
 

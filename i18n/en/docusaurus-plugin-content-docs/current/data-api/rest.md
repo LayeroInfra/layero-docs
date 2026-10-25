@@ -40,9 +40,7 @@ A fresh database exposes zero tables over the API. For a table to become
 visible, the role needs a grant, and the table needs an RLS policy:
 
 ```sql
-DO $$ BEGIN
-    EXECUTE format('GRANT SELECT ON public.entries TO %I', layero.role('anon'));
-END $$;
+GRANT SELECT ON public.entries TO anon;
 ALTER TABLE public.entries ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY entries_read_own ON public.entries
@@ -50,13 +48,11 @@ CREATE POLICY entries_read_own ON public.entries
     USING (owner_id = auth.uid());
 ```
 
-🚨 **Get the role name from `layero.role()`, not from `pg_roles`.** The name
-contains the database identifier, you can't write it in literally, and the
-temptation to look it up by pattern (`rolname ~ '^u_.*_anon$'`) feels
-natural. It's wrong: the role list is shared across the whole server, the
-pattern matches other tenants' roles, and permissions end up in the wrong
-place. The function `layero.role('anon'|'auth'|'svc')` exists in every
-database with the API enabled and returns **your** role.
+🚨 **Roles are `anon`, `authenticated`, `service_role`, as in Supabase.** Don't
+look up "your" role by pattern (`rolname ~ '^u_.*_anon$'`): the role list is
+shared across the whole server, the pattern matches other tenants' roles, and
+permissions end up in the wrong place. This database's own role name, if you
+need it, is returned by `layero.role('anon'|'auth'|'svc')`.
 
 Don't check what's been granted by eye: the panel will run the query **under
 the key's role** — as `anon`, as the signed-in user, or as the secret key —
@@ -66,7 +62,8 @@ and roll back the transaction.
 
 | Response | What it means |
 |---|---|
-| `unknown_table` | the table isn't in the catalog of **the role the request is running under** — that role's name is stated in the refusal text. Almost always this is a grant that went to the wrong role |
+| `unknown_table` (404) | there is no such table — check the name and schema |
+| `42501` (401 for a guest, 403 for a signed-in user) | the table exists but isn't open to this key: no grant. The `hint` says how to open it (dashboard or `layero data grant`) |
 | `no_table_grant` | the table exists, but the role lacks the needed privilege; a ready-made `GRANT` is in `hint` |
 | `permission_denied` / `42501` | a refusal from the database itself |
 | an empty array | the grant exists, but the RLS policy doesn't let any rows through |
