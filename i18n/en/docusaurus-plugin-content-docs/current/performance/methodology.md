@@ -14,7 +14,7 @@ and record what appeared on screen and when.
 This page explains how a run works, what every number in the report means and
 when two runs of the same page can be compared.
 
-:::tip In short
+:::tip[In short]
 
 - The headline number is the **Lighthouse score**, from 0 to 100. It is built
   from five loading metrics with the same formula PageSpeed Insights uses.
@@ -153,7 +153,7 @@ between them is just noise.
 We refine the threshold with repeated runs of the same pages, so it may shift
 slightly over time.
 
-:::note Run under load
+:::note[Run under load]
 
 If our server was busy with other work during the run, the numbers may have
 come out worse than they really are. Such a run is marked and left out of
