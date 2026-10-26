@@ -22,16 +22,16 @@ not like that" surfaces at the visitor's end, not the developer's.
 | What's missing | What to do instead |
 |---|---|
 | **Realtime** — change subscriptions | poll on an interval |
-| **Edge Functions** — running your code on our side | logic lives in database functions; for outbound calls see [Outbound calls](./outbound.md) |
+| **Edge Functions** — running your code on our side | logic lives in database functions; to reach out — [HTTP from SQL](./outbound.md) (`net.http_post`) |
 | `/auth/v1/admin/*` | manage users with your own functions in the `api` schema |
 | email change, SMS, enterprise SSO | —; a second factor exists: an authenticator app (TOTP), `supabase.auth.mfa.*` |
 | RS256/JWKS | tokens are signed with HS256 using the database's secret |
 | image transforms, resumable upload, S3 protocol | prepare the file on your side; upload and serving work |
 
-⚠️ "No Edge Functions" does **not** mean "no outbound calls." Telegram
-notifications, webhooks, and calls to third-party APIs work — see
-[Outbound calls](./outbound.md). What's missing is specifically running your
-own code on our side.
+⚠️ "No Edge Functions" does **not** mean "no outbound requests." Telegram
+notifications, webhooks and calls to third-party APIs are made by a database
+function with `net.http_post` — see [HTTP from SQL](./outbound.md). What's
+missing is specifically running your own code on our side.
 
 ## Boundaries worth knowing about upfront
 
@@ -45,7 +45,7 @@ own code on our side.
 | Databases per organization | one shared, as many dedicated as you need; see [database limits](../database/limits.md) |
 | Accepted origins per database | 50 |
 
-Every request counts: tables, functions, files, and outbound calls. Sites
+Every request counts: tables, functions, files, and HTTP from SQL. Sites
 and direct Postgres connections to the database are not affected by the
 daily limit.
 
@@ -54,8 +54,7 @@ platform is overloaded": neighboring databases keep working fine.
 
 ## Client
 
-Our own package is `@layero/data`. It's thin: calling database functions and
-outbound calls through the gateway, with no wrapper over tables.
+Our own package is `@layero/data`. It's thin: calling database functions through the gateway, with no wrapper over tables.
 
 ```bash
 npm i @layero/data

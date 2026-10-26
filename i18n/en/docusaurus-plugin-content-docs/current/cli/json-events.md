@@ -342,18 +342,14 @@ Result of `layero data origins add` and `layero data origins remove`.
 | `database` | string — database slug or id |
 | `origin` | string — site address |
 
-### Outbound calls: `data_hosts`, `data_secrets`, `data_calls`, `data_call_log`
+### `data_secrets`, `data_secret_set`, `data_secret_removed`
 
-Results of `layero data hosts list`, `layero data secrets list`, `layero data calls list` and `layero data calls log`.
+Results of `layero data secrets list|set|remove`: the database's secrets for HTTP from SQL and sign-in.
 
 | event | fields |
 |---|---|
-| `data_hosts` | `org`, `database`, `hosts` (string[]) — allowed hosts |
 | `data_secrets` | `org`, `database`, `secrets` (string[]) — names only, no values |
-| `data_calls` | `org`, `database`, `calls` — `name`, `method`, `url_template`, `headers`, `body_template`, `allow_anon`, `hourly_limit` |
-| `data_call_log` | `org`, `database`, `calls` — `call_name`, `mode` (`queue` \| `sync`), `status_code`, `error`, `elapsed_ms`, `at` |
-
-Changes — `data_host_added` / `data_host_removed` (field `host`), `data_secret_set` / `data_secret_removed` (field `name`, no value), `data_call_saved` / `data_call_removed` (field `name`); all of them also carry `org` and `database`.
+| `data_secret_set`, `data_secret_removed` | `org`, `database`, `name` — no value |
 
 ### `data_methods`
 

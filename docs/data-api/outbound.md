@@ -1,10 +1,10 @@
 ---
 sidebar_position: 6
-title: Исходящие вызовы
-description: Уведомления в Telegram и вебхуки прямо из базы — очередь api.outbox и синхронный вызов через шлюз.
+title: HTTP из SQL
+description: Уведомления в Telegram и вебхуки прямо из функции базы — net.http_post, как pg_net у Supabase.
 ---
 
-# Исходящие вызовы
+# HTTP из SQL
 
 :::info[Бета-версия]
 
@@ -13,101 +13,132 @@ Data API работает в бета-версии и открыт пока не
 
 :::
 
-Наружу ходит шлюз, а не база. Расширений вроде `http` или `pg_net` у вашей
-базы нет осознанно: синхронный HTTP из Postgres выпивает соединения, а
-возможность ходить куда угодно из SQL — это открытый прокси с нашего адреса.
+Уведомление в Telegram, вебхук на ваш сервер, вызов чужого API — это обычная
+функция базы, которая зовёт `net.http_post`. Функции те же, что у расширения
+`pg_net` в Supabase, поэтому код оттуда переносится без правок, кроме секретов.
 
-Механизм состоит из трёх частей, и ни одна не зашита под конкретный сервис:
-Telegram настраивается так же, как любой вебхук.
-
-| Часть | Что это |
+| Функция | Что делает |
 |---|---|
-| **Секреты** | значения, которые подставляются в вызов и не возвращаются наружу никогда |
-| **Разрешённые хосты** | список вида `api.telegram.org` — без него мы открытый прокси |
-| **Описание вызова** | метод, адрес, заголовки и тело с подстановками |
+| `net.http_post(url, body, params, headers, timeout_milliseconds)` | POST с телом JSON; заголовок `Content-Type: application/json` по умолчанию |
+| `net.http_get(url, params, headers, timeout_milliseconds)` | GET |
+| `net.http_delete(url, params, headers, timeout_milliseconds)` | DELETE |
 
-Все три настраиваются у базы в панели — раздел «Data API», вкладка
-«Исходящие», — или из терминала, то есть кодом в CI:
+Все аргументы, кроме `url`, необязательны. Функция возвращает номер запроса
+(`bigint`) и сразу отдаёт управление: запрос уходит после коммита транзакции.
+
+Схема `net` появляется у базы вместе с Data API. Если у базы уже есть своя
+схема `net` или расширение `pg_net`, Layero её не трогает.
+
+## Уведомление в Telegram
+
+Сначала задайте секрет — токен бота от @BotFather. Значение уходит в Layero
+и в базу не попадает:
 
 ```bash
-npx layero@latest data hosts add api.telegram.org --db <база>
 printf %s "$BOT_TOKEN" | npx layero@latest data secrets set TELEGRAM_BOT_TOKEN --db <база>
-npx layero@latest data calls set --file telegram_notify.json --db <база>
-npx layero@latest data calls log --db <база>     # код ответа и причина отказа
 ```
 
-Значение секрета команда берёт со stdin, из переменной (`--from-env`) или
-спрашивает без эха — аргументом его не передать, иначе оно осело бы в истории
-shell. Сначала хост, потом вызов: описание с неразрешённым хостом сервер не примет.
+То же — в панели: «Data API» → «Доступ» → «Секреты».
 
-## Описание вызова
+В адресе, заголовках и теле запроса секрет пишется как `{{secrets.ИМЯ}}` —
+Layero подставит значение при отправке.
 
-```json
-{
-  "name": "telegram_notify",
-  "method": "POST",
-  "url_template": "https://api.telegram.org/bot{{secrets.TELEGRAM_BOT_TOKEN}}/sendMessage",
-  "body_template": {
-    "chat_id": "{{secrets.CHAT_ID}}",
-    "text": "{{args.text}}"
-  }
-}
-```
+### Вариант 1. Одна функция пишет и уведомляет
 
-Подстановок ровно две: `{{secrets.X}}` — ваш секрет, `{{args.y}}` — то, что
-передал вызывающий. Свободного `fetch` через нас нет: адрес и заголовки задаёт
-описание, а не тот, кто зовёт.
-
-## Два пути доставки
-
-### Очередь — из самой базы
+Сайт зовёт один RPC-метод. Запись и уведомление в одной транзакции: не
+записалось — не отправилось.
 
 ```sql
-CREATE FUNCTION api.submit(payload jsonb) RETURNS jsonb
-LANGUAGE plpgsql SECURITY DEFINER AS $$
-DECLARE new_id bigint;
+CREATE FUNCTION api.submit_report(site_key text, message text) RETURNS jsonb
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  s  public.sites%ROWTYPE;
+  id bigint;
 BEGIN
-    INSERT INTO public.entries (payload) VALUES (payload) RETURNING id INTO new_id;
-    INSERT INTO api.outbox (call_name, args)
-    VALUES ('telegram_notify',
-            jsonb_build_object('text', 'Новая заявка № ' || new_id));
-    RETURN jsonb_build_object('ok', true, 'id', new_id);
+  SELECT * INTO s FROM public.sites WHERE sites.key = submit_report.site_key;
+  IF NOT FOUND THEN RAISE EXCEPTION 'unknown site key'; END IF;
+
+  INSERT INTO public.reports (site_id, message) VALUES (s.id, submit_report.message)
+  RETURNING reports.id INTO id;
+
+  PERFORM net.http_post(
+    url  := 'https://api.telegram.org/bot{{secrets.TELEGRAM_BOT_TOKEN}}/sendMessage',
+    body := jsonb_build_object('chat_id', s.telegram_chat_id,
+                               'text', 'Новое обращение: ' || left(submit_report.message, 500))
+  );
+  RETURN jsonb_build_object('id', id);
 END $$;
+
+GRANT EXECUTE ON FUNCTION api.submit_report(text, text) TO anon;
 ```
 
-Таблица `api.outbox` живёт **в вашей базе**, поэтому запись и уведомление
-попадают в одну транзакцию: откатилась заявка — уведомление не ушло. Шлюз
-разбирает очередь, повторяет с растущей задержкой и складывает исход в те же
-строки (`status`, `attempts`, `response_code`, `last_error`).
+### Вариант 2. Триггер — если пишут несколькими путями
 
-Повторяются сетевые сбои и 5xx. Не повторяются 4xx и ошибки настройки — их
-чинит человек, а не время. Строка в `failed` сама не оживёт: поправив
-настройку, поставьте новую или верните прежние в очередь:
+Если в таблицу пишут и сайт через Data API, и ваш сервер по строке
+подключения, и миграции, уведомление надёжнее повесить на триггер: его не
+обойти.
 
 ```sql
-UPDATE api.outbox SET status = 'pending', run_after = now(), attempts = 0
- WHERE status = 'failed';
+CREATE FUNCTION private.notify_new_report() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  PERFORM net.http_post(
+    url  := 'https://api.telegram.org/bot{{secrets.TELEGRAM_BOT_TOKEN}}/sendMessage',
+    body := jsonb_build_object('chat_id', 123456789, 'text', 'Новое обращение: ' || new.message)
+  );
+  RETURN new;
+END $$;
+
+CREATE TRIGGER reports_notify AFTER INSERT ON public.reports
+  FOR EACH ROW EXECUTE FUNCTION private.notify_new_report();
 ```
 
-### Синхронно — из приложения
+⚠️ Не делайте отдельный RPC «отправь уведомление», который сайт зовёт после
+записи. Его позовёт кто угодно с вашим публичным ключом и любым текстом, а
+между двумя вызовами запись и уведомление разойдутся.
 
+## Вебхук на ваш сервер
+
+```sql
+PERFORM net.http_post(
+  url     := 'https://example.ru/hooks/order',
+  headers := jsonb_build_object('Content-Type', 'application/json',
+                                'Authorization', 'Bearer {{secrets.HOOK_TOKEN}}'),
+  body    := jsonb_build_object('type', 'INSERT', 'table', 'orders', 'record', to_jsonb(new))
+);
 ```
-POST https://data.layero.ru/<база>/call/<имя>
+
+## Что происходит после вызова
+
+1. Запрос ложится в очередь `net.http_request_queue` — в той же транзакции,
+   что и ваша запись. Откатилась транзакция — запрос не уйдёт.
+2. После коммита Layero отправляет его. Внутренние адреса запрещены: запрос
+   уходит только в интернет.
+3. Сетевые сбои, 5xx, 408 и 429 повторяются с растущей задержкой, до 5
+   попыток. 4xx и ошибки настройки (нет секрета, неверный адрес) не
+   повторяются: их чинит человек, а не время.
+4. Итог — в `net._http_response` под тем же номером: код, заголовки, тело
+   (до 64 КБ, значения секретов вырезаны), `timed_out`, `error_msg`. Ответы
+   хранятся 6 часов, как у `pg_net`.
+
+```sql
+SELECT id, status_code, error_msg, left(content, 200)
+  FROM net._http_response ORDER BY id DESC LIMIT 10;
 ```
 
-Ответ внешнего сервиса возвращается вызывающему. Публичному ключу такой вызов
-доступен, только если в описании явно разрешён анонимный вызов: иначе
-публичный ключ означал бы право слать что угодно куда угодно с нашего адреса.
+Таймаут — `timeout_milliseconds`, но не больше 15 секунд. Запросы считаются в
+суточный лимит запросов базы.
 
-## Что уже учтено
+## Отличия от `pg_net` в Supabase
 
-- **Секреты не возвращаются** — значения вырезаются и из тела ответа, и из
-  текста ошибки, и из журнала.
-- **Защита от SSRF** — адрес резолвится и проверяется: внутренние диапазоны
-  запрещены, подмена DNS на них не проходит.
-- **Telegram доезжает.** DNS отдаёт для `api.telegram.org` один адрес, и с
-  части сетей он заблокирован намертво. Шлюз пробует и его, и запасные адреса
-  Telegram, идёт на тот, до которого дошло рукопожатие, и сохраняет имя хоста
-  в TLS — сертификат проверяется по имени, а не по адресу.
-- **Хост, добавленный только что, работает сразу** — отказ `host_not_allowed`
-  перепроверяется свежим списком.
+| | Supabase `pg_net` | Layero |
+|---|---|---|
+| Сигнатуры `net.http_*` | — | те же |
+| Отправка | после коммита | после коммита |
+| Повторы | нет | да, до 5 попыток |
+| Секреты | `vault.decrypted_secrets` прямо в SQL | `{{secrets.ИМЯ}}` — значение в базу не попадает |
+| Внутренние адреса | доступны | запрещены |
+| Database Webhooks в панели | есть | нет: вебхук — это триггер из варианта 2 |
+
+Если в коде из Supabase токен читается из `vault.decrypted_secrets`, замените
+это выражение на `{{secrets.ИМЯ}}` в строке адреса или заголовка.

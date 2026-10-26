@@ -38,7 +38,7 @@ description: The full list of layero commands — init, login, projects, deploy,
 | `layero db disconnect <database>` | Disconnect a project from the database: the variable goes away with the next deploy. |
 | `layero db sql <database> "SQL"` | Run a query or a script in the database. |
 | `layero data env` | The [Data API](/data-api) URL and public key for the frontend. |
-| `layero data hosts` / `secrets` / `calls` | The database's [outbound calls](/data-api/outbound): allowed hosts, secrets, call descriptions and their log. |
+| `layero data secrets` | Database secrets for [HTTP from SQL](/data-api/outbound): substituted into `net.http_post` as `{{secrets.NAME}}`. |
 | `layero token set <jwt>` | Set the token by hand (for CI). |
 
 The full flag list for a command:

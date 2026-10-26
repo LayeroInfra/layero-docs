@@ -109,6 +109,6 @@ called right after `CREATE FUNCTION`, an `api` function only after an explicit
 - [Files](./storage.md) — buckets, policies, signed URLs
 - [Accepting requests from another domain](./origins.md) — a form on a
   client's site
-- [Outbound calls](./outbound.md) — Telegram notifications and webhooks
+- [HTTP from SQL](./outbound.md) — Telegram notifications and webhooks from a database function
 - [Migration pitfalls](./pitfalls.md) — where people trip up most often
 - [What's Missing](./limits.md) — what's unsupported and what to do instead

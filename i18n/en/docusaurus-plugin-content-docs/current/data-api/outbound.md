@@ -1,10 +1,10 @@
 ---
 sidebar_position: 6
-title: Outbound Calls
-description: Telegram notifications and webhooks straight from the database — the api.outbox queue and a synchronous call through the gateway.
+title: HTTP from SQL
+description: Telegram notifications and webhooks straight from a database function — net.http_post, like pg_net in Supabase.
 ---
 
-# Outbound Calls
+# HTTP from SQL
 
 :::info[Beta]
 
@@ -13,108 +13,135 @@ what to expect from these pages is covered in [What Data API Is](./index.md).
 
 :::
 
-The gateway reaches out, not the database. Your database deliberately has no
-extensions like `http` or `pg_net`: a synchronous HTTP call from Postgres
-eats up connections, and being able to reach anywhere from SQL would be an
-open proxy running from our address.
+A Telegram notification, a webhook to your server, a call to a third-party API
+is an ordinary database function that calls `net.http_post`. The functions are
+the same as in the `pg_net` extension in Supabase, so code from there moves over
+unchanged, except for secrets.
 
-The mechanism has three parts, and none of them is hardcoded for a specific
-service: Telegram is configured the same way as any webhook.
-
-| Part | What it is |
+| Function | What it does |
 |---|---|
-| **Secrets** | values substituted into the call and never returned outward |
-| **Allowed hosts** | a list like `api.telegram.org` — without it we'd be an open proxy |
-| **Call description** | method, address, headers, and body with substitutions |
+| `net.http_post(url, body, params, headers, timeout_milliseconds)` | POST with a JSON body; `Content-Type: application/json` by default |
+| `net.http_get(url, params, headers, timeout_milliseconds)` | GET |
+| `net.http_delete(url, params, headers, timeout_milliseconds)` | DELETE |
 
-All three are configured for the database in the panel — the "Data API"
-section, "Outbound" tab — or from the terminal, that is, as code in CI:
+Every argument except `url` is optional. The function returns the request id
+(`bigint`) and returns immediately: the request goes out after the transaction
+commits.
+
+The `net` schema appears in the database together with the Data API. If the
+database already has its own `net` schema or the `pg_net` extension, Layero
+leaves it alone.
+
+## A Telegram notification
+
+First set a secret — the bot token from @BotFather. The value goes to Layero
+and never lands in the database:
 
 ```bash
-npx layero@latest data hosts add api.telegram.org --db <database>
 printf %s "$BOT_TOKEN" | npx layero@latest data secrets set TELEGRAM_BOT_TOKEN --db <database>
-npx layero@latest data calls set --file telegram_notify.json --db <database>
-npx layero@latest data calls log --db <database>     # status code and refusal reason
 ```
 
-The command reads the secret value from stdin, from a variable (`--from-env`)
-or asks for it without echo — it can't be passed as an argument, or it would
-end up in the shell history. Host first, then the call: the server won't
-accept a description whose host isn't allowed.
+The same in the panel: "Data API" → "Access" → "Secrets".
 
-## Call description
+In the URL, headers and body of a request a secret is written as
+`{{secrets.NAME}}` — Layero substitutes the value when sending.
 
-```json
-{
-  "name": "telegram_notify",
-  "method": "POST",
-  "url_template": "https://api.telegram.org/bot{{secrets.TELEGRAM_BOT_TOKEN}}/sendMessage",
-  "body_template": {
-    "chat_id": "{{secrets.CHAT_ID}}",
-    "text": "{{args.text}}"
-  }
-}
-```
+### Option 1. One function writes and notifies
 
-There are exactly two kinds of substitution: `{{secrets.X}}` — your secret,
-`{{args.y}}` — whatever the caller passed. There's no free-form `fetch`
-through us: the address and headers are set by the description, not by the
-caller.
-
-## Two delivery paths
-
-### Queue — from inside the database itself
+The site calls one RPC method. The write and the notification share a
+transaction: nothing written — nothing sent.
 
 ```sql
-CREATE FUNCTION api.submit(payload jsonb) RETURNS jsonb
-LANGUAGE plpgsql SECURITY DEFINER AS $$
-DECLARE new_id bigint;
+CREATE FUNCTION api.submit_report(site_key text, message text) RETURNS jsonb
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  s  public.sites%ROWTYPE;
+  id bigint;
 BEGIN
-    INSERT INTO public.entries (payload) VALUES (payload) RETURNING id INTO new_id;
-    INSERT INTO api.outbox (call_name, args)
-    VALUES ('telegram_notify',
-            jsonb_build_object('text', 'New submission #' || new_id));
-    RETURN jsonb_build_object('ok', true, 'id', new_id);
+  SELECT * INTO s FROM public.sites WHERE sites.key = submit_report.site_key;
+  IF NOT FOUND THEN RAISE EXCEPTION 'unknown site key'; END IF;
+
+  INSERT INTO public.reports (site_id, message) VALUES (s.id, submit_report.message)
+  RETURNING reports.id INTO id;
+
+  PERFORM net.http_post(
+    url  := 'https://api.telegram.org/bot{{secrets.TELEGRAM_BOT_TOKEN}}/sendMessage',
+    body := jsonb_build_object('chat_id', s.telegram_chat_id,
+                               'text', 'New report: ' || left(submit_report.message, 500))
+  );
+  RETURN jsonb_build_object('id', id);
 END $$;
+
+GRANT EXECUTE ON FUNCTION api.submit_report(text, text) TO anon;
 ```
 
-The `api.outbox` table lives **in your database**, so the write and the
-notification land in the same transaction: if the submission rolls back, the
-notification never goes out. The gateway drains the queue, retries with
-growing backoff, and records the outcome in the same rows (`status`,
-`attempts`, `response_code`, `last_error`).
+### Option 2. A trigger — when the table is written several ways
 
-Network failures and 5xx responses are retried. 4xx and configuration errors
-are not — those get fixed by a person, not by waiting. A row in `failed` won't
-come back on its own: once the setup is fixed, enqueue a new one or put the
-old ones back in the queue:
+If the site writes through the Data API, your server through the connection
+string and migrations as well, hang the notification on a trigger: it can't be
+bypassed.
 
 ```sql
-UPDATE api.outbox SET status = 'pending', run_after = now(), attempts = 0
- WHERE status = 'failed';
+CREATE FUNCTION private.notify_new_report() RETURNS trigger
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+BEGIN
+  PERFORM net.http_post(
+    url  := 'https://api.telegram.org/bot{{secrets.TELEGRAM_BOT_TOKEN}}/sendMessage',
+    body := jsonb_build_object('chat_id', 123456789, 'text', 'New report: ' || new.message)
+  );
+  RETURN new;
+END $$;
+
+CREATE TRIGGER reports_notify AFTER INSERT ON public.reports
+  FOR EACH ROW EXECUTE FUNCTION private.notify_new_report();
 ```
 
-### Synchronous — from the application
+⚠️ Don't make a separate "send a notification" RPC that the site calls after
+the write. Anyone with your public key can call it with any text, and between
+the two calls the write and the notification drift apart.
 
+## A webhook to your server
+
+```sql
+PERFORM net.http_post(
+  url     := 'https://example.com/hooks/order',
+  headers := jsonb_build_object('Content-Type', 'application/json',
+                                'Authorization', 'Bearer {{secrets.HOOK_TOKEN}}'),
+  body    := jsonb_build_object('type', 'INSERT', 'table', 'orders', 'record', to_jsonb(new))
+);
 ```
-POST https://data.layero.ru/<database>/call/<name>
+
+## What happens after the call
+
+1. The request lands in the `net.http_request_queue` queue — in the same
+   transaction as your write. Rolled back — the request won't go out.
+2. After the commit Layero sends it. Internal addresses are refused: the
+   request only goes to the internet.
+3. Network failures, 5xx, 408 and 429 are retried with a growing delay, up to
+   5 attempts. 4xx and setup errors (missing secret, bad address) are not
+   retried: a person fixes those, not time.
+4. The outcome goes to `net._http_response` under the same id: status code,
+   headers, body (up to 64 KB, secret values cut out), `timed_out`,
+   `error_msg`. Responses are kept for 6 hours, as in `pg_net`.
+
+```sql
+SELECT id, status_code, error_msg, left(content, 200)
+  FROM net._http_response ORDER BY id DESC LIMIT 10;
 ```
 
-The external service's response is returned to the caller. The public key
-can make this call only if the description explicitly allows an anonymous
-call: otherwise the public key would mean the right to send anything,
-anywhere, from our address.
+The timeout is `timeout_milliseconds`, but no more than 15 seconds. Requests
+count toward the database's daily request limit.
 
-## What's already handled
+## Differences from `pg_net` in Supabase
 
-- **Secrets are never returned** — values are stripped from the response
-  body, from the error text, and from the log.
-- **SSRF protection** — the address is resolved and checked: internal ranges
-  are forbidden, and DNS spoofing against them doesn't get through.
-- **Telegram gets through.** DNS returns a single address for
-  `api.telegram.org`, and it's blocked outright from some networks. The
-  gateway tries it along with Telegram's fallback addresses, connects to
-  whichever one completes the handshake, and keeps the hostname for TLS —
-  the certificate is checked by name, not by address.
-- **A host added just now works right away** — a `host_not_allowed` refusal
-  is re-checked against the current list.
+| | Supabase `pg_net` | Layero |
+|---|---|---|
+| `net.http_*` signatures | — | the same |
+| Sending | after commit | after commit |
+| Retries | no | yes, up to 5 attempts |
+| Secrets | `vault.decrypted_secrets` right in SQL | `{{secrets.NAME}}` — the value never lands in the database |
+| Internal addresses | reachable | refused |
+| Database Webhooks in the panel | yes | no: a webhook is the trigger from option 2 |
+
+If code from Supabase reads a token from `vault.decrypted_secrets`, replace that
+expression with `{{secrets.NAME}}` in the URL or header string.

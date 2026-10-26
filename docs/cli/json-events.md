@@ -334,18 +334,14 @@ CLI упаковал директорию в tar.gz.
 | `database` | string — слаг или id базы |
 | `origin` | string — адрес сайта |
 
-### Исходящие вызовы: `data_hosts`, `data_secrets`, `data_calls`, `data_call_log`
+### `data_secrets`, `data_secret_set`, `data_secret_removed`
 
-Итоги `layero data hosts list`, `layero data secrets list`, `layero data calls list` и `layero data calls log`.
+Итоги `layero data secrets list|set|remove`: секреты базы для HTTP из SQL и входа.
 
 | событие | поля |
 |---|---|
-| `data_hosts` | `org`, `database`, `hosts` (string[]) — разрешённые хосты |
-| `data_secrets` | `org`, `database`, `secrets` (string[]) — только имена, значений нет |
-| `data_calls` | `org`, `database`, `calls` — `name`, `method`, `url_template`, `headers`, `body_template`, `allow_anon`, `hourly_limit` |
-| `data_call_log` | `org`, `database`, `calls` — `call_name`, `mode` (`queue` \| `sync`), `status_code`, `error`, `elapsed_ms`, `at` |
-
-Изменения — `data_host_added` / `data_host_removed` (поле `host`), `data_secret_set` / `data_secret_removed` (поле `name`, значения нет), `data_call_saved` / `data_call_removed` (поле `name`); у всех ещё `org` и `database`.
+| `data_secrets` | `org`, `database`, `secrets` (string[]) — только имена, значений нет |
+| `data_secret_set`, `data_secret_removed` | `org`, `database`, `name` — значения нет |
 
 ### `data_methods`
 
