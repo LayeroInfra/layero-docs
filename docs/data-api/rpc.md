@@ -72,8 +72,10 @@ await db.rpc("submit", { site_token: "abc", payload: { name: "Аня" } });
    `column reference "token" is ambiguous` — в том числе внутри
    `ON CONFLICT (token, …)`, куда локальная переменная тоже подставляется.
 
-Лечится это не переименованием аргумента (он публичный), а квалификацией имён
-внутри функции:
+Лечится это не переименованием аргумента (он публичный), а квалификацией имён
+внутри функции. Метка блока в PL/pgSQL — имя функции **без схемы**: `submit.token`,
+а не `api.submit.token`. Со схемой функция создастся, но упадёт на первом вызове
+с `missing FROM-clause entry for table "submit"`:
 
 ```sql
 CREATE FUNCTION api.submit(token text, payload jsonb) RETURNS jsonb
@@ -81,7 +83,7 @@ LANGUAGE plpgsql AS $$
 #variable_conflict use_column          -- колонка важнее переменной
 BEGIN
     INSERT INTO public.counters AS c (token, minute, hits)
-    VALUES (api.submit.token, date_trunc('minute', now()), 1)  -- аргумент — по полному имени
+    VALUES (submit.token, date_trunc('minute', now()), 1)  -- аргумент — именем функции, без схемы
     ON CONFLICT (token, minute) DO UPDATE SET hits = c.hits + 1;
     RETURN jsonb_build_object('ok', true);
 END $$;

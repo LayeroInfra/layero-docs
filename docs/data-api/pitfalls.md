@@ -62,10 +62,14 @@ CREATE POLICY workspaces_read ON public.workspaces
 
 Либо вставкой без возврата: `db.from("workspaces").insert(row)` без `.select()`.
 
-## 3. Функции живут только в схеме `api`
+## 3. Функции ищутся в `api` и `public`, умолчания у них разные
 
-Таблицы шлюз ищет в `api`, `public` и `app`, функции — только в `api`.
-`Accept-Profile` на это не влияет. Подробности — [Функции и RPC](./rpc.md).
+Таблицы шлюз ищет в `api`, `public` и `app`, функции — в `api` и `public`.
+Новая функция `public` вызывается по API сразу, как у Supabase; новая функция
+`api` закрыта, пока не выдан `GRANT EXECUTE`. Вспомогательную функцию, которую
+не должен звать интернет, кладите в свою закрытую схему (`private`,
+`app_private`). `Accept-Profile` на поиск функций не влияет. Подробности —
+[Функции и RPC](./rpc.md).
 
 ## 4. Имя аргумента функции — публичный контракт
 
@@ -88,3 +92,20 @@ CREATE POLICY workspaces_read ON public.workspaces
 
 Проверьте в панели, что политика держит чужого: запрос выполнится **от роли
 ключа**, а транзакция откатится.
+
+## 6. Внутри шлюза `current_user` — не `authenticated`
+
+Запрос вошедшего пользователя выполняется под служебной ролью вашей базы,
+которая входит в группу `authenticated` (гостя — в `anon`, секретного
+ключа — в `service_role`). Политики `TO authenticated` и права `GRANT …
+TO authenticated` работают как у Supabase, а сравнение имени — нет:
+`current_user = 'authenticated'` ложно, и проверка в триггере молча
+пропускает всех.
+
+Кто зовёт, проверяйте по токену:
+
+```sql
+IF auth.role() = 'authenticated' THEN …          -- вошедший
+IF auth.uid() IS NULL THEN …                      -- гость
+IF pg_has_role('authenticated', 'MEMBER') THEN …  -- членство в группе
+```

@@ -80,6 +80,15 @@ Run this on a server or in a script, never in the browser: the secret key
 bypasses RLS.
 
 
+## Second factor
+
+An authenticator app (TOTP) works as in Supabase: `supabase.auth.mfa.enroll`,
+`challenge`, `verify`, `unenroll`. Turn it on for the database with the "Allow a
+second factor" switch under "Authorization" → "Sign-in methods" → "Settings".
+After the code is verified the token carries `aal: "aal2"` — a policy can require
+it: `auth.jwt() ->> 'aal' = 'aal2'`. SMS and other second-factor kinds are not
+supported.
+
 ## Signing in from the Layero panel: no second password
 
 If you're building the application yourself and its users are your own team

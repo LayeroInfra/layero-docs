@@ -142,7 +142,9 @@ exists only in the files the platform serves.
   and Bing, `node_modules` and folders whose names start with a dot. HTML
   served by a container (SSR, a Node or Python server) is not changed. The
   frontend of a fullstack project does get the label.
-- **How to configure it.** Dashboard → project → **Settings → Layero Label**:
-  automatic colour, your own colour, or off. Turning the label off needs the
-  Pro plan ([plans](../billing/plans)). The change takes effect with the
-  next deploy.
+- **How to remove it.** The label is on by default for every project, the Pro
+  plan included, and is turned off per project: Dashboard → project →
+  **Settings → Layero Label** → "Off". The same place sets automatic or your own
+  colour. An agent turns it off with the MCP tool `project_settings` and
+  `badge: false`. Turning the label off needs the Pro plan
+  ([plans](../billing/plans)). The change takes effect with the next deploy.

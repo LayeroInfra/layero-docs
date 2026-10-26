@@ -13,57 +13,72 @@ what to expect from these pages is covered in [What Data API Is](./index.md).
 
 :::
 
-The browser won't let a page reach `data.layero.ru` unless its domain is
-allowed by the database: we never set `Access-Control-Allow-Origin` to `*` —
-with key-based authentication that isn't a simplification, it's removing the
-protection.
-
-Allowed domains are made up of two lists.
+The browser won't let a page reach `data.layero.ru` unless its domain is allowed
+by the database. Allowed domains come from two lists, and for widgets on other
+people's sites there is a third mode — "any site".
 
 ## 1. Domains of connected projects are allowed automatically
 
-A project connected to a database automatically gets the right to call it
-from the browser: both the apex (`<project>.layero.app`) and its own custom
-domains. Nothing needs to be configured.
+A project connected to the database may call it from the browser
+automatically: its apex (`<project>.layero.app`), its own domains and branch
+previews. Nothing to configure.
 
 ## 2. Accepted origins — for third-party sites
 
-If you need to put a form on a site that is **not connected** to the database
-(a client's site, a landing page on someone else's platform), add its domain
-to accepted origins:
+If a form has to live on a site that is **not** connected to the database (a
+client's site, a landing page on another platform), add its domain to the
+accepted origins:
 
 ```bash
-curl -X POST "https://api.layero.ru/organizations/<organization>/databases/<id>/api/origins" \
-     -H "authorization: Bearer <token>" -H "content-type: application/json" \
-     -d '{"origin": "https://zarya.example", "note": "client landing page"}'
+npx layero@latest data origins add https://zarya.example --db <database> --note "client landing"
+npx layero@latest data origins list --db <database>     # both lists at once
+npx layero@latest data origins remove https://zarya.example --db <database>
 ```
+
+The same in the panel: "Data API" → "Access" → "Sites allowed to call the Data
+API". A database has up to 50 accepted origins.
+
+🚨 **This is not the same as connecting a project to the database.** Connecting
+gives the project a role with table privileges and a connection string for
+server code. An accepted origin grants neither: it lifts exactly one
+restriction — the browser one.
+
+What an allowed domain can do is still decided by the key, grants and RLS. For
+taking in submissions this is usually one public function and no open tables —
+see [Functions and RPC](./rpc.md).
+
+## 3. Any site — for embeddable widgets
+
+A widget installed on hundreds of other people's sites (a feedback form, a
+chat, reviews) won't fit into 50 origins. For it the database has an "any site"
+mode, as in Supabase: the gateway accepts requests with the public key from any
+page.
 
 ```bash
-# view both lists at once
-curl "https://api.layero.ru/organizations/<organization>/databases/<id>/api/origins" \
-     -H "authorization: Bearer <token>"
+npx layero@latest data origins add '*' --db <database>     # turn on
+npx layero@latest data origins remove '*' --db <database>  # turn off
 ```
 
-🚨 **This is not the same as connecting a project to the database.**
-Connecting a project grants its roles rights on the database's tables and
-puts a connection string into its environment variables — that is, it hands
-over the whole database. An accepted origin grants neither grants nor a
-connection string: it lifts exactly one restriction — the browser's.
+In the panel it is the "Any site" switch in the same list.
 
-What a domain on the list can actually access is still decided by the key,
-grants, and RLS. For accepting form submissions this is usually one public
-function and not a single open table — see [Functions and RPC](./rpc.md).
+⚠️ When you turn it on, only privileges and policies protect the data. Any page
+on the internet can read and write whatever is open to guests and spend the
+database's daily request limit. For a widget, open one intake function to
+guests (`SECURITY DEFINER`, input checked inside) and no tables. "Any site" does
+not open post-sign-in redirect addresses: they are still checked against the
+list.
+
+If opening that much is not acceptable, there is a way without "any site": on
+the other page a script draws a button, and the form lives in an `iframe` on
+your connected project's domain and gets the page data via `postMessage`.
 
 ## Format
 
-`https://domain` or `https://domain:port` — exactly as the browser sends it.
-A path and `*` are not accepted: a path never arrives in `Origin` at all, and
-an asterisk would mean "any page on the internet, on behalf of your
-visitor." `localhost` and `127.0.0.1` on any port are allowed by default —
-for requests and as the return address after sign-in, as in Supabase. You can
-turn it off in the "Access" section.
+`https://domain` or `https://domain:port` — exactly as the browser sends it — or
+`*` for any site. Paths and patterns like `https://*.example` are not accepted:
+a path never arrives in `Origin`. `localhost` and `127.0.0.1` on any port are
+allowed by default — for requests and as a post-sign-in redirect, as in
+Supabase. You can turn that off under "Access".
 
-A change to the list takes effect within seconds: on a stale-cache refusal
-the gateway re-checks against the current list instead of serving from
-cache. Hence the ceiling — a few seconds, not the minute of waiting it used
-to be.
+List changes apply within seconds: a refusal based on a stale cache is
+re-checked against a fresh list rather than served from the cache.

@@ -91,21 +91,22 @@ compatible with both. Details — [What's Missing](./limits.md).
 
 | Schema | Tables | Functions |
 |---|---|---|
-| `api` | yes | **yes, and only here** |
-| `public` | yes | no |
+| `api` | yes | yes; a new function is closed until `EXECUTE` is granted |
+| `public` | yes | yes; a new function is callable right away — as in Supabase |
 | `app` | yes | no |
 
-The gateway looks for tables in three schemas, but functions for `/rpc/` —
-**only in `api`**. The rule is asymmetric on purpose, and the
-`Accept-Profile` header cannot change it: `api` is the public storefront —
-whatever you put there, you put there deliberately. Details —
-[Functions and RPC](./rpc.md).
+The gateway looks for tables in three schemas and for `/rpc/` functions in
+`api` and `public`. The difference is the defaults: a `public` function can be
+called right after `CREATE FUNCTION`, an `api` function only after an explicit
+`GRANT EXECUTE`. So keep internal helpers in a separate closed schema, not in
+`public`. Details — [Functions and RPC](./rpc.md).
 
 ## What's next
 
 - [Tables and REST](./rest.md) — reading, writing, filters, access
 - [Functions and RPC](./rpc.md) — a public function as the only entry point
 - [User sign-in](./auth.md) — sign-up, sessions, sign-in from the panel
+- [Files](./storage.md) — buckets, policies, signed URLs
 - [Accepting requests from another domain](./origins.md) — a form on a
   client's site
 - [Outbound calls](./outbound.md) — Telegram notifications and webhooks

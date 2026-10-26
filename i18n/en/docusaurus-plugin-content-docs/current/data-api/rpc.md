@@ -76,7 +76,9 @@ Two things follow from this:
    substituted.
 
 The fix isn't renaming the argument (it's public), it's qualifying names
-inside the function:
+inside the function. The PL/pgSQL block label is the function name **without the
+schema**: `submit.token`, not `api.submit.token`. With the schema the function is
+created but fails on its first call with `missing FROM-clause entry for table "submit"`:
 
 ```sql
 CREATE FUNCTION api.submit(token text, payload jsonb) RETURNS jsonb
@@ -84,7 +86,7 @@ LANGUAGE plpgsql AS $$
 #variable_conflict use_column          -- the column takes priority over the variable
 BEGIN
     INSERT INTO public.counters AS c (token, minute, hits)
-    VALUES (api.submit.token, date_trunc('minute', now()), 1)  -- argument, by its full name
+    VALUES (submit.token, date_trunc('minute', now()), 1)  -- argument, by the function name, no schema
     ON CONFLICT (token, minute) DO UPDATE SET hits = c.hits + 1;
     RETURN jsonb_build_object('ok', true);
 END $$;

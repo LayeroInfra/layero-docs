@@ -65,10 +65,13 @@ CREATE POLICY workspaces_read ON public.workspaces
 Or insert without returning a row: `db.from("workspaces").insert(row)`
 without `.select()`.
 
-## 3. Functions only live in the `api` schema
+## 3. Functions are looked up in `api` and `public`, with different defaults
 
-The gateway looks for tables in `api`, `public`, and `app`, but for
-functions — only in `api`. `Accept-Profile` doesn't affect this. Details —
+The gateway looks for tables in `api`, `public` and `app`, and for functions in
+`api` and `public`. A new `public` function is callable over the API right
+away, as in Supabase; a new `api` function is closed until `GRANT EXECUTE`.
+Put helpers the internet must not call into your own closed schema (`private`,
+`app_private`). `Accept-Profile` does not affect the function lookup. Details —
 [Functions and RPC](./rpc.md).
 
 ## 4. A function argument name is a public contract
@@ -94,3 +97,21 @@ apart:
 
 Check in the panel that the policy is holding back the right person: the
 query runs **under the key's role**, and the transaction is rolled back.
+
+## 6. Inside the gateway `current_user` is not `authenticated`
+
+A signed-in user's request runs under your database's service role, which is a
+member of the `authenticated` group (a guest's — of `anon`, the secret key's —
+of `service_role`). `TO authenticated` policies and `GRANT … TO authenticated`
+work as in Supabase, but comparing the name does not: `current_user =
+'authenticated'` is false, and a check in a trigger silently lets everyone
+through.
+
+Check the caller by the token:
+
+```sql
+IF auth.role() = 'authenticated' THEN …          -- signed in
+IF auth.uid() IS NULL THEN …                      -- guest
+IF pg_has_role('authenticated', 'MEMBER') THEN …  -- group membership
+```
+

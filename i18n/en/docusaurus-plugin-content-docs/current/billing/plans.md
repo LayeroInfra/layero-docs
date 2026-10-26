@@ -24,7 +24,7 @@ The plan applies at the account level.
 | Observability & logs | — | ✅ |
 | Performance audit (Lighthouse/SiteSpeed) | — | ✅ |
 | Boosted runtime tier | — | ✅ |
-| Remove the Layero badge | — | ✅ |
+| Remove the Layero badge ([how](../getting-started/concepts.md#the-layero-label-in-html)) | — | ✅ |
 | Team organizations | — | ✅ |
 | Team seats included | — | 1 |
 

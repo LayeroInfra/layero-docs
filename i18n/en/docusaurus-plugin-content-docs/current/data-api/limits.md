@@ -24,7 +24,7 @@ not like that" surfaces at the visitor's end, not the developer's.
 | **Realtime** — change subscriptions | poll on an interval |
 | **Edge Functions** — running your code on our side | logic lives in database functions; for outbound calls see [Outbound calls](./outbound.md) |
 | `/auth/v1/admin/*` | manage users with your own functions in the `api` schema |
-| email change, SMS, MFA, enterprise SSO | — |
+| email change, SMS, enterprise SSO | —; a second factor exists: an authenticator app (TOTP), `supabase.auth.mfa.*` |
 | RS256/JWKS | tokens are signed with HS256 using the database's secret |
 | image transforms, resumable upload, S3 protocol | prepare the file on your side; upload and serving work |
 
@@ -37,7 +37,7 @@ own code on our side.
 
 | What | Value |
 |---|---|
-| Concurrent connections per database | 4 per gateway process, two processes — so 8; beyond that, a `db_too_busy` refusal |
+| Concurrent queries per database | shared database — 4 (2 on each of the two entry points), shared between the Data API and your server; dedicated — 20 % of the cluster connection ceiling, at least 4. `layero db list` shows the same number (`data_api_concurrent`). Beyond that — a queue, then a `db_too_busy` refusal |
 | Requests to one database per day | Free — 50,000, Pro — 1,000,000; beyond that, a `quota_exceeded` refusal (429) until 00:00 UTC |
 | Sign-in users per database | Free — 10,000, Pro — 100,000; beyond that, new sign-ups are closed, existing users keep working |
 | File in storage | up to 50 MB on any plan |
