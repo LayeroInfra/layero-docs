@@ -252,11 +252,13 @@ Result of `layero data enable`: the Data API is on for the database.
 | `org` | string | organisation slug |
 | `database` | string | database slug or id |
 | `slug` | string | the database address in the Data API: `https://data.layero.ru/<slug>` |
-| `public_key` | string \| null | the public key for the site — full value, sent once |
+| `url` | string \| null | the database's API address |
+| `url_note` | string \| null | why the address differs from the database name: it is built from the name in Latin letters, without hyphens and spaces; `null` when they match |
+| `public_key` | string \| null | the public key for the site — full value; get it again with `layero data keys list` |
 | `secret_key` | string \| null | the secret key — only with `--with-secret`; keep it on the server, never in site code |
 | `secrets` | string[] | `["secret_key"]` when the secret key is in the event — do not print or log it |
 | `reapplied` | boolean | `true` — the Data API was already on and was re-applied with `--repair` |
-| `next_action` | string | present when keys came in the event: where to get them later. Public — `layero data env` on a connected project or a new `layero data keys issue`; the secret one is never shown again |
+| `next_action` | string | present when keys came in the event: the secret one is never shown again, the public one is in `layero data keys list` |
 
 ### `database_created`
 
@@ -273,13 +275,13 @@ Result of `layero db create`. The command waits up to 90 seconds for the databas
 
 ### `data_keys`
 
-Result of `layero data keys list`. Key values are never in this event — prefixes only.
+Result of `layero data keys list`. Only the public key comes with its value: it is not a secret and ships in the site code anyway. Secret key values are never included.
 
 | field | type | note |
 |---|---|---|
 | `org` | string | organisation slug |
 | `database` | string | database slug or id |
-| `keys` | array | keys: `id`, `kind` (`public` \| `secret`), `prefix`, `label`, `created_at`, `last_used_at`, `expires_at` (string \| null), `in_build` (boolean — the key goes into the site build), `service` (boolean) |
+| `keys` | array | keys: `id`, `kind` (`public` \| `secret`), `prefix`, `label`, `created_at`, `last_used_at`, `expires_at` (string \| null), `in_build` (boolean — the key goes into the site build), `service` (boolean), `value` (string \| null — the public key's value, `null` for a secret one) |
 
 ### `data_key_issued`
 
