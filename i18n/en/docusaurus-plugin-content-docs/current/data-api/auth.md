@@ -61,6 +61,25 @@ anyone can register someone else's address. Switch it off in «Авториза�
 «Подтверждать почту». Databases where sign-in was enabled before 26.10.2026
 keep their previous setting — check it in the same place.
 
+### Test users — through the admin API
+
+To test sign-in without a mailbox, create a user with the secret key, as in
+Supabase. The user is created already confirmed and can sign in right away:
+
+```js
+const admin = createClient(url, secretKey); // the database secret key
+await admin.auth.admin.createUser({
+  email: "test@example.com",
+  password: "a-strong-password",
+  email_confirm: true,
+});
+// change the password: admin.auth.admin.updateUserById(id, { password: "…" })
+```
+
+Run this on a server or in a script, never in the browser: the secret key
+bypasses RLS.
+
+
 ## Signing in from the Layero panel: no second password
 
 If you're building the application yourself and its users are your own team
