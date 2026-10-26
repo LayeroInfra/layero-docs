@@ -39,24 +39,24 @@ GRANT EXECUTE ON FUNCTION api.submit(text, jsonb) TO anon;
 await db.rpc("submit", { site_token: "abc", payload: { name: "Anya" } });
 ```
 
-## Functions are only looked up in the `api` schema
+## Where functions are looked up and what comes back
 
-The gateway looks for tables in `api`, `public`, and `app`, but for
-functions — **only in `api`**. The `Accept-Profile` and `Content-Profile`
-headers don't affect this.
+Functions are looked up in the `api` and `public` schemas — as in Supabase,
+`supabase.rpc("name")` calls a `public` function without a single Layero-specific
+line. A new `public` function gets call rights by itself (default privileges), so
+your migration needs no `GRANT`. Trigger functions are never methods.
 
-The asymmetry is deliberate: `api` is the public storefront. A function in
-`public` is internal application machinery, and it must not be callable from
-the internet simply by existing.
+Only a function granted to the Data API roles explicitly can be called over the
+API. A function callable only through `PUBLIC` (the Postgres default) is closed,
+and the refusal names the `GRANT` to issue: internal application mechanics don't
+become callable from the internet just by existing.
 
-If a function lives elsewhere, the refusal will say so:
+The two addresses answer differently:
 
-```json
-{
-  "error": "unknown_function",
-  "message": "function api.submit not found or not exposed via API; one with the same name exists in public — only the api schema is visible over HTTP"
-}
-```
+| Address | Response body |
+|---|---|
+| `/<db>/rest/v1/rpc/<function>` (supabase-js) | the result as is: `"hi"`, `{"ok": true}`, `[…]` — as in PostgREST |
+| `/<db>/rpc/<function>` (`@layero/data`) | `{"data": <result>}` |
 
 ## Argument names are a public contract
 
