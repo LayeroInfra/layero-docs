@@ -330,6 +330,19 @@ Result of `layero data origins add` and `layero data origins remove`.
 | `database` | string — database slug or id |
 | `origin` | string — site address |
 
+### Outbound calls: `data_hosts`, `data_secrets`, `data_calls`, `data_call_log`
+
+Results of `layero data hosts list`, `layero data secrets list`, `layero data calls list` and `layero data calls log`.
+
+| event | fields |
+|---|---|
+| `data_hosts` | `org`, `database`, `hosts` (string[]) — allowed hosts |
+| `data_secrets` | `org`, `database`, `secrets` (string[]) — names only, no values |
+| `data_calls` | `org`, `database`, `calls` — `name`, `method`, `url_template`, `headers`, `body_template`, `allow_anon`, `hourly_limit` |
+| `data_call_log` | `org`, `database`, `calls` — `call_name`, `mode` (`queue` \| `sync`), `status_code`, `error`, `elapsed_ms`, `at` |
+
+Changes — `data_host_added` / `data_host_removed` (field `host`), `data_secret_set` / `data_secret_removed` (field `name`, no value), `data_call_saved` / `data_call_removed` (field `name`); all of them also carry `org` and `database`.
+
 ### `data_methods`
 
 Result of `layero data methods`: tables and functions of the database with the access level of each method. Levels: `closed`, `visitor` — any visitor, `user` — signed-in users, `server` — server only.

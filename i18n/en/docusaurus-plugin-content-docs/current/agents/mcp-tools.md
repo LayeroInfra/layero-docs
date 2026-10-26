@@ -75,6 +75,7 @@ line per tool.
 | `data_api_grant` ⚠️ | Open or close access to a method for a role. |
 | `data_api_keys` ⚠️ | Issue or revoke Data API keys. |
 | `data_api_origins` ⚠️ | Sites allowed to call from the browser (CORS). |
+| `data_api_outbound` ⚠️ | [Outbound calls](/data-api/outbound): allowed hosts, secret names, call descriptions and the log. Secret values are set by the person in the panel or the CLI. |
 | `data_api_probe` | A trial call of a method — check that access and the response are as expected. |
 
 ## Documentation

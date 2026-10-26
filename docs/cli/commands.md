@@ -38,6 +38,7 @@ description: Полный список команд layero — init, login, proj
 | `layero db disconnect <база>` | Отключить проект от базы: переменная уйдёт со следующим деплоем. |
 | `layero db sql <база> "SQL"` | Выполнить запрос или скрипт в базе. |
 | `layero data env` | Адрес и публичный ключ [Data API](/data-api) для фронтенда. |
+| `layero data hosts` / `secrets` / `calls` | [Исходящие вызовы](/data-api/outbound) базы: разрешённые хосты, секреты, описания вызовов и их журнал. |
 | `layero token create <имя>` | Выпустить долгоживущий токен для CI и агентов. |
 | `layero token list` / `revoke <id>` | Посмотреть и отозвать выпущенные токены. |
 | `layero token set <jwt>` | Сохранить токен, полученный иначе. |

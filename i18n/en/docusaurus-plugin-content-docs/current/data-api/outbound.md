@@ -27,8 +27,20 @@ service: Telegram is configured the same way as any webhook.
 | **Allowed hosts** | a list like `api.telegram.org` — without it we'd be an open proxy |
 | **Call description** | method, address, headers, and body with substitutions |
 
-All three are configured for the database in the panel ("API" section →
-"Outbound").
+All three are configured for the database in the panel — the "Data API"
+section, "Outbound" tab — or from the terminal, that is, as code in CI:
+
+```bash
+npx layero@latest data hosts add api.telegram.org --db <database>
+printf %s "$BOT_TOKEN" | npx layero@latest data secrets set TELEGRAM_BOT_TOKEN --db <database>
+npx layero@latest data calls set --file telegram_notify.json --db <database>
+npx layero@latest data calls log --db <database>     # status code and refusal reason
+```
+
+The command reads the secret value from stdin, from a variable (`--from-env`)
+or asks for it without echo — it can't be passed as an argument, or it would
+end up in the shell history. Host first, then the call: the server won't
+accept a description whose host isn't allowed.
 
 ## Call description
 
@@ -73,7 +85,14 @@ growing backoff, and records the outcome in the same rows (`status`,
 `attempts`, `response_code`, `last_error`).
 
 Network failures and 5xx responses are retried. 4xx and configuration errors
-are not — those get fixed by a person, not by waiting.
+are not — those get fixed by a person, not by waiting. A row in `failed` won't
+come back on its own: once the setup is fixed, enqueue a new one or put the
+old ones back in the queue:
+
+```sql
+UPDATE api.outbox SET status = 'pending', run_after = now(), attempts = 0
+ WHERE status = 'failed';
+```
 
 ### Synchronous — from the application
 
