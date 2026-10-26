@@ -254,6 +254,7 @@ Result of `layero data enable`: the Data API is on for the database.
 | `slug` | string | the database address in the Data API: `https://data.layero.ru/<slug>` |
 | `public_key` | string \| null | the public key for the site — full value, sent once |
 | `secret_key` | string \| null | the secret key — only with `--with-secret`; keep it on the server, never in site code |
+| `secrets` | string[] | `["secret_key"]` when the secret key is in the event — do not print or log it |
 | `reapplied` | boolean | `true` — the Data API was already on and was re-applied with `--repair` |
 | `next_action` | string | present when keys came in the event: where to get them later. Public — `layero data env` on a connected project or a new `layero data keys issue`; the secret one is never shown again |
 
@@ -293,6 +294,7 @@ Result of `layero data keys issue`. The full key value is sent once — store it
 | `prefix` | string | start of the key, shown in the list |
 | `key` | string | the full key value |
 | `expires_at` | string \| null | when the key stops working; `null` — never |
+| `secrets` | string[] | `["key"]` for a secret key — do not print or log it |
 
 ### `data_key_revoked`
 
