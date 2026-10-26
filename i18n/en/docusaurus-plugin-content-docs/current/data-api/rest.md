@@ -59,8 +59,8 @@ line in `npx layero@latest data methods`. Tables created without RLS before
 🚨 **Roles are `anon`, `authenticated`, `service_role`, as in Supabase.** Don't
 look up "your" role by pattern (`rolname ~ '^u_.*_anon$'`): the role list is
 shared across the whole server, the pattern matches other tenants' roles, and
-permissions end up in the wrong place. This database's own role name, if you
-need it, is returned by `layero.role('anon'|'auth'|'svc')`.
+permissions end up in the wrong place. To close a table to the public key, use
+`REVOKE … FROM anon`, as in Supabase.
 
 Don't check what's been granted by eye: the panel will run the query **under
 the key's role** — as `anon`, as the signed-in user, or as the secret key —

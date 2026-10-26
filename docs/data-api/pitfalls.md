@@ -35,9 +35,9 @@ SELECT rolname FROM pg_roles WHERE rolname ~ '^u_.*_anon$' LIMIT 1;
 GRANT SELECT ON public.entries TO anon;
 ```
 
-Имя роли именно этой базы отдаёт `layero.role('anon'|'auth'|'svc')`. В `GRANT`
-оно подставляется через `DO` и `format('%I')`:
-`DO $$ BEGIN EXECUTE format('GRANT SELECT ON public.entries TO %I', layero.role('anon')); END $$;`
+Закрывают так же, как в Supabase: `REVOKE SELECT ON public.entries FROM anon;`
+— публичный ключ теряет доступ сразу. Выдавайте права только этим ролям, не роли
+своей базы из `layero.role(...)`: выданное ей поимённо `REVOKE … FROM anon` не снимет.
 
 ## 2. `INSERT … RETURNING` проходит политику **чтения**
 

@@ -35,10 +35,10 @@ once, a product's table permissions went to a role of another organization.
 GRANT SELECT ON public.entries TO anon;
 ```
 
-This database's own role name, if you need it, is returned by
-`layero.role('anon'|'auth'|'svc')`; in a `GRANT` substitute it through `DO`
-and `format('%I')`:
-`DO $$ BEGIN EXECUTE format('GRANT SELECT ON public.entries TO %I', layero.role('anon')); END $$;`
+Close access the same way as in Supabase: `REVOKE SELECT ON public.entries FROM anon;`
+takes it away from the public key at once. Grant only to these roles, not to
+your database's own role from `layero.role(...)`: a grant made to it by name is
+not removed by `REVOKE … FROM anon`.
 
 ## 2. `INSERT … RETURNING` goes through the **read** policy
 
