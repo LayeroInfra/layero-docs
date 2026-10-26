@@ -255,6 +255,20 @@ Result of `layero data enable`: the Data API is on for the database.
 | `public_key` | string \| null | the public key for the site — full value, sent once |
 | `secret_key` | string \| null | the secret key — only with `--with-secret`; keep it on the server, never in site code |
 | `reapplied` | boolean | `true` — the Data API was already on and was re-applied with `--repair` |
+| `next_action` | string | present when keys came in the event: where to get them later. Public — `layero data env` on a connected project or a new `layero data keys issue`; the secret one is never shown again |
+
+### `database_created`
+
+Result of `layero db create`. The command waits up to 90 seconds for the database to be ready and only then sends the event.
+
+| field | type | note |
+|---|---|---|
+| `org` | string | organisation slug |
+| `name` | string | database name |
+| `connection_string` | string | connection string with the password — sent once |
+| `secrets` | string[] | fields that must not be printed or logged |
+| `status` | `active` \| `creating` \| `failed` | `active` — `data enable` and `db sql` work right away; `creating` — still being prepared |
+| `next_action` | string | present for `creating` and `failed`: what to do next |
 
 ### `data_keys`
 

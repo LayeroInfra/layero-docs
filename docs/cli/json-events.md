@@ -246,7 +246,21 @@ CLI упаковал директорию в tar.gz.
 | `slug` | string | адрес базы в Data API: `https://data.layero.ru/<slug>` |
 | `public_key` | string \| null | публичный ключ для сайта — полное значение, приходит один раз |
 | `secret_key` | string \| null | секретный ключ — только с `--with-secret`; хранить на сервере, в код сайта не класть |
-| `reapplied` | boolean | `true` — Data API у базы уже был включён и переприменён через `--repair` |
+| `reapplied` | boolean | `true` — Data API у базы уже был включён и переприменён через `--repair` |
+| `next_action` | string | есть, когда в событии пришли ключи: где взять их потом. Публичный — `layero data env` у подключённого проекта или новый `layero data keys issue`, секретный больше не покажут |
+
+### `database_created`
+
+Итог `layero db create`. Команда ждёт готовности базы до 90 секунд и только потом присылает событие.
+
+| поле | тип | примечание |
+|---|---|---|
+| `org` | string | slug организации |
+| `name` | string | имя базы |
+| `connection_string` | string | строка подключения с паролем — приходит один раз |
+| `secrets` | string[] | поля, которые нельзя печатать и класть в журнал |
+| `status` | `active` \| `creating` \| `failed` | `active` — можно сразу `data enable` и `db sql`; `creating` — база ещё готовится |
+| `next_action` | string | есть при `creating` и `failed`: что делать дальше |
 
 ### `data_keys`
 
