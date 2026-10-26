@@ -64,6 +64,7 @@ to the project (since 0.11.0). Only what a person names is sent: `--type`,
 | `next_action` | string? | one concrete step: `npx layero@latest deploy --root apps/web`, the text of a `layero.json`, etc. |
 | `candidates` | string[]? | app folders found below the current one |
 | `ssr_warning` | string? | Nuxt/SvelteKit will build a server, not static files |
+| `skipped_build_script` | string? | a static site with a `build` script in package.json: the script will not run, files go as they are. To build — `layero.json` with `"framework": "generic"` |
 | `layero_warnings` | string[]? | `layero.json` keys the platform will not apply, with the right name. For example, `"type": "vite"` does nothing — write `"framework": "vite"` (since CLI 0.11.4) |
 
 `framework`, `buildCommand` and `outputDirectory` from `layero.json` are
@@ -242,6 +243,17 @@ The apex now points at the given deploy. Emitted by `layero promote` and by
 |---|---|
 | `url` | string — the public address |
 | `deploy_id` | string |
+
+### `data_services_enabled`
+
+Result of `layero data enable --auth --storage`: which of sign-in and files this call enabled.
+
+| field | type |
+|---|---|
+| `org` | string — organisation slug |
+| `database` | string — database slug or id |
+| `auth` | boolean — sign-in enabled: the `auth` schema and `auth.uid()` |
+| `storage` | boolean — files enabled: the `storage` schema |
 
 ### `data_api_enabled`
 
@@ -588,7 +600,7 @@ and starts the build.
 |---|---|---|
 | `setup_applied` | `project`, `framework`, `build_cmd` (string \| null), `output_dir` (string \| null), `layero_found` (boolean) | Setup finished. The framework, command and folder are what detection saw, for information: they are not written into the project (since CLI 0.11.4) — the builder detects them from the repository on every build |
 | `deploy_started` | `project`, `deploy_id`, `url` | First build started; follow it with `layero deploys list --project <slug>` |
-| `queued` | `waited_s` | The build is waiting for a free builder; printed every 15 s until the first `stage`. Not a failure — keep waiting |
+| `queued` | `waited_s`, `position`, `ahead`, `running`, `estimated_wait_s`, `message` | The build is waiting for a free builder; printed every 15 s until the first `stage`. `position` — place in the queue, `running` — builds running now, `estimated_wait_s` — an estimate from the last 30 minutes' pace (`null` when there is nothing to estimate from). Not a failure — keep waiting |
 | `setup_pending` | `project`, `url`, `hint` | `--no-deploy`: the project stays in the wizard; nothing builds until setup is finished at `url` |
 | `setup_failed` | `project`, `reason`, `url`, `hint` | Detection, setup or the build start failed. The project **is created**, exit 0 — tell the person to finish in the dashboard at `url` |
 

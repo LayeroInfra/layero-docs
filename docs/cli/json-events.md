@@ -59,6 +59,7 @@ CLI продолжит поллить каждые 2 секунды. Когда 
 | `next_action` | string? | один конкретный шаг: `npx layero@latest deploy --root apps/web`, текст `layero.json` и т. п. |
 | `candidates` | string[]? | папки приложений, найденные ниже текущей |
 | `ssr_warning` | string? | Nuxt/SvelteKit соберутся сервером, а не статикой |
+| `skipped_build_script` | string? | статика со скриптом `build` в package.json: скрипт не запустится, файлы уйдут как есть. Собрать — `layero.json` с `"framework": "generic"` |
 | `layero_warnings` | string[]? | ключи `layero.json`, которые платформа не применит, с верным именем. Например, `"type": "vite"` не работает — нужно `"framework": "vite"` (с CLI 0.11.4) |
 
 `framework`, `buildCommand` и `outputDirectory` из `layero.json` здесь уже
@@ -234,6 +235,17 @@ CLI упаковал директорию в tar.gz.
 |---|---|
 | `url` | string — публичный адрес |
 | `deploy_id` | string |
+
+### `data_services_enabled`
+
+Итог `layero data enable --auth --storage`: что из входа и файлов включено этим вызовом.
+
+| поле | тип |
+|---|---|
+| `org` | string — slug организации |
+| `database` | string — слаг или id базы |
+| `auth` | boolean — включён вход: схема `auth` и `auth.uid()` |
+| `storage` | boolean — включены файлы: схема `storage` |
 
 ### `data_api_enabled`
 
@@ -576,7 +588,7 @@ CLI упаковал директорию в tar.gz.
 |---|---|---|
 | `setup_applied` | `project`, `framework`, `build_cmd` (string \| null), `output_dir` (string \| null), `layero_found` (boolean) | Мастер завершён. Фреймворк, команда и папка — то, что увидел детект, для сведения: в проект они не записаны (с CLI 0.11.4), сборщик определяет их по репозиторию на каждой сборке |
 | `deploy_started` | `project`, `deploy_id`, `url` | Первая сборка запущена; следить — `layero deploys list --project <slug>` |
-| `queued` | `waited_s` | Сборка ждёт свободный сборщик; печатается раз в 15 с до первого `stage`. Не ошибка — ждать дальше |
+| `queued` | `waited_s`, `position`, `ahead`, `running`, `estimated_wait_s`, `message` | Сборка ждёт свободный сборщик; печатается раз в 15 с до первого `stage`. `position` — место в очереди, `running` — сколько сборок идёт сейчас, `estimated_wait_s` — оценка по скорости последних 30 минут (`null`, если оценить не по чему). Не ошибка — ждать дальше |
 | `setup_pending` | `project`, `url`, `hint` | `--no-deploy`: проект оставлен в мастере, сборок не будет, пока настройку не завершат по `url` |
 | `setup_failed` | `project`, `reason`, `url`, `hint` | Детект, настройка или запуск сборки не удались. Проект **создан**, выход 0 — сказать человеку завершить в панели по `url` |
 
