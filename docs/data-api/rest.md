@@ -33,19 +33,26 @@ curl "https://data.layero.ru/moya-baza/rest/v1/entries?id=eq.42&select=*" \
 Если `limit` не задан, шлюз ставит свой — 1000 строк. Запрос без предела
 выедал бы пул соединений, общий для всех баз платформы.
 
-## Доступ: грант плюс политика
+## Доступ: политика RLS, как в Supabase
 
-Свежая база не отдаёт по API ни одной таблицы. Чтобы таблица стала видна, роли нужен
-грант, а таблице — политика RLS:
+Новая таблица в `public` сразу доступна ролям `anon`, `authenticated` и
+`service_role` — права по умолчанию, как у Supabase. Какие строки видны, решает
+RLS, поэтому включайте его сразу:
 
 ```sql
-GRANT SELECT ON public.entries TO anon;
+CREATE TABLE public.entries (id bigint generated always as identity primary key,
+                             owner_id uuid default auth.uid(), body text);
 ALTER TABLE public.entries ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY entries_read_own ON public.entries
-    FOR SELECT TO PUBLIC
+    FOR SELECT TO authenticated
     USING (owner_id = auth.uid());
 ```
+
+🚨 **Таблица без RLS отдаёт все строки любому с публичным ключом.** Платформа
+предупреждает о такой: красная метка «видны все строки» в панели и строка в
+`npx layero@latest data methods`. Таблицы, созданные до 26.10.2026 без RLS, закрыты —
+откройте их после включения RLS: `npx layero@latest data grant <таблица> --get visitor`.
 
 🚨 **Роли — `anon`, `authenticated`, `service_role`, как в Supabase.** Не ищите
 «свою» роль шаблоном (`rolname ~ '^u_.*_anon$'`): список ролей общий на весь

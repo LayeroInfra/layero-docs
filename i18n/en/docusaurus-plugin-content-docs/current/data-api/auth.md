@@ -42,16 +42,16 @@ A signed-in user runs as `authenticated`, a guest as `anon`, the secret key as
 `service_role`. Policies can use `auth.uid()`, `auth.role()` and `auth.jwt()` —
 the same names as in Supabase.
 
-How we differ:
+Access works the same way as in Supabase:
 
-- **No table privileges by default.** A new table is closed until you
-  `GRANT` it (or set an access level in the dashboard). Without a grant the
-  request answers `401`/`403` with code `42501` and a hint on how to open it.
-- **A signed-in user also gets what is open to guests:** a `TO anon` policy
-  applies to signed-in users too.
-- **`service_role` does not bypass RLS.** The secret key sees rows only
-  through `TO service_role` policies; add `USING (true)` for the server to see
-  everything.
+- **A new table in `public` is open to the roles by itself** — default
+  privileges, as there. A migration without `GRANT` lines works as is; RLS
+  decides the rows. A table without RLS gives every row to anyone with the
+  public key — enable RLS right away; the platform warns about such a table.
+- **Guest and signed-in user are different roles.** A `TO anon` policy applies
+  to guests only, `TO authenticated` — to signed-in users only.
+- **The secret key (`service_role`) bypasses RLS** — it sees and changes every
+  row, so it lives on your server only.
 
 ## Email confirmation
 

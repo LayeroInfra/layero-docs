@@ -34,19 +34,27 @@ If `limit` isn't set, the gateway applies its own — 1000 rows. An unbounded
 request would eat into the connection pool shared by every database on the
 platform.
 
-## Access: a grant plus a policy
+## Access: an RLS policy, as in Supabase
 
-A fresh database exposes zero tables over the API. For a table to become
-visible, the role needs a grant, and the table needs an RLS policy:
+A new table in `public` is available to the `anon`, `authenticated` and
+`service_role` roles right away — default privileges, as in Supabase. RLS
+decides which rows are visible, so enable it right away:
 
 ```sql
-GRANT SELECT ON public.entries TO anon;
+CREATE TABLE public.entries (id bigint generated always as identity primary key,
+                             owner_id uuid default auth.uid(), body text);
 ALTER TABLE public.entries ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY entries_read_own ON public.entries
-    FOR SELECT TO PUBLIC
+    FOR SELECT TO authenticated
     USING (owner_id = auth.uid());
 ```
+
+🚨 **A table without RLS gives every row to anyone with the public key.** The
+platform warns about one: a red "all rows visible" mark in the dashboard and a
+line in `npx layero@latest data methods`. Tables created without RLS before
+26.10.2026 are closed — open them after enabling RLS:
+`npx layero@latest data grant <table> --get visitor`.
 
 🚨 **Roles are `anon`, `authenticated`, `service_role`, as in Supabase.** Don't
 look up "your" role by pattern (`rolname ~ '^u_.*_anon$'`): the role list is

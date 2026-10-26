@@ -59,8 +59,9 @@ function and not a single open table — see [Functions and RPC](./rpc.md).
 `https://domain` or `https://domain:port` — exactly as the browser sends it.
 A path and `*` are not accepted: a path never arrives in `Origin` at all, and
 an asterisk would mean "any page on the internet, on behalf of your
-visitor." `localhost` is always allowed — otherwise development would be
-impossible before the first deploy.
+visitor." `localhost` and `127.0.0.1` on any port are allowed by default —
+for requests and as the return address after sign-in, as in Supabase. You can
+turn it off in the "Access" section.
 
 A change to the list takes effect within seconds: on a stale-cache refusal
 the gateway re-checks against the current list instead of serving from
