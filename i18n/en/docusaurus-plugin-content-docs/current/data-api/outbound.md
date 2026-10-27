@@ -126,6 +126,9 @@ PERFORM net.http_post(
 4. The outcome goes to `net._http_response` under the same id: status code,
    headers, body (up to 64 KB, secret values cut out), `timed_out`,
    `error_msg`. Responses are kept for 6 hours, as in `pg_net`.
+5. A database's queue holds at most 1000 unsent requests. Beyond that
+   `net.http_*` fails right away — most often it is a function calling the
+   request in a loop.
 
 ```sql
 SELECT id, status_code, error_msg, left(content, 200)
