@@ -23,8 +23,8 @@ const { data: { user } } = await db.auth.getUser();
 
 Surface: `/auth/v1/{token,signup,recover,verify,resend,authorize,callback}`,
 `GET /auth/v1/user`, `PUT /auth/v1/user`, `POST /auth/v1/logout`. Magic-link
-sign-in, PKCE, and external providers are available — enabled in the panel
-for the database.
+sign-in, PKCE, and external providers are available: Yandex, VK ID and Sber ID.
+How to connect them: [“Sign-in with Yandex, VK ID and Sber ID”](./oauth.md).
 
 ## Roles — as in Supabase
 

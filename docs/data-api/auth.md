@@ -23,8 +23,8 @@ const { data: { user } } = await db.auth.getUser();
 
 Поверхность: `/auth/v1/{token,signup,recover,verify,resend,authorize,callback}`,
 `GET /auth/v1/user`, `PUT /auth/v1/user`, `POST /auth/v1/logout`. Есть вход по
-ссылке из письма (magic link), PKCE и внешние провайдеры — включаются в панели
-у базы.
+ссылке из письма (magic link), PKCE и внешние провайдеры: Яндекс, VK ID и Сбер ID.
+Как их подключить — в разделе [«Вход через Яндекс, VK ID и Сбер ID»](./oauth.md).
 
 ## Роли — как в Supabase
 
