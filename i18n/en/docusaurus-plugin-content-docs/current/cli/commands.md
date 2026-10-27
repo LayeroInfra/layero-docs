@@ -36,9 +36,12 @@ description: The full list of layero commands — init, login, projects, deploy,
 | `layero db create <name>` | Create a shared database from the plan. The connection string is printed once. |
 | `layero db connect <database>` | Connect a project to the database — the connection string goes into its environment variables. |
 | `layero db disconnect <database>` | Disconnect a project from the database: the variable goes away with the next deploy. |
-| `layero db sql <database> "SQL"` | Run a query or a script in the database. |
+| `layero db sql <database> "SQL"` | Run a query or a script in the database; `--file migration.sql` or stdin reads the script from a file. |
+| `layero db delete <database> --yes` | Delete the database with all its data and backups — irreversible. The name and the API address become free again. |
 | `layero data env` | The [Data API](/data-api) URL and public key for the frontend. |
 | `layero data secrets` | Database secrets for [HTTP from SQL](/data-api/outbound): substituted into `net.http_post` as `{{secrets.NAME}}`. |
+| `layero data buckets list` / `create <name>` | Storage buckets: `--public`, `--max 5MB`, `--types image/jpeg,image/png`. No secret key needed. |
+| `layero data auth sender "Name"` | The sender name of sign-in emails (codes, links, password reset). |
 | `layero token set <jwt>` | Set the token by hand (for CI). |
 
 The full flag list for a command:
@@ -257,7 +260,13 @@ npx layero@latest db list                            # which databases exist
 npx layero@latest db create crm                      # create one
 npx layero@latest db connect crm                     # connect the current project
 npx layero@latest db sql crm "select count(*) from entries"
+npx layero@latest db sql crm --file migrations/0001.sql  # a script from a file
+npx layero@latest db delete crm --yes                # delete irreversibly
 ```
+
+A new project can get its database on the very first deploy:
+`npx layero@latest deploy --db crm`. The first build already receives the Data API
+URL and key, no second deploy needed.
 
 With a single organization the CLI uses it; with several, your personal one.
 For a team organization pass `--org <slug>`. A database is addressed by name, slug or id.

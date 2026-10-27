@@ -343,6 +343,28 @@ CLI упаковал директорию в tar.gz.
 | `data_secrets` | `org`, `database`, `secrets` (string[]) — только имена, значений нет |
 | `data_secret_set`, `data_secret_removed` | `org`, `database`, `name` — значения нет |
 
+### `database_deleted`
+
+Итог `layero db delete`: база снесена вместе с копиями, имя и адрес API снова свободны.
+
+| поле | тип | примечание |
+|---|---|---|
+| `org` | string | slug организации |
+| `database` | string | имя базы |
+
+### `data_buckets`, `data_bucket_created`
+
+Итоги `layero data buckets list|create`.
+
+| событие | поля |
+|---|---|
+| `data_buckets` | `org`, `database`, `buckets` — как отвечает хранилище: `id`, `public`, `file_size_limit`, `allowed_mime_types` |
+| `data_bucket_created` | `org`, `database`, `bucket`, `public`, `file_size_limit` (байты или `null`), `allowed_mime_types` (string[] или `null`) |
+
+### `data_auth_sender_set`
+
+Итог `layero data auth sender`: `org`, `database`, `sender_name`, `reply_to` (или `null`).
+
 ### `data_methods`
 
 Итог `layero data methods`: таблицы и функции базы с уровнем доступа по каждому методу. Уровни: `closed` — закрыто, `visitor` — любой посетитель, `user` — вошедшие, `server` — только сервер.
@@ -680,6 +702,7 @@ CLI упаковал директорию в tar.gz.
 | `data_probe_schema` | `--schema` у таблицы не из `api`, `public`, `app` или у функции не `api`: функции шлюз зовёт только из `api`. Без этой проверки платформа молча проигнорировала бы флаг. У `/whoami` схема отбрасывается без отказа, пустая — как без флага | У таблицы — `--schema api`, `public` или `app`; у функции — `api` или без флага. Без флага шлюз ищет таблицу в `api`, затем в `public`, затем в `app` |
 | `data_probe_expect` | `--expect` не разобран: нужен статус (`200`), класс (`2xx`) или список через запятую | `--expect 200`, `--expect 2xx`, `--expect 201,204` |
 | `data_probe_rejected` | Платформа отказала в пробе до запроса к шлюзу: путь не метод базы, у базы не включён вход, тело больше 64 КБ, больше 50 параметров, шлюз ещё не умеет пробу с откатом. Причина — в `message`, запрос не выполнялся. Отказ самого шлюза (`4xx`) приходит не этим кодом, а событием `data_probe` | Подсказка по случаю — в `next_action` |
+| `storage_refused` | Хранилище отказало создать бакет: такой уже есть, неверное имя или файлы у базы не включены. Причина — в тексте ошибки | Включить файлы: `layero data enable --storage`, или взять другое имя |
 | `data_probe_gateway_failed` | Шлюз не дал ответа: ответил `5xx` (например, `503` с `too_busy`) или не ответил платформе вовсе. Если шлюз ответил, событие `data_probe` пришло перед ошибкой. Статус, указанный в `--expect`, этой ошибкой не бывает | Повторить пробу позже |
 | `data_probe_unexpected_status` | Статус ответа шлюза не совпал с `--expect`. Событие `data_probe` пришло перед ошибкой | Сверить ответ пробы с уровнями доступа: `layero data methods --db <база>` |
 | `data_probe_not_rolled_back` | Проба записи прошла (ответ 200–399), а шлюз не подтвердил откат: данные могли измениться. Событие `data_probe` пришло перед ошибкой; `--expect` эту ошибку не снимает | Проверить данные базы; пробу записи не повторять, пока причина не найдена |
@@ -721,7 +744,7 @@ CLI упаковал директорию в tar.gz.
 | `2` | нужен вход | `auth_required`, `auth_expired`, `auth_timeout`, `sandbox_claimed` |
 | `3` | не найдено | `sandbox_expired`, `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `no_runs`, `data_key_unknown` |
 | `4` | неверный ввод | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `claim_static_only`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect` |
-| `5` | удалённая ошибка | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `deploy_watch_lost`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, любой `deploy_<status>` и `http_5xx` |
+| `5` | удалённая ошибка | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `deploy_watch_lost`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, `storage_refused`, любой `deploy_<status>` и `http_5xx` |
 
 ## Cold-start template для агента
 

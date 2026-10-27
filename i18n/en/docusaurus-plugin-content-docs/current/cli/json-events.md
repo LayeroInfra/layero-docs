@@ -351,6 +351,28 @@ Results of `layero data secrets list|set|remove`: the database's secrets for HTT
 | `data_secrets` | `org`, `database`, `secrets` (string[]) — names only, no values |
 | `data_secret_set`, `data_secret_removed` | `org`, `database`, `name` — no value |
 
+### `database_deleted`
+
+Result of `layero db delete`: the database is gone together with its backups; the name and the API address are free again.
+
+| field | type | note |
+|---|---|---|
+| `org` | string | organization slug |
+| `database` | string | database name |
+
+### `data_buckets`, `data_bucket_created`
+
+Results of `layero data buckets list|create`.
+
+| event | fields |
+|---|---|
+| `data_buckets` | `org`, `database`, `buckets` — as the storage answers: `id`, `public`, `file_size_limit`, `allowed_mime_types` |
+| `data_bucket_created` | `org`, `database`, `bucket`, `public`, `file_size_limit` (bytes or `null`), `allowed_mime_types` (string[] or `null`) |
+
+### `data_auth_sender_set`
+
+Result of `layero data auth sender`: `org`, `database`, `sender_name`, `reply_to` (or `null`).
+
 ### `data_methods`
 
 Result of `layero data methods`: tables and functions of the database with the access level of each method. Levels: `closed`, `visitor` — any visitor, `user` — signed-in users, `server` — server only.
@@ -689,6 +711,7 @@ Do not write handling for codes that are not on this list.
 | `data_probe_schema` | `--schema` for a table is not `api`, `public` or `app`, or for a function is not `api`: the gateway calls functions only from `api`. Without this check the platform would silently ignore the flag. For `/whoami` the schema is dropped without a refusal; an empty one counts as no flag | For a table — `--schema api`, `public` or `app`; for a function — `api` or no flag. Without the flag the gateway looks for the table in `api`, then `public`, then `app` |
 | `data_probe_expect` | `--expect` could not be parsed: a status (`200`), a class (`2xx`) or a comma-separated list is expected | `--expect 200`, `--expect 2xx`, `--expect 201,204` |
 | `data_probe_rejected` | The platform refused the probe before calling the gateway: the path is not a method of the database, sign-in is off for the database, the body exceeds 64 KB, more than 50 parameters, the gateway cannot roll back probes yet. The reason is in `message`; nothing was run. A refusal by the gateway itself (`4xx`) is not this code but a `data_probe` event | A hint for the specific case is in `next_action` |
+| `storage_refused` | The storage refused to create the bucket: it already exists, the name is invalid or files are not enabled for the database. The reason is in the error text | Enable files: `layero data enable --storage`, or pick another name |
 | `data_probe_gateway_failed` | The gateway gave no answer: it answered `5xx` (e.g. `503` with `too_busy`) or did not answer the platform at all. If the gateway answered, the `data_probe` event arrived before the error. A status listed in `--expect` never produces this error | Repeat the probe later |
 | `data_probe_unexpected_status` | The gateway status did not match `--expect`. The `data_probe` event arrived before the error | Compare the probe answer with the access levels: `layero data methods --db <database>` |
 | `data_probe_not_rolled_back` | A write probe went through (response 200–399) and the gateway did not confirm the rollback: data may have changed. The `data_probe` event arrived before the error; `--expect` does not suppress this error | Check the database data; do not repeat the write probe until the cause is found |
@@ -732,7 +755,7 @@ error code.
 | `2` | sign-in needed | `auth_required`, `auth_expired`, `auth_timeout`, `sandbox_claimed` |
 | `3` | not found | `sandbox_expired`, `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `no_runs`, `data_key_unknown` |
 | `4` | invalid input | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `claim_static_only`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect` |
-| `5` | remote failure | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `deploy_watch_lost`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, any `deploy_<status>` and `http_5xx` |
+| `5` | remote failure | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `deploy_watch_lost`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, `storage_refused`, any `deploy_<status>` and `http_5xx` |
 
 ## Cold-start template for an agent
 

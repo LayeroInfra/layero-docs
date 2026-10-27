@@ -36,9 +36,12 @@ description: Полный список команд layero — init, login, proj
 | `layero db create <имя>` | Завести общую базу из тарифа. Строка подключения печатается один раз. |
 | `layero db connect <база>` | Подключить проект к базе — строка подключения приедет в его переменные. |
 | `layero db disconnect <база>` | Отключить проект от базы: переменная уйдёт со следующим деплоем. |
-| `layero db sql <база> "SQL"` | Выполнить запрос или скрипт в базе. |
+| `layero db sql <база> "SQL"` | Выполнить запрос или скрипт в базе; `--file миграция.sql` или поток ввода — скрипт из файла. |
+| `layero db delete <база> --yes` | Удалить базу со всеми данными и копиями — безвозвратно. Имя и адрес API снова свободны. |
 | `layero data env` | Адрес и публичный ключ [Data API](/data-api) для фронтенда. |
-| `layero data secrets` | Секреты базы для [HTTP из SQL](/data-api/outbound): подставляются в `net.http_post` как `{{secrets.ИМЯ}}`. |
+| `layero data secrets` | Секреты базы для [HTTP из SQL](/data-api/outbound): подставляются в `net.http_post` как `{{secrets.ИМЯ}}`. |
+| `layero data buckets list` / `create <имя>` | Бакеты хранилища: `--public`, `--max 5MB`, `--types image/jpeg,image/png`. Секретный ключ не нужен. |
+| `layero data auth sender "Имя"` | Имя отправителя писем входа (коды, ссылки, сброс пароля). |
 | `layero token create <имя>` | Выпустить долгоживущий токен для CI и агентов. |
 | `layero token list` / `revoke <id>` | Посмотреть и отозвать выпущенные токены. |
 | `layero token set <jwt>` | Сохранить токен, полученный иначе. |
@@ -235,7 +238,13 @@ npx layero@latest db list                            # какие базы ес�
 npx layero@latest db create crm                      # завести
 npx layero@latest db connect crm                     # подключить текущий проект
 npx layero@latest db sql crm "select count(*) from entries"
+npx layero@latest db sql crm --file migrations/0001.sql  # скрипт из файла
+npx layero@latest db delete crm --yes                # удалить безвозвратно
 ```
+
+Новому проекту базу можно подключить уже при первом деплое:
+`npx layero@latest deploy --db crm`. Первая же сборка получит адрес и ключ
+Data API, второй деплой не нужен.
 
 Если организация одна, CLI возьмёт её, если несколько — личную. Командную
 организацию укажите через `--org <slug>`.
