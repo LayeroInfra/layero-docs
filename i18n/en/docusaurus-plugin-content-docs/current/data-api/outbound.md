@@ -148,3 +148,34 @@ count toward the database's daily request limit.
 
 If code from Supabase reads a token from `vault.decrypted_secrets`, replace that
 expression with `{{secrets.NAME}}` in the URL or header string.
+
+## Incoming webhooks — there are none
+
+HTTP from SQL works one way: from the database out. The Data API has no
+address that accepts someone else's request without a key and runs your
+function. In Supabase such requests are handled by Edge Functions; we do not
+have them and do not run your code on our side.
+
+What to use instead, from best to worst:
+
+1. **The service can add headers** — your backend, an integration platform.
+   Let it call the function itself:
+   `POST https://data.layero.ru/<database-address>/rest/v1/rpc/<function>` with
+   the key in the `apikey` header. Keep the secret key on the server only.
+2. **The service only sends a webhook** (Telegram, YooKassa, GitHub). Run a
+   small server app on Layero in Node or Python. It receives the webhook,
+   checks the service's signature or secret and calls the database function
+   with the secret key. It is an ordinary Layero project; nothing extra is
+   needed.
+3. **The service has a "give me what's new" method** — e.g. `getUpdates` of a
+   Telegram bot. A database function polls it with `net.http_get` and reads
+   the answer from `net._http_response`. This works, but keep polling in bounds:
+   - poll only while you wait for an answer (the "connect the bot" dialog is
+     open), and cap the wait, e.g. 15 minutes;
+   - no more often than every 2 seconds;
+   - pass `offset` so the same updates are not read again;
+   - every function call from the browser counts towards the database's daily
+     request limit, and responses are kept for 6 hours and take its space.
+
+   In Telegram polling and a webhook exclude each other: while the bot has a
+   webhook set, `getUpdates` returns an error.

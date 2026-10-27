@@ -23,6 +23,7 @@ not like that" surfaces at the visitor's end, not the developer's.
 |---|---|
 | **Realtime** — change subscriptions | poll on an interval |
 | **Edge Functions** — running your code on our side | logic lives in database functions; to reach out — [HTTP from SQL](./outbound.md) (`net.http_post`) |
+| **Incoming webhooks** — an address that accepts another service's request | your own server on Layero receives the webhook and calls the function; options are in [HTTP from SQL](./outbound.md#incoming-webhooks--there-are-none) |
 | `/auth/v1/admin/*` | manage users with your own functions in the `api` schema |
 | email change, SMS, enterprise SSO | —; a second factor exists: an authenticator app (TOTP), `supabase.auth.mfa.*` |
 | RS256/JWKS | tokens are signed with HS256 using the database's secret |
