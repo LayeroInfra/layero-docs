@@ -244,7 +244,9 @@ npx layero@latest db delete crm --yes                # удалить безво
 
 Новому проекту базу можно подключить уже при первом деплое:
 `npx layero@latest deploy --db crm`. Первая же сборка получит адрес и ключ
-Data API, второй деплой не нужен.
+Data API, второй деплой не нужен. Адрес новому проекту задаёт `--address`:
+`npx layero@latest deploy --name inbox --address inbox` — сайт будет на
+`inbox.layero.app`.
 
 Если организация одна, CLI возьмёт её, если несколько — личную. Командную
 организацию укажите через `--org <slug>`.

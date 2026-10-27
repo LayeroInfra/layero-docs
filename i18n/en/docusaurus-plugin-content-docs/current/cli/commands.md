@@ -266,7 +266,9 @@ npx layero@latest db delete crm --yes                # delete irreversibly
 
 A new project can get its database on the very first deploy:
 `npx layero@latest deploy --db crm`. The first build already receives the Data API
-URL and key, no second deploy needed.
+URL and key, no second deploy needed. `--address` sets a new project's address:
+`npx layero@latest deploy --name inbox --address inbox` puts the site at
+`inbox.layero.app`.
 
 With a single organization the CLI uses it; with several, your personal one.
 For a team organization pass `--org <slug>`. A database is addressed by name, slug or id.
