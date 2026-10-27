@@ -75,6 +75,8 @@ line per tool.
 | `data_api_grant` ⚠️ | Open or close access to a method for a role. |
 | `data_api_keys` ⚠️ | Issue or revoke Data API keys. |
 | `data_api_origins` ⚠️ | Sites allowed to call from the browser (CORS). |
+| `data_api_buckets` ⚠️ | The database's storage buckets: list and create (with consent). Needs an admin-scope token. |
+| `data_api_auth` | Sign-in of the app's users: methods, providers, callback URL; the sender name of sign-in emails. Provider keys are set by the person — in the dashboard or with `layero data auth provider set`. |
 | `data_api_probe` | A trial call of a method — check that access and the response are as expected. |
 
 ## Documentation
