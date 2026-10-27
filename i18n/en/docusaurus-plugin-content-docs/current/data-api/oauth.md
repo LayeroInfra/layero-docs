@@ -48,6 +48,14 @@ You do it once per database: open the database in the dashboard, then
 3. **Paste the Client ID and secret into the dashboard** and press “Check
    sign-in”. The check runs a real sign-in and shows what the provider returned.
 
+The same from the terminal, handy in a setup script:
+
+```bash
+printf %s "$YANDEX_SECRET" | npx layero@latest data auth provider set yandex --client-id <id> --db <database>
+npx layero@latest data auth redirects add yandex http://localhost:5173 --db <database>
+npx layero@latest data auth status --db <database>
+```
+
 ### Which scopes to enable at the provider
 
 The platform asks the provider only for what the account needs — enable the

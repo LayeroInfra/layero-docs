@@ -365,6 +365,19 @@ CLI упаковал директорию в tar.gz.
 
 Итог `layero data auth sender`: `org`, `database`, `sender_name`, `reply_to` (или `null`).
 
+### `data_auth_status`, `data_auth_provider_set`, `data_auth_provider_toggled`, `data_auth_provider_removed`, `data_auth_redirects`, `data_auth_methods_set`
+
+Итоги `layero data auth status|provider|redirects|methods`. Ключи провайдеров в события не попадают.
+
+| событие | поля |
+|---|---|
+| `data_auth_status` | `org`, `database`, `callback_url`, `providers` (`provider`, `configured`, `enabled`, `checked_at`, `return_urls`), `methods` (`password`, `link`, `signup_open`, `confirm_email`), `email_return_urls` |
+| `data_auth_provider_set` | `org`, `database`, `provider`, `callback_url` |
+| `data_auth_provider_toggled` | `org`, `database`, `provider`, `enabled` |
+| `data_auth_provider_removed` | `org`, `database`, `provider` |
+| `data_auth_redirects` | `org`, `database`, `method` (провайдер или `email`), `urls` |
+| `data_auth_methods_set` | `org`, `database`, `changed` — что изменено: `password_enabled`, `magiclink_enabled`, `signup_open`, `confirm_email` |
+
 ### `data_methods`
 
 Итог `layero data methods`: таблицы и функции базы с уровнем доступа по каждому методу. Уровни: `closed` — закрыто, `visitor` — любой посетитель, `user` — вошедшие, `server` — только сервер.

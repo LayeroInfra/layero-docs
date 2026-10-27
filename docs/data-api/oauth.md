@@ -49,6 +49,14 @@ await db.auth.signInWithOAuth({
 3. **Скопируйте Client ID и секрет в панель** и нажмите «Проверить вход».
    Проверка выполняет настоящий вход через провайдера и показывает, что он вернул.
 
+То же из терминала, удобно для скрипта развёртывания:
+
+```bash
+printf %s "$YANDEX_SECRET" | npx layero@latest data auth provider set yandex --client-id <id> --db <база>
+npx layero@latest data auth redirects add yandex http://localhost:5173 --db <база>
+npx layero@latest data auth status --db <база>
+```
+
 ### Какие права отметить у провайдера
 
 Платформа запрашивает у провайдера только права, нужные для учётки. Отметьте

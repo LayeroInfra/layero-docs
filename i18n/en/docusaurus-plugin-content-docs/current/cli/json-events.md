@@ -373,6 +373,19 @@ Results of `layero data buckets list|create`.
 
 Result of `layero data auth sender`: `org`, `database`, `sender_name`, `reply_to` (or `null`).
 
+### `data_auth_status`, `data_auth_provider_set`, `data_auth_provider_toggled`, `data_auth_provider_removed`, `data_auth_redirects`, `data_auth_methods_set`
+
+Results of `layero data auth status|provider|redirects|methods`. Provider keys never appear in events.
+
+| event | fields |
+|---|---|
+| `data_auth_status` | `org`, `database`, `callback_url`, `providers` (`provider`, `configured`, `enabled`, `checked_at`, `return_urls`), `methods` (`password`, `link`, `signup_open`, `confirm_email`), `email_return_urls` |
+| `data_auth_provider_set` | `org`, `database`, `provider`, `callback_url` |
+| `data_auth_provider_toggled` | `org`, `database`, `provider`, `enabled` |
+| `data_auth_provider_removed` | `org`, `database`, `provider` |
+| `data_auth_redirects` | `org`, `database`, `method` (provider or `email`), `urls` |
+| `data_auth_methods_set` | `org`, `database`, `changed` — what changed: `password_enabled`, `magiclink_enabled`, `signup_open`, `confirm_email` |
+
 ### `data_methods`
 
 Result of `layero data methods`: tables and functions of the database with the access level of each method. Levels: `closed`, `visitor` — any visitor, `user` — signed-in users, `server` — server only.

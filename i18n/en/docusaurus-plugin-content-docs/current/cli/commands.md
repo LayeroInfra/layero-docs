@@ -42,6 +42,10 @@ description: The full list of layero commands — init, login, projects, deploy,
 | `layero data secrets` | Database secrets for [HTTP from SQL](/data-api/outbound): substituted into `net.http_post` as `{{secrets.NAME}}`. |
 | `layero data buckets list` / `create <name>` | Storage buckets: `--public`, `--max 5MB`, `--types image/jpeg,image/png`. No secret key needed. |
 | `layero data auth sender "Name"` | The sender name of sign-in emails (codes, links, password reset). |
+| `layero data auth status` | Sign-in methods, providers and the callback URL for the provider console. |
+| `layero data auth provider set yandex --client-id …` | Connect Yandex, VK ID or Sber ID; the secret comes from stdin or `--secret-from-env`. Also `on`, `off`, `remove`. |
+| `layero data auth redirects list\|add\|remove <provider\|email> [url]` | Where people may be sent back after sign-in. |
+| `layero data auth methods --password on --link off` | Turn sign-in methods and registration on or off. |
 | `layero token set <jwt>` | Set the token by hand (for CI). |
 
 The full flag list for a command:

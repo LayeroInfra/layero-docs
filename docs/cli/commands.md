@@ -42,6 +42,10 @@ description: Полный список команд layero — init, login, proj
 | `layero data secrets` | Секреты базы для [HTTP из SQL](/data-api/outbound): подставляются в `net.http_post` как `{{secrets.ИМЯ}}`. |
 | `layero data buckets list` / `create <имя>` | Бакеты хранилища: `--public`, `--max 5MB`, `--types image/jpeg,image/png`. Секретный ключ не нужен. |
 | `layero data auth sender "Имя"` | Имя отправителя писем входа (коды, ссылки, сброс пароля). |
+| `layero data auth status` | Способы входа, провайдеры и адрес возврата для консоли провайдера. |
+| `layero data auth provider set yandex --client-id …` | Подключить Яндекс, VK ID или Сбер ID; секрет — через stdin или `--secret-from-env`. Ещё `on`, `off`, `remove`. |
+| `layero data auth redirects list\|add\|remove <провайдер\|email> [адрес]` | Куда можно вернуть человека после входа. |
+| `layero data auth methods --password on --link off` | Включить или выключить способы входа и регистрацию. |
 | `layero token create <имя>` | Выпустить долгоживущий токен для CI и агентов. |
 | `layero token list` / `revoke <id>` | Посмотреть и отозвать выпущенные токены. |
 | `layero token set <jwt>` | Сохранить токен, полученный иначе. |
