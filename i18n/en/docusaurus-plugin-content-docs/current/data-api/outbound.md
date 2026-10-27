@@ -117,9 +117,12 @@ PERFORM net.http_post(
    transaction as your write. Rolled back — the request won't go out.
 2. After the commit Layero sends it. Internal addresses are refused: the
    request only goes to the internet.
-3. Network failures, 5xx, 408 and 429 are retried with a growing delay, up to
-   5 attempts. 4xx and setup errors (missing secret, bad address) are not
-   retried: a person fixes those, not time.
+3. Any server response is final, as in `pg_net`: 3xx, 4xx and 5xx are stored
+   with their code, and your code decides by `status_code`. Layero does not
+   follow redirects. Only network failures and timeouts, where there is no
+   response at all, are retried with a growing delay, up to 5 attempts. Setup
+   errors (missing secret, bad address) are not retried: a person fixes those,
+   not time.
 4. The outcome goes to `net._http_response` under the same id: status code,
    headers, body (up to 64 KB, secret values cut out), `timed_out`,
    `error_msg`. Responses are kept for 6 hours, as in `pg_net`.
@@ -138,7 +141,7 @@ count toward the database's daily request limit.
 |---|---|---|
 | `net.http_*` signatures | — | the same |
 | Sending | after commit | after commit |
-| Retries | no | yes, up to 5 attempts |
+| Retries | no | network failure and timeout only, up to 5 attempts; any server response is final |
 | Secrets | `vault.decrypted_secrets` right in SQL | `{{secrets.NAME}}` — the value never lands in the database |
 | Internal addresses | reachable | refused |
 | Database Webhooks in the panel | yes | no: a webhook is the trigger from option 2 |
