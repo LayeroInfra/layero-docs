@@ -8,8 +8,8 @@ description: How to connect sign-in through an external provider — the provide
 
 :::info[Beta]
 
-The Data API is in beta and not open to everyone yet. How to get access is
-described in [“What the Data API is”](./index.md).
+The Data API is in beta and available on the Pro plan. More on the
+[“What the Data API is”](./index.md) page.
 
 :::
 

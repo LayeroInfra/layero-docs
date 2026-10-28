@@ -8,8 +8,8 @@ description: How to let a client's site send data to your database without handi
 
 :::info[Beta]
 
-Data API is in beta and isn't open to everyone yet. How to get access and
-what to expect from these pages is covered in [What Data API Is](./index.md).
+Data API is in beta and available on the Pro plan. What to expect from
+these pages is covered in [What Data API Is](./index.md).
 
 :::
 

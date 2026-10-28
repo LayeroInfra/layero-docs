@@ -69,8 +69,8 @@ limits — ["Limits"](./limits.md).
 - **Access by address** — from outside, only addresses on your list can
   connect to the database.
 - **[Data API](../data-api/index.md)** — the database over HTTP for your
-  frontend, without your own server. Data API isn't open to everyone yet — how to
-  get access is described in its section.
+  frontend, without your own server. Data API is in beta and available on
+  the Pro plan.
 
 ## Where to start
 

@@ -13,12 +13,9 @@ names, buttons, and endpoint responses are still changing. A page may lag
 behind the product by a few days; if you notice a discrepancy, write to us in
 the dashboard chat — it helps.
 
-**Data API isn't open to everyone yet**, even to those who already have
-[databases](../database/index.md). If the "API", "Authentication", and
-"Files" items on the database page are grey and marked "Soon", your
-organization doesn't have access yet. Write to us in the "💬" chat in the
-bottom-right corner of the [dashboard](https://app.layero.ru) — we'll enable
-it manually.
+**Data API is available on the Pro plan.** On the free plan the "API",
+"Authentication", and "Files" items on the database page are visible, but
+you can turn them on only after [upgrading to Pro](../billing/plans.md).
 
 :::
 

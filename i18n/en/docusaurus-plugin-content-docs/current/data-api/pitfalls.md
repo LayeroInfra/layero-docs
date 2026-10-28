@@ -8,8 +8,8 @@ description: Five spots where people most often trip up when moving a project fr
 
 :::info[Beta]
 
-Data API is in beta and isn't open to everyone yet. How to get access and
-what to expect from these pages is covered in [What Data API Is](./index.md).
+Data API is in beta and available on the Pro plan. What to expect from
+these pages is covered in [What Data API Is](./index.md).
 
 :::
 
