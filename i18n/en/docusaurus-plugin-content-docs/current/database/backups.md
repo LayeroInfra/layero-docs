@@ -87,31 +87,61 @@ it locally.
 
 ## Download a backup
 
-The arrow button next to a finished backup. The file is an ordinary
-PostgreSQL dump: you can restore it anywhere, including outside Layero. For
-a shared database it's a dump in `pg_dump -Fc` format, restored with
-`pg_restore`:
+Download a backup with the arrow button in the row of a finished backup.
+
+For a shared database the file is an ordinary PostgreSQL dump in
+`pg_dump -Fc` format. You can restore it on any PostgreSQL server,
+including outside Layero, with `pg_restore`:
 
 ```bash
 pg_restore --no-owner --no-privileges -d postgresql://localhost/restored backup.dump
 ```
 
-This is also the way to move off Layero or to keep your own copy just in
+This is also how you move off Layero or keep a copy of your own just in
 case.
 
-### Your own dump of a shared database
+For a dedicated database the file is a snapshot of the whole disk. Its size
+equals the size of the database disk, not of the data: a database with an
+8 GB disk and 60 MB of data gives an 8 GB file. To get a file the size of
+your data, [take your own dump](#your-own-dump).
 
-You can take a dump with your own tools too — plain `pg_dump` to an SQL file:
+### Your own dump
+
+You can take a dump with your own tools for both shared and dedicated
+databases — plain `pg_dump` with the connection string from the dashboard.
+Check three things first.
+
+1. **`pg_dump` 18 or newer.** Layero databases run PostgreSQL 18, and a
+   `pg_dump` older than the server refuses to dump:
+   `aborting because of server version mismatch`. Check the version with
+   `pg_dump --version`.
+2. **Your address is on the allowed list.** Otherwise the server answers
+   `no authentication method is found`. How to add an address — see
+   ["Who to let in"](./connect.md#who-to-let-in).
+3. **The client has a root certificate.** The connection string from the
+   dashboard requires `sslmode=verify-full`, and without a root certificate
+   `pg_dump` fails with `root certificate file "…/root.crt" does not exist`.
+   Either put the certificate in place following
+   ["How to enable verify-full"](./connect.md#how-to-enable-verify-full),
+   or append `&sslrootcert=system` to the string so that `pg_dump` uses the
+   system root certificates. The official `postgres` Docker image has no
+   system certificates, so there follow the instructions instead.
+
+Then dump to an SQL file as usual:
 
 ```bash
-pg_dump "$DATABASE_URL" -f backup.sql
+pg_dump "postgresql://<role>:<password>@db.layero.ru:5432/<database>?sslmode=verify-full&sslrootcert=system" -f backup.sql
 ```
 
-Archive formats (`-Fc`, `-Fd`, `-Ft`) and the `-C` flag fail on a shared
-database with `permission denied for table pg_db_role_setting`: this
-server-wide catalog holds role settings of every database, so it is closed to
-neighbours. If you need an archive format, download a backup from the
-dashboard.
+Restore such a file with `psql -f backup.sql`.
+
+A dedicated database also supports archive formats, for example `-Fc` for
+`pg_restore`. On a shared database the server answers archive formats
+(`-Fc`, `-Fd`, `-Ft`) and the `-C` flag with
+`permission denied for table pg_db_role_setting`. This system catalog holds
+role settings of every database on the server, so it is closed to other
+customers. If you need an archive format for a shared database, download a
+backup from the dashboard.
 
 ## Backup types in the list
 
