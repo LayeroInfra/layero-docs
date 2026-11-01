@@ -7,60 +7,108 @@ title: Support
 
 If something is broken or unclear, write to us.
 
+## Hours and response times
+
+Support works on business days from 10:00 to 19:00 Moscow time. You can
+write at any time: a specialist's first reply arrives within **three business
+hours**, and only support working hours count.
+
+| You wrote | We reply by |
+|---|---|
+| Tuesday at 08:30 | Tuesday at 13:00 |
+| Friday at 18:00 | Monday at 12:00 |
+| Saturday at 15:00 | Monday at 13:00 |
+
+If a public holiday falls in between, the deadline moves to the next business day.
+
+The first reply is a message from a specialist about your issue, not an
+automatic acknowledgement. How long a fix takes depends on the problem; the
+specialist will tell you in the conversation.
+
+If a published site does not open or builds are failing, say so at the start
+of your request — those requests are handled first. Support does not run a
+24/7 on-call shift.
+
+The full terms are in the [Technical Support Regulation](https://layero.ru/support-terms)
+(in Russian).
+
 ## Through the dashboard widget
 
-The fastest route is the "💬" button in the bottom right corner of
+The main route is the "💬" button in the bottom right corner of
 [app.layero.ru](https://app.layero.ru).
 
-1. Describe the problem in words — what happened and what you expected.
-2. If it concerns a particular project, pick it in the selector. We attach the
-   context automatically: a link to the project, the branch, and the last failed
-   deploy if there was one.
-3. Press **Open a ticket** — an operator sees it within a few minutes.
+The widget interface is in Russian; button names are given below with a
+translation.
 
-Once the ticket is open the window turns into a chat. Keep writing there;
-operator replies arrive in real time.
+1. Describe the problem in words — what happened and what you expected.
+2. If it concerns a particular project, pick it in the «Обращение по проекту»
+   (Request about project) line above the input field. On a project page it is
+   filled in for you.
+3. Send the message — that opens a ticket, and the first-reply clock starts.
+
+From then on the window works as a chat. Keep writing there; replies arrive in
+real time.
 
 ### Screenshots
 
-You can attach images to any message — an operator works out a problem faster by
-seeing it than by reading about it.
+You can attach images to any message — a specialist works out a problem faster
+by seeing it than by reading about it.
 
-- **Paste from the clipboard** — take a screenshot (`Cmd+Shift+4` on macOS,
+- **Paste from the clipboard** — take a screenshot (`Cmd+Ctrl+Shift+4` on macOS,
   `Win+Shift+S` on Windows) and press `Cmd/Ctrl+V` straight into the input field.
 - **The paperclip** to the left of the input field.
 - **Drag** a file into the chat window.
 
 Up to five images per message, in PNG, JPEG, WebP or GIF. Large screenshots are
-downscaled by the widget itself. Operators can send images too — they appear
+downscaled by the widget itself. Specialists can send images too — they appear
 inline in the conversation, and a click opens them full screen.
 
-## Through Telegram
+## By email
 
-If Telegram suits you better, especially for long conversations, link your
-account:
+Write to [support@layero.ru](mailto:support@layero.ru), preferably from the
+address your account is registered with. The first-reply time is the same:
+three business hours.
 
-1. In the widget, press **💬 Connect Telegram for notifications and history**.
-2. Click **Open in the Telegram app** — the @layero_support_bot opens
-   automatically.
-3. That is it. Operator replies are now mirrored to your DMs, and the whole
-   conversation history is kept in the chat.
+## Replies in Telegram
+
+If you prefer to read replies in Telegram, link your account to the support
+chat:
+
+1. In the widget, open the **⋯** menu and choose **Подключить Telegram**
+   (Connect Telegram).
+2. Sign in with the Telegram button. If it does not work, press
+   **Кнопка не работает?** (Button not working?) → **Сгенерировать код
+   вручную** (Generate a code manually) and send the code to
+   @layero_support_bot.
+3. Once the widget shows «✓ Telegram привязан» (Telegram linked), replies are
+   mirrored to your DMs. You can answer the bot directly — your message goes
+   into the open ticket.
+
+The bot continues a ticket from the dashboard; you cannot open a new request
+through it.
+
+### The public Layero Telegram channel
+
+The public channel is for news and discussion, not support. A reply there is
+not guaranteed, and the regulation's response times do not apply to the channel. To get help on time,
+write in the widget or to support@layero.ru.
 
 ## Ticket statuses
 
-- 🟡 **Open** — received, waiting for an operator.
-- 🟢 **In progress** — an operator has picked it up and is working on it.
-- ✅ **Closed** — resolved. Either you close it (the button at the bottom of the
-  widget) or the operator does when the work is done.
+The status is shown in the widget header:
 
-While you have an active ticket you cannot open a new one, so that the whole
-history stays in one place. Close the current one or wait for a reply.
+- **Ждём оператора** (Waiting for an operator) — received, no specialist has
+  picked it up yet.
+- **Оператор на связи** (Operator connected) — a specialist is working on it.
+- **Команда поддержки** (Support team) — no open ticket: you have not
+  written yet, or the last ticket is closed. Your next message opens a new one.
 
-## Response times
+You can close a ticket yourself — **⋯** menu → **Закрыть тикет** (Close
+ticket) — or the specialist closes it when the issue is resolved.
 
-Support is a small team right now. We aim to answer within the **working day**
-(Moscow time) for ordinary questions, and **within the hour** for sites that are
-down or problems with serving.
+While a ticket is open you cannot open a new one, so that the whole
+history stays in one place. Ask your new question in the current ticket or
+close it.
 
 ## What to write
 
@@ -71,4 +119,7 @@ To get an answer faster, include:
 - **What you got** — the error text, a screenshot (attach it in the widget), and
   the URL of the page where it broke.
 
-If it concerns a deploy, give the id or the short commit SHA.
+For a deploy, give its id or the short commit SHA.
+
+Do not put passwords, sign-in codes, keys or tokens in a request: support never
+asks for them.
