@@ -100,8 +100,14 @@ The status is shown in the widget header:
 - **Ждём оператора** (Waiting for an operator) — received, no specialist has
   picked it up yet.
 - **Оператор на связи** (Operator connected) — a specialist is working on it.
-- **Команда поддержки** (Support team) — no open ticket: you have not
-  written yet, or the last ticket is closed. Your next message opens a new one.
+- **Пн–пт 10:00–19:00 МСК** (Mon–Fri 10:00–19:00 Moscow time) — no open
+  ticket: you have not written yet, or the last ticket is closed. Instead of a
+  status the widget shows support hours. Your next message opens a new ticket.
+
+After your first message in a ticket, the widget reminds you in the
+conversation when to expect a reply: support works on business days from
+10:00 to 19:00 Moscow time, and the first reply comes within three business
+hours.
 
 You can close a ticket yourself — **⋯** menu → **Закрыть тикет** (Close
 ticket) — or the specialist closes it when the issue is resolved.
