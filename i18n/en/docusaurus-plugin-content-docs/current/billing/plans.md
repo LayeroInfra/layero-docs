@@ -22,7 +22,7 @@ The plan applies at the account level.
 | Custom domains | — | ✅ |
 | Web analytics | — | ✅ |
 | Observability & logs | — | ✅ |
-| Performance audit (Lighthouse/SiteSpeed) | — | ✅ |
+| Page Speed — page load speed | 3 runs a month | 500 runs a month, schedules |
 | Boosted runtime tier | — | ✅ |
 | Remove the Layero badge ([how](../getting-started/concepts.md#the-layero-label-in-html)) | — | ✅ |
 | Team organizations | — | ✅ |

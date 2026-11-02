@@ -20,7 +20,7 @@ when two runs of the same page can be compared.
   from five loading metrics with the same formula PageSpeed Insights uses.
 - The page is opened **in Russia**, so the network is the one your audience
   has. PageSpeed Insights opens it from data centers abroad.
-- Every run loads the page **several times**; the report shows the median
+- Every run loads the page **twice**; the report shows the median
   of each metric.
 - We only say "got worse" when the difference is **larger than the noise**.
 
@@ -32,7 +32,7 @@ when two runs of the same page can be compared.
    published on the branch right now, at its public address. You can enter a
    path (`/pricing?sort=price`) or a full address, including one on a
    connected domain.
-2. **The browser loads the page several times.** We use Chrome and repeat the
+2. **The browser loads the page twice.** We use Chrome and repeat the
    load so a one-off delay in a single pass doesn't skew the result. During
    the passes we record a video of the load, every network request and the
    main-thread activity.
@@ -52,7 +52,9 @@ manually.
 | | Desktop | Phone |
 |---|---|---|
 | Screen | wide, like a laptop | a mid-range smartphone |
-| Network | no artificial throttling | a slow mobile network |
+| Internet | 90 / 90 Mbit/s | 37 / 8 Mbit/s |
+| Latency | 20 ms | 50 ms |
+| CPU | no slowdown | 2× slower |
 | Lighthouse profile | desktop | mobile |
 
 The device sets the profile for the **whole** report: the browser passes and
@@ -140,18 +142,19 @@ purpose.
 
 ## How we compare runs
 
-The report and the run list compare a run with the previous run of **the
-same page, on the same device, on the same branch, but on the previous
+The report and the run list compare a run with the previous scheduled run of
+**the same page, on the same device, on the same branch, but on a different
 deploy**. Comparing two runs of one deploy is pointless: the difference
-between them is just noise.
+between them is just noise. One-off runs don't move the baseline.
 
-- **Got worse** — the score dropped by 3 points or more, or the main content
-  (LCP) started appearing one and a half times slower.
-- **Got better** — the score rose by 3 points or more.
+- **Got worse** — the score dropped by 10 points or more, or the main content
+  (LCP) started appearing 1.5 times slower and at least 500 ms later.
+- **Got better** — the score rose by 10 points or more.
 - **No change** — the difference is smaller: within measurement noise.
 
-We refine the threshold with repeated runs of the same pages, so it may shift
-slightly over time.
+The threshold comes from repeated runs of the same pages: on one deploy the
+score varied by 9–19 points. When run conditions change, new runs are only
+compared with runs made under the same conditions.
 
 :::note[Run under load]
 
@@ -172,8 +175,8 @@ in the run list, so you can see how speed changed from deploy to deploy.
 
 ## Limits
 
-- The audit is available on the Pro plan. The limit is 500 runs a month per
-  organization, manual and scheduled combined; it resets on the 1st.
+- Free gives 3 runs a month, Pro gives 500, manual and scheduled combined;
+  the limit resets on the 1st. Schedules are Pro only.
 - You can only measure addresses of your own project: branch addresses, the
   project address and domains connected to it.
 - The audit measures a single page load without signing in. Actions after the

@@ -1,8 +1,8 @@
 {
-  "label": "Performance",
+  "label": "Page Speed",
   "position": 9,
   "link": {
-    "type": "generated-index",
-    "description": "Site speed audit: how a run works, the Lighthouse score, Core Web Vitals, comparing runs and schedules."
+    "type": "doc",
+    "id": "performance/index"
   }
 }
