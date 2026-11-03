@@ -1,3 +1,5 @@
+import {createHash} from 'node:crypto';
+import {readFileSync} from 'node:fs';
 import {execSync} from 'node:child_process';
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
@@ -213,7 +215,7 @@ const config: Config = {
     // Facebook, Slack, VK, Twitter — SVG в карточке не рисует, поддерживаются
     // только PNG/JPEG/WebP. С logo.svg все 56 страниц и оба поста блога
     // разворачивались в чате без картинки.
-    image: 'img/og-image.png',
+    image: `img/og-image.png?v=${createHash('sha256').update(readFileSync('static/img/og-image.png')).digest('hex').slice(0, 12)}`,
     colorMode: {
       respectPrefersColorScheme: true,
     },
