@@ -92,18 +92,6 @@ it was started.
 
 How many builds were started in the period. Limited on Free only.
 
-### Files
-
-How many files all deploys of the organization stored in the period:
-production, previews and CLI. The webp copies of images that the platform
-makes are not counted.
-
-Example: a site of 3,000 files deployed 20 times a month is 60,000 files.
-That is over the Free limit and within Pro.
-
-There is also a limit on the size of a single deploy: if it has more than
-10,000 files on Free or 100,000 on Pro, it is rejected as a whole.
-
 ### Outbound traffic
 
 Bytes that the organization's sites and apps sent to visitors. 1 GB is
@@ -146,8 +134,6 @@ Memory and CPU are counted from 27 September 2026.
 |---|---|---|---|
 | Builds per period | 100 | unlimited | — |
 | Build minutes | 300 | 1,000 | 1 ₽ per minute |
-| Files per deploy | 10,000 | 100,000 | the deploy is rejected |
-| Files per period | 50,000 | 500,000 | 1.5 ₽ per 1,000 |
 | Outbound traffic | 15 GB | 100 GB | 8 ₽ per GB |
 | Requests to sites | 300 k | 3 M | 130 ₽ per million |
 | App memory | 1,500 GB·min | 12,000 GB·min | 0.05 ₽ per GB·min |
@@ -175,8 +161,6 @@ The sequence is the same for every metric; only the reaction at 100% differs.
 |---|---|---|---|
 | Builds per period | new builds do not start | unlimited | unlimited |
 | Build minutes | new builds do not start | new builds do not start | builds run, minutes above the limit at ₽1 each |
-| Files per period | a deploy that would exceed the limit is rejected | same | the deploy runs, files above the limit at ₽1.5 per 1,000 |
-| Files per deploy | the deploy is rejected as a whole | same | same — this is a cap, not a quota |
 | Outbound traffic | sites keep responding; on a multiple overrun — slower delivery and a banner | sites keep responding, no limit | traffic above the limit at ₽8 per GB |
 | Requests to sites | same as traffic | sites keep responding, no limit | requests above the limit at ₽130 per million |
 | App memory | a running app is not stopped; a sleeping one is not woken until the new period — visitors see a "limit reached" page instead | apps keep running, no limit | above the limit at ₽0.05 per GB·min |
@@ -203,8 +187,6 @@ after warning you by email.
 3. If the usage is unexpected, the cause is usually one of these:
    - **many builds** — preview branches built on every push; limit which
      branches are built in the project settings;
-   - **many files** — the build puts sources, `node_modules` or thousands
-     of pages into its output; check the build output folder;
    - **traffic** — the build output folder has heavy images or video;
    - **requests** — bots and monitoring that poll the site every minute;
    - **app memory** — the app never sleeps because external monitoring or
