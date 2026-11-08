@@ -91,6 +91,7 @@ Node, Python.
 
 Ссылка на файл действует 5 минут. Не больше 30 скачиваний в час на человека.
 
+Из терминала — `npx layero@latest source` (подробно — [команды CLI](../cli/commands.md#layero-source)).
 Тот же файл можно получить через API:
 `GET /projects/{project_id}/deploys/{deploy_id}/source` возвращает
 `{url, filename, expires_in}`, а с `?redirect=1` сразу перенаправляет на файл.

@@ -236,6 +236,28 @@ CLI упаковал директорию в tar.gz.
 | `url` | string — публичный адрес |
 | `deploy_id` | string |
 
+### `source_downloaded`
+
+`layero source` сохранил ZIP с тем, из чего собран деплой.
+
+| поле | тип |
+|---|---|
+| `deploy_id` | string |
+| `path` | string — полный путь к сохранённому файлу |
+| `bytes` | number — размер файла |
+
+### `source_link`
+
+`layero source --url`: ссылка на ZIP вместо файла. Ссылка короткая — живёт
+`expires_in` секунд.
+
+| поле | тип |
+|---|---|
+| `deploy_id` | string |
+| `url` | string — ссылка на скачивание |
+| `filename` | string — имя файла |
+| `expires_in` | number — сколько секунд действует ссылка |
+
 ### `data_services_enabled`
 
 Итог `layero data enable --auth --storage`: что из входа и файлов включено этим вызовом.
@@ -679,6 +701,10 @@ CLI упаковал директорию в tar.gz.
 | `repeated_failure` | Подряд идущие сборки падают с **одной и той же** ошибкой, и платформа отказалась выкатывать следующую вслепую. Текст ошибки — в `message` и в событии `repeated_failure_guard` | Прочитать ошибку и устранить причину. Повтор без изменений даст тот же результат. Если причина уже устранена — `layero deploy --confirm-repeated-failure` |
 | `repeated_failure_declined` | То же, но в интерактивном терминале на вопрос «Всё равно выкатить?» ответили «нет» | Исправить ошибку и запустить `layero deploy` заново |
 | `no_deploy` / `no_deploys` | У проекта ещё нет деплоев | Сначала `layero deploy` |
+| `source_not_kept` | Исходники этого деплоя удалены: срок хранения вышел. Выход `3` | Загрузить файлы заново: `layero deploy` |
+| `source_in_repository` | Деплой собран из репозитория — платформа его исходники не хранит. Ссылка на коммит — в `next_action`. Выход `4` | Открыть коммит в репозитории |
+| `file_exists` | `layero source`: файл с таким именем уже есть. Выход `4` | `--out <путь>` или `--force` |
+| `rate_limited` | Слишком много скачиваний исходников за час | Повторить через час |
 | `rollback_unsupported` | У деплоя нет раздаваемого артефакта: runtime-проект либо вычищенная по ретенции статика | Пересобрать нужный коммит через `layero deploy` |
 | `rollback_noop` | Цель отката уже на живом адресе — например, второй `layero rollback` подряд. Ничего не изменено, выход `4` | Точечно — `layero promote <sha>`; список — `layero deploys list` |
 | `env_not_found` | Переменной нет | `layero env list` |
@@ -756,8 +782,8 @@ CLI упаковал директорию в tar.gz.
 | `0` | успех | — |
 | `1` | прочее | `plan_limit`, `forbidden`, `confirmation_required`, `repeated_failure`, `cli_deploys_disabled`, `username_required` и всё, что не попало в классы ниже |
 | `2` | нужен вход | `auth_required`, `auth_expired`, `auth_timeout`, `sandbox_claimed` |
-| `3` | не найдено | `sandbox_expired`, `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `no_runs`, `data_key_unknown` |
-| `4` | неверный ввод | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `claim_static_only`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect`, `address_required` |
+| `3` | не найдено | `sandbox_expired`, `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `source_not_kept`, `no_runs`, `data_key_unknown` |
+| `4` | неверный ввод | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `claim_static_only`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect`, `address_required`, `source_in_repository`, `file_exists` |
 | `5` | удалённая ошибка | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `deploy_watch_lost`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, `storage_refused`, любой `deploy_<status>` и `http_5xx` |
 
 ## Cold-start template для агента

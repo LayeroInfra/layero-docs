@@ -232,6 +232,23 @@ npx layero@latest promote --yes                  # без подтвержден
 `layero deploy --promote` — короткий путь: «собери и сразу выкати в production», эквивалент `layero deploy ... && layero promote <last-sha>`.
 
 
+## `layero source`
+
+Скачать ZIP с тем, из чего собран деплой: исходники, загруженные
+`layero deploy`, или файлы публикации из чата. Файлы `.env*` в ZIP не
+попадают. Скачивать могут участники проекта с правом деплоить. Подробно о
+сроках — [Точки отката и хранение исходников](../deploys/retention.md).
+
+```bash
+npx layero@latest source                  # деплой, который открывается на адресе проекта
+npx layero@latest source a3f9c2b          # конкретный деплой по commit_sha или id
+npx layero@latest source --out site.zip   # своё имя файла; --force — перезаписать
+npx layero@latest source --url            # только ссылка на 5 минут, например для curl
+```
+
+У деплоя из репозитория исходников на платформе нет: команда выйдет с кодом
+`source_in_repository` и ссылкой на коммит.
+
 ## `layero db`
 
 Базы организации из терминала — чтобы не уходить в браузер посреди работы и

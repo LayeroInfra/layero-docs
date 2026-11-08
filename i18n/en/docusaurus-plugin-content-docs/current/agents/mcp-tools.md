@@ -37,6 +37,7 @@ line per tool.
 | `retry_deploy` ⚠️ | Restart a build: a failed one as it is; `redeploy=true` rebuilds the latest commit of a repository project without a push. |
 | `cancel_deploy` ⚠️ | Cancel a running build. |
 | `rollback` ⚠️ | Roll production back to a previous build. |
+| `download_source` | A link to a ZIP of what an uploaded build was made from; valid for 5 minutes, no `.env*` inside. A build from a repository gets the commit link. |
 | `publish_site` ⚠️ | Publish ready static output (a folder with `index.html`) without the CLI; creates the project if it does not exist. `publish_landing` is a deprecated alias of `publish_site`. |
 | `env_vars` ⚠️ | Read, set or delete the project's environment variables. |
 

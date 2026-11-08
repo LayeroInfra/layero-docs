@@ -254,6 +254,24 @@ npx layero@latest promote --yes                  # no confirmation (CI)
 production straight away", equivalent to
 `layero deploy … && layero promote <last-sha>`.
 
+
+## `layero source`
+
+Download a ZIP of what a deploy was built from: the sources uploaded by
+`layero deploy`, or the files of a site published from chat. `.env*` files
+are left out. Project members who can deploy can download it. Retention
+details — [Rollback points and source retention](../deploys/retention.md).
+
+```bash
+npx layero@latest source                  # the deploy served on the project address
+npx layero@latest source a3f9c2b          # a specific deploy by commit_sha or id
+npx layero@latest source --out site.zip   # your own file name; --force to overwrite
+npx layero@latest source --url            # just a 5-minute link, e.g. for curl
+```
+
+A deploy built from a repository has no sources on the platform: the command
+exits with `source_in_repository` and the commit link.
+
 ## `layero db`
 
 The organization's databases from the terminal — so you don't have to switch

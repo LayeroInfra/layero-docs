@@ -244,6 +244,28 @@ The apex now points at the given deploy. Emitted by `layero promote` and by
 | `url` | string — the public address |
 | `deploy_id` | string |
 
+### `source_downloaded`
+
+`layero source` saved a ZIP of what the deploy was built from.
+
+| field | type |
+|---|---|
+| `deploy_id` | string |
+| `path` | string — full path of the saved file |
+| `bytes` | number — file size |
+
+### `source_link`
+
+`layero source --url`: a link to the ZIP instead of the file. The link is
+short-lived — valid for `expires_in` seconds.
+
+| field | type |
+|---|---|
+| `deploy_id` | string |
+| `url` | string — download link |
+| `filename` | string — file name |
+| `expires_in` | number — seconds the link stays valid |
+
 ### `data_services_enabled`
 
 Result of `layero data enable --auth --storage`: which of sign-in and files this call enabled.
@@ -692,6 +714,10 @@ Do not write handling for codes that are not on this list.
 | `repeated_failure` | Consecutive builds keep failing with the **same** error, so the platform refused to ship another one blindly. The error text is in `message` and in the `repeated_failure_guard` event | Read the error and fix its cause. Re-running unchanged fails the same way. If you already fixed it — `layero deploy --confirm-repeated-failure` |
 | `repeated_failure_declined` | Same, but the interactive prompt «ship anyway?» was answered no | Fix the error and run `layero deploy` again |
 | `no_deploy` / `no_deploys` | The project has no deploys yet | Run `layero deploy` first |
+| `source_not_kept` | This deploy's sources were deleted: the retention period is over. Exit `3` | Upload the files again: `layero deploy` |
+| `source_in_repository` | The deploy was built from a repository — the platform does not store its sources. The commit link is in `next_action`. Exit `4` | Open the commit in the repository |
+| `file_exists` | `layero source`: a file with that name already exists. Exit `4` | `--out <path>` or `--force` |
+| `rate_limited` | Too many source downloads in an hour | Try again in an hour |
 | `rollback_unsupported` | The deploy has no servable artifact: either a runtime project, or static whose artifact was purged by retention | Rebuild the commit with `layero deploy` |
 | `rollback_noop` | The rollback target is already live — e.g. a second `layero rollback` in a row. Nothing changed, exit code `4` | Pick a build: `layero promote <sha>`; list them with `layero deploys list` |
 | `env_not_found` | No such variable | `layero env list` |
@@ -767,8 +793,8 @@ error code.
 | `0` | success | — |
 | `1` | other | `plan_limit`, `forbidden`, `confirmation_required`, `repeated_failure`, `cli_deploys_disabled`, `username_required` and anything not in the classes below |
 | `2` | sign-in needed | `auth_required`, `auth_expired`, `auth_timeout`, `sandbox_claimed` |
-| `3` | not found | `sandbox_expired`, `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `no_runs`, `data_key_unknown` |
-| `4` | invalid input | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `claim_static_only`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect`, `address_required` |
+| `3` | not found | `sandbox_expired`, `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `source_not_kept`, `no_runs`, `data_key_unknown` |
+| `4` | invalid input | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `claim_static_only`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect`, `address_required`, `source_in_repository`, `file_exists` |
 | `5` | remote failure | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `deploy_watch_lost`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, `storage_refused`, any `deploy_<status>` and `http_5xx` |
 
 ## Cold-start template for an agent

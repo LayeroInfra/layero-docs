@@ -96,6 +96,7 @@ is in the "⋯" menu of the deploy in the list.
 The download link is valid for 5 minutes. Up to 30 downloads per hour per
 person.
 
+From the terminal — `npx layero@latest source` (see [CLI commands](../cli/commands.md#layero-source)).
 The same file is available through the API:
 `GET /projects/{project_id}/deploys/{deploy_id}/source` returns
 `{url, filename, expires_in}`; with `?redirect=1` it redirects straight to
