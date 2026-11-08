@@ -223,6 +223,8 @@ const config: Config = {
       logo: {
         alt: 'Layero',
         src: 'img/logo.svg',
+        // В <img> currentColor всегда чёрный — тёмной теме нужен свой файл.
+        srcDark: 'img/logo-dark.svg',
       },
       items: [
         {
