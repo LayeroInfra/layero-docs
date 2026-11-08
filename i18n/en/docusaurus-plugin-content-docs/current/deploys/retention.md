@@ -1,7 +1,7 @@
 ---
 sidebar_position: 10
 title: Rollback points and source retention
-description: How many past deploys Layero keeps for rollback, what happens to stale branches, and how long files uploaded without a repository are stored.
+description: How many past deploys Layero keeps for rollback, what happens to stale branches, how long files uploaded without a repository are stored, and how to download them.
 ---
 
 # Rollback points and source retention
@@ -64,16 +64,45 @@ the project can be rebuilt without uploading again.
 
 - The archive of the project's **latest upload** is kept for as long as the
   project exists.
-- Archives of earlier uploads are kept for **7 days**.
+- The archives of the deploy currently served on the site and of the
+  previous production deploy are kept while they are there.
+- Archives of other uploads are kept for **7 days**.
 
 The "Redeploy" button rebuilds the project from the latest uploaded archive.
 When there is nothing to rebuild — no files have been uploaded yet — the
 button is disabled and its hint says why. In that case use "Update files" or
 run `layero deploy`.
 
-The source archive is not a backup of your code. Keep your sources yourself
-or in a repository: the archive can rebuild a project, but it cannot be
-downloaded back.
+## Download a deploy's sources
+
+While the archive is kept, you can download it as a ZIP file: open the
+deploy and click the down-arrow icon next to "Build again". The same item
+is in the "⋯" menu of the deploy in the list.
+
+- For a deploy from the terminal the archive holds the sources; for a
+  publication from chat or with `--prebuilt` it holds the uploaded ready-made
+  files.
+- Project members who can deploy can download it. Viewers don't see the
+  button.
+- `.env`, `.env.local` and other `.env.*` files are left out of the ZIP even
+  if they were uploaded. Templates such as `.env.example` stay. The project's
+  environment variables and the files Layero adds during the build are never
+  stored in the archive.
+- When the archive is no longer kept, the button is disabled and its hint
+  says why.
+- A deploy built from a repository offers a link to the commit at the
+  provider instead.
+
+The download link is valid for 5 minutes. Up to 30 downloads per hour per
+person.
+
+The same file is available through the API:
+`GET /projects/{project_id}/deploys/{deploy_id}/source` returns
+`{url, filename, expires_in}`; with `?redirect=1` it redirects straight to
+the file.
+
+The source archive is not a backup of your code: it is deleted after 7 days.
+Keep your sources yourself or in a repository.
 
 For projects built from a repository Layero stores no sources at all: every
 build fetches the code from the repository again.
