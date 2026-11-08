@@ -284,11 +284,14 @@ The CLI honours:
 
 Env files stay out of the archive even when `.gitignore` allows them
 (`!.env.example`, `!.env` — common in monorepos). `.gitignore` rules are
-written for git, not for a deploy: a static site without a build is served
-from the archive as-is, and the `.env` would be readable at the site's
-address.
+written for git, not for a deploy, and the secrets in `.env` have no reason
+to be sent to the platform.
 
-To upload an env file on purpose, name it in `.layeroignore`:
+`.env*` files never reach the site itself either way: the platform strips
+them before publishing.
+
+If the build needs an env file — say, `.env.production` with public
+variables for Vite — name it in `.layeroignore`:
 
 ```
 !.env.production
