@@ -696,6 +696,7 @@ CLI упаковал директорию в tar.gz.
 | `prebuilt_no_dir` | Каталог из `--prebuilt` не найден | Указать явно: `--prebuilt ./dist` |
 | `prebuilt_no_index` | В каталоге `--prebuilt` нет `index.html` | Указать папку со собранным `index.html` |
 | `deploy_not_started` | Сборка не стартовала | Запустить `layero deploy` ещё раз; не помогло — `npx layero@latest diagnose` |
+| `pack_stalled` | Упаковка файлов остановилась на середине, на сервер ничего не ушло | Обновить CLI и запустить `npx layero@latest deploy` ещё раз; повторилось — прислать вывод в поддержку |
 | `deploy_watch_lost` | CLI потерял связь с логом сборки (несколько сбоев сети подряд). Сама сборка на платформе продолжается | **Не** запускать деплой заново. Итог — `npx layero@latest deploys list --json`, лог — `npx layero@latest logs --deploy <id>` |
 | `deploy_failed` | Сборка не дошла до `ready` | `npx layero@latest diagnose --deploy <id>` — команда из `next_action`, работает и в песочнице без аккаунта |
 | `repeated_failure` | Подряд идущие сборки падают с **одной и той же** ошибкой, и платформа отказалась выкатывать следующую вслепую. Текст ошибки — в `message` и в событии `repeated_failure_guard` | Прочитать ошибку и устранить причину. Повтор без изменений даст тот же результат. Если причина уже устранена — `layero deploy --confirm-repeated-failure` |

@@ -709,6 +709,7 @@ Do not write handling for codes that are not on this list.
 | `prebuilt_no_dir` | The `--prebuilt` directory does not exist | Pass it explicitly: `--prebuilt ./dist` |
 | `prebuilt_no_index` | The `--prebuilt` directory has no `index.html` | Point it at the folder containing the built `index.html` |
 | `deploy_not_started` | The build never started | Re-run `layero deploy`; if it repeats, `npx layero@latest diagnose` |
+| `pack_stalled` | Packing the files stopped halfway; nothing reached the server | Update the CLI and re-run `npx layero@latest deploy`; if it repeats, send the output to support |
 | `deploy_watch_lost` | The CLI lost its connection to the build log (several network failures in a row). The build itself keeps running on the platform | Do **not** deploy again. Result: `npx layero@latest deploys list --json`; log: `npx layero@latest logs --deploy <id>` |
 | `deploy_failed` | The build never reached `ready` | `npx layero@latest diagnose --deploy <id>` — the command in `next_action`; works in a sandbox without an account too |
 | `repeated_failure` | Consecutive builds keep failing with the **same** error, so the platform refused to ship another one blindly. The error text is in `message` and in the `repeated_failure_guard` event | Read the error and fix its cause. Re-running unchanged fails the same way. If you already fixed it — `layero deploy --confirm-repeated-failure` |
