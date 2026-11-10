@@ -69,6 +69,16 @@ After the `ready` event the first request may get a 404 placeholder for up to
 a minute while the container starts. A 404 that outlives a minute is a real
 failure: read `npx layero@latest logs --runtime`.
 
+### Visitor address
+
+The address the visitor connected from is in the `X-Real-IP` header. The
+platform sets it, and the visitor cannot forge it. It is safe to rely on for
+rate limits, blocks and logs.
+
+`X-Forwarded-For` is a chain of addresses: the visitor sends the left-hand
+elements, the platform appends the last one. If you read this header, use only
+the last element.
+
 ### What the platform adds to a Python app
 
 The `python_web` image first installs the dependencies from `requirements.txt`
