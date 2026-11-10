@@ -31,8 +31,8 @@ build log as `[config] node=22.18.0 (.nvmrc)`.
 ### Runtime version for server-rendered Next.js
 
 A server-rendered (SSR) Next.js site runs on the version it was built on when
-that version is Node.js 22 or 24. Sites built on Node.js 20 or 18 currently
-run on Node.js 22. The runtime version appears in the application logs in a
+that version is Node.js 20, 22 or 24. Sites built on Node.js 18 run on
+Node.js 22. The runtime version appears in the application logs in a
 line ending with `Node.js 24`.
 
 ## Pinning a Node.js version
