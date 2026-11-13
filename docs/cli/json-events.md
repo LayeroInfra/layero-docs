@@ -718,7 +718,7 @@ CLI упаковал директорию в tar.gz.
 | `database_unknown` | В организации нет базы с таким именем, слагом или id. У `layero data enable --repair` — база не указана через `--db`: переприменение снимает у ролей API права на схему `public`, и базу не угадываем | `layero db list`; завести — `layero db create <имя>`. Для `--repair` — `layero data enable --db <база> --repair` |
 | `sql_missing` | `layero db sql` вызван без запроса | Передать запрос следом за именем базы: `layero db sql моя-база "select 1"` |
 | `gb_not_supported` | `layero db create --gb` — объём базы так не выбирается. Флаг остался ради этого отказа: раньше он молча ничего не делал | У базы из тарифа объём задан тарифом, у выделенного инстанса — диском ступени |
-| `dedicated_needs_panel` | `layero db create --cpu/--ram/--dedicated` — выделенный инстанс из терминала не заказывается: у него есть цена и заморозка денег на карте, а подтвердить сумму в терминале негде | Заказать в панели: адрес приходит в `next_action` |
+| `dedicated_needs_panel` | `layero db create --cpu/--ram/--dedicated` — выделенный инстанс из терминала не заказывается: у него есть цена, а подтвердить её в терминале негде | Заказать в панели: адрес приходит в `next_action` |
 | `branch_without_env` | Для ветки ещё нет окружения | Сначала задеплоить эту ветку |
 | `analytics_not_connected` | Аналитика не подключена | `layero analytics connect` |
 | `no_runs` | Нет прогонов замера скорости | `layero perf check` |
