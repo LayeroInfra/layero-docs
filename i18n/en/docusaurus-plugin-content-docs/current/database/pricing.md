@@ -243,8 +243,8 @@ deleted — see [If Pro isn't renewed](#if-pro-isnt-renewed).
 **Can I have two shared databases?** No, there's one shared database per
 organization. Create the second and any further ones as dedicated.
 
-**Do databases count toward the plan limits?** No. Pro limits (builds,
-traffic, requests) don't apply to databases, see
+**Do databases count toward the plan limits?** The databases themselves
+don't. Only Data API calls and file storage count, see
 [Usage and limits](../billing/usage.md).
 
 **Can I pay for a year at once?** No, a dedicated database is paid for

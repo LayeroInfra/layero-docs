@@ -15,7 +15,7 @@ The plan applies at the account level.
 |---|---|---|
 | Price | 0 ₽ | **990 ₽/mo** |
 | Projects | up to **5** | unlimited |
-| Webhook builds | 100/mo | unlimited |
+| Builds | 100 a month | 1,000 a month |
 | Serving on a platform address (`*.layero.app`) | ✅ | ✅ |
 | Runtime apps (SSR, Streamlit, Gradio) | ✅ | ✅ |
 | **Search-engine indexing** | — | ✅ |
@@ -27,6 +27,9 @@ The plan applies at the account level.
 | Remove the Layero badge ([how](../getting-started/concepts.md#the-layero-label-in-html)) | — | ✅ |
 | Team organizations | — | ✅ |
 | Team seats included | — | 1 |
+
+Limits on traffic, requests, apps, the Data API and speed runs, and the
+prices above the limit on Pro, are in [Usage and limits](./usage).
 
 :::danger[Indexing is off by default — for everyone]
 Every new project is created with `indexing_enabled = false`, and the platform
