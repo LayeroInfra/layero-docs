@@ -8,7 +8,7 @@ description: What the Usage page counts, the Free and Pro limits and when they t
 
 :::info[When the limits take effect]
 - **Free** — from December 1, 2026.
-- **Pro** — from the first subscription renewal on or after December 15,
+- **Pro** — from the first subscription renewal on or after December 16,
   2026. For example, if Pro renews on the 5th, the limits take effect on
   January 5.
 

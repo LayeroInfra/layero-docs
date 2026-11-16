@@ -7,9 +7,9 @@ description: 'How to keep working above the plan limits on Pro: how to turn it o
 # Extra usage
 
 :::info[When it takes effect]
-Pro limits take effect from the first subscription renewal on or after
-December 15, 2026. Until then you can go over the limits for free, and
-extra usage charges nothing.
+Extra usage can be turned on from December 16, 2026. Pro limits take
+effect from the first subscription renewal on or after December 16, 2026.
+Until then you can go over the limits for free.
 :::
 
 On Pro you don't have to stop at a limit: you can keep working, paid from
