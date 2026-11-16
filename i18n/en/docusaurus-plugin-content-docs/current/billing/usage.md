@@ -93,9 +93,22 @@ minute.
 | 0.25 vCPU · 256 MB | 0.25 GB·h |
 | 1 vCPU · 1 GB (Pro only) | 1 GB·h |
 
-An app goes to sleep after 15 minutes without requests, and sleep time is
-not counted. A Pro reference point: 400 GB·h is 400 hours of an app with
+An app goes to sleep no later than 15 minutes without requests, often
+sooner, and sleep time is not counted. An open connection such as a
+WebSocket keeps the app awake. A Pro reference point: 400 GB·h is 400 hours of an app with
 1 GB or 1,600 hours with 256 MB.
+
+**SSR sites** (Next.js with server rendering) are counted only for page
+render time: from the start of request handling to the response, × the
+configuration's memory. Time between requests, site start-up and queueing
+are not counted, and concurrent requests are not added up. Reference:
+100,000 views at 0.3 s on a 1 GB configuration is 8.3 GB·h.
+
+**Configuration — no more than the plan.** Memory and CPU share are capped
+by the plan's configuration (Free — 256 MB, Pro — up to 1 GB), and sleep
+happens no later than 15 minutes. The `memory_mb`, `cpu_quota` and
+`idle_timeout_s` keys in `layero.json` can only lower these values; larger
+values are cut to the plan's cap with a line in the build log.
 
 Example: an app with 1 GB is awake 4 hours a day. Over a month that's
 4 × 30 = 120 GB·h — above the Free limit, within Pro. The same app with
@@ -188,6 +201,11 @@ already published disappears.
      only the branches you need in the project settings.
    - **Traffic.** The build output contains heavy images or videos.
    - **Requests.** Bots and monitoring poll the site every minute.
+   - **Traffic and requests on a Next.js site.** The page itself, with no
+     clicks, keeps fetching internal data in a loop (URLs with `?_rsc=`).
+     Open the site with the Network tab of the developer tools: if such
+     requests never stop, look for `router.refresh()` or `router.push()`
+     inside `useEffect` and for links that remount on every render.
    - **Apps.** The app never sleeps: an external monitor or cron keeps
      waking it up.
 4. Still unclear — write to support and include a link to the project.
