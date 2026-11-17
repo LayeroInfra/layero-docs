@@ -8,11 +8,11 @@ description: What the Usage page counts, the Free and Pro limits and when they t
 
 :::info[When the limits take effect]
 - **Free** — from December 1, 2026.
-- **Monthly Pro** — from the first paid period starting December 16, 2026
+- **Monthly Pro** — from the first paid period starting December 17, 2026
   or later.
 - **Annual Pro** — from the first monthly usage window within the paid year
-  starting December 16, 2026 or later. If the window starts December 15,
-  the limits take effect January 15, 2027.
+  starting December 17, 2026 or later. If the window starts December 16,
+  the limits take effect January 16, 2027.
 
 Until then, the Usage page shows your usage for reference only: you can go
 over the limits, and nothing is capped or charged. The card at the top of
