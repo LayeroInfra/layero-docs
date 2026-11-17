@@ -697,7 +697,7 @@ Do not write handling for codes that are not on this list.
 | `auth_required` | No token in `~/.layero/config.json` and none in `LAYERO_TOKEN` | Run `layero login`, or set `LAYERO_TOKEN` |
 | `auth_expired` | The login no longer works: either the `user_code` expired (15 min TTL) without confirmation, or the saved token expired (7-day TTL) / its session was revoked — the API answered `401` | Run `layero login` again |
 | `auth_timeout` | The CLI polled for 15 minutes and the user never confirmed | Run `layero login` again |
-| `plan_limit` | A plan limit: the API answered `402` (e.g. more projects than the free plan allows) | Change the plan at `app.layero.ru/billing`, or delete what you no longer need |
+| `plan_limit` | A plan limit: the API answered `402` (e.g. more projects than the free plan allows, or the period's build quota is used up). `message` is the server's text | Follow `next_action`: on Free — switch to Pro at `app.layero.ru/billing` or delete what you no longer need; on Pro — turn on extra usage, raise the budget in the Usage section, or top up the balance |
 | `username_required` | The account has no username (it doubles as the personal organisation's address) — the API answers `412`. An interactive terminal is asked during `login`/`deploy`; in agent mode there is nobody to ask | `layero username <name>` |
 | `username_rejected` | The name is taken, reserved, or malformed | Pick another: lowercase latin letters, digits and hyphens, 2–32 characters |
 | `oauth_unavailable` | The sign-in provider is unreachable | Ours to fix — retry later |
