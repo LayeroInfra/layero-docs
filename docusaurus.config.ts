@@ -116,6 +116,7 @@ const config: Config = {
           {from: ['/plugin', '/plugin/intro', '/plugin/integrations'], to: '/agents/'},
           {from: '/plugin/install', to: '/agents/install'},
           {from: '/plugin/catalogue', to: '/agents/mcp-tools'},
+          {from: '/billing/usage/overage', to: '/billing/overage/'},
         ],
       },
     ],
