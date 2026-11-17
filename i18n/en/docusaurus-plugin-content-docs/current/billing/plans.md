@@ -29,7 +29,7 @@ The plan applies at the account level.
 | Team seats included | — | 1 |
 
 Limits on traffic, requests, apps, the Data API and speed runs, and the
-prices above the limit on Pro, are in [Usage and limits](./usage).
+prices above the limit on Pro, are in [Usage and limits](./usage.md).
 
 :::danger[Indexing is off by default — for everyone]
 Every new project is created with `indexing_enabled = false`, and the platform

@@ -9,11 +9,11 @@ description: 'How to keep working above the plan limits on Pro: how to turn it o
 :::info[When it takes effect]
 Extra usage launches December 16, 2026. Overage can incur charges once
 the feature is enabled and the limits have taken effect for your organization.
-For monthly and annual Pro start dates, see [Usage and limits](./usage).
+For monthly and annual Pro start dates, see [Usage and limits](./usage.md).
 :::
 
 On Pro you don't have to stop at a limit: you can keep working, paid from
-the balance, at the prices listed in [Usage and limits](./usage). Free has
+the balance, at the prices listed in [Usage and limits](./usage.md). Free has
 no extra usage: the limit is hard, and the only way past it is upgrading
 to Pro.
 
@@ -79,7 +79,7 @@ up, the same restrictions apply as at 100 % of a limit without extra usage:
   speed runs don't start.
 
 Details are in the table [What happens when a limit runs
-out](./usage#what-happens-when-a-limit-runs-out).
+out](./usage.md#what-happens-when-a-limit-runs-out).
 
 **Restrictions are lifted right away** once you raise the budget with
 "Change budget" or top up the balance. With a new period the budget starts

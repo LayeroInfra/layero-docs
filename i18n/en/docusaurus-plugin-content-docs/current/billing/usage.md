@@ -22,7 +22,7 @@ the page shows the exact date for your organization.
 The **Usage** page in the dashboard shows how much of each resource the
 organization has used in the current billing period and how much the plan
 includes. How to keep working above the limits on Pro is covered in
-[Extra usage](./overage).
+[Extra usage](./overage.md).
 
 ## In short
 
@@ -32,7 +32,7 @@ includes. How to keep working above the limits on Pro is covered in
 - At 80 % of a limit you get an email; at 100 % nothing new starts, and
   whatever is already running keeps running.
 - On Free the limit is hard. On Pro you can keep going above the limit,
-  paid from the balance, if you turn on [extra usage](./overage).
+  paid from the balance, if you turn on [extra usage](./overage.md).
 
 ## Where to look
 
@@ -197,7 +197,7 @@ already published disappears.
 1. Open the metric's row on the Usage page and switch to "By project": it
    shows which project is using up the limit.
 2. If the growth is expected and you are on Free, upgrade to Pro. On Pro,
-   turn on [extra usage](./overage) so work doesn't stop at the limit.
+   turn on [extra usage](./overage.md) so work doesn't stop at the limit.
 3. If the growth is unexpected, check the usual causes:
    - **Many builds.** Every push to a preview branch starts a build: keep
      only the branches you need in the project settings.
