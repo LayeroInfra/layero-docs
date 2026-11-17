@@ -8,9 +8,11 @@ description: What the Usage page counts, the Free and Pro limits and when they t
 
 :::info[When the limits take effect]
 - **Free** — from December 1, 2026.
-- **Pro** — from the first subscription renewal on or after December 16,
-  2026. For example, if Pro renews on the 5th, the limits take effect on
-  January 5.
+- **Monthly Pro** — from the first paid period starting December 16, 2026
+  or later.
+- **Annual Pro** — from the first monthly usage window within the paid year
+  starting December 16, 2026 or later. If the window starts December 15,
+  the limits take effect January 15, 2027.
 
 Until then, the Usage page shows your usage for reference only: you can go
 over the limits, and nothing is capped or charged. The card at the top of
@@ -25,8 +27,8 @@ includes. How to keep working above the limits on Pro is covered in
 ## In short
 
 - Limits are counted **per organization**: each organization has its own.
-- On Pro the period runs from one subscription renewal to the next; on
-  Free it is the calendar month.
+- On monthly Pro, the period runs from one renewal to the next. Annual Pro
+  uses monthly usage windows. Free uses calendar months.
 - At 80 % of a limit you get an email; at 100 % nothing new starts, and
   whatever is already running keeps running.
 - On Free the limit is hard. On Pro you can keep going above the limit,
@@ -167,7 +169,7 @@ The general rule: **nothing new starts, and what's running is left alone.**
 | When | Free | Pro, extra usage off | Pro, extra usage on |
 |---|---|---|---|
 | **80 % of a limit** | email and a banner on the Usage page, an offer to upgrade to Pro | email and a banner, an offer to turn on extra usage | email and a banner |
-| **100 % of a limit** | restrictions from the table below | restrictions from the table below | everything keeps working; usage above the limit is charged to the balance every hour |
+| **100 % of a limit** | restrictions from the table below | restrictions from the table below | everything keeps working; usage above the limit accrues hourly |
 | **Extra usage budget used up** | — | — | restrictions from the table below |
 | **No money on the balance** | — | — | restrictions from the table below |
 

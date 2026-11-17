@@ -7,9 +7,9 @@ description: 'How to keep working above the plan limits on Pro: how to turn it o
 # Extra usage
 
 :::info[When it takes effect]
-Extra usage can be turned on from December 16, 2026. Pro limits take
-effect from the first subscription renewal on or after December 16, 2026.
-Until then you can go over the limits for free.
+Extra usage launches December 16, 2026. Overage can incur charges once
+the feature is enabled and the limits have taken effect for your organization.
+For monthly and annual Pro start dates, see [Usage and limits](./usage).
 :::
 
 On Pro you don't have to stop at a limit: you can keep working, paid from
@@ -23,8 +23,7 @@ to Pro.
   Pro limits are hard.
 - You set a **budget** — how much can be spent above the limits per
   billing period. From 1 ₽, 1,000 ₽ by default.
-- Usage above the limits is charged to the organization's balance **every
-  hour**.
+- Overage accrues **hourly** and reduces the available balance.
 - You get an email at 80 % and 100 % of the budget.
 - When the budget runs out or the balance is empty, work above the limits
   pauses. There is never any debt.
@@ -44,19 +43,21 @@ balance. You can turn extra usage off or change the budget at any time.
 
 ## How we charge
 
-- Every hour we calculate how much the organization used above the limits
-  and charge it to the balance at the plan prices.
+- Every hour we calculate the cost of usage above the limits. Accrued
+  charges reduce the available balance. The advance payment for the calendar
+  month is applied on the first day of the next month under the
+  [Public Offer](https://layero.ru/offer-v4-2#section-4).
 - Each metric is counted separately: (used − limit) × price. Speed runs
   are charged in packs of 10 for 10 ₽.
 - Data sometimes arrives late, for example traffic for the previous day.
-  Such usage is charged in the hour it arrives, against the current period
-  and its budget.
-- Every charge is shown in the balance transaction history.
+  Usage from an earlier period may accrue against the budget of the current
+  period. The price is based on the date the usage occurred.
+- You can see accrued charges and final settlement in Billing.
 
 Example: Pro, budget 1,000 ₽. By the middle of the period sites have
 served 112.5 GB against a 100 GB limit. That's 12.5 GB × 8 ₽ = 100 ₽ above
-the limit, charged to the balance hour by hour as traffic grew. 900 ₽ of
-the budget is left.
+the limit. The available balance falls by 100 ₽ and 900 ₽ of the
+budget is left.
 
 ## If the balance runs short
 
