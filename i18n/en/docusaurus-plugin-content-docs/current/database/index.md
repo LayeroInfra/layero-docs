@@ -30,7 +30,7 @@ The section is open to all organizations: the **Databases** item is in the
 | Power | shared processor, "Shared CPU" | you choose the cores, memory, and disk |
 | Space | 0.5 GB | 8 to 2,000 GB, the disk can be increased |
 | Plan | Pro only | any, no subscription needed |
-| Price | included in Pro | from 600 ₽ per month |
+| Price | included in Pro | from 1 350 ₽ per month, by the hour from the balance |
 | Without a Pro subscription | access closes after the grace period, data is deleted | doesn't depend on the subscription |
 | How many | one per organization | as many as you need |
 | Wait time | under a minute | 7–13 minutes |

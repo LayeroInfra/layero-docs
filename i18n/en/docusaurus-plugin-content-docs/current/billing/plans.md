@@ -6,14 +6,18 @@ description: How Free and Pro differ on Layero — project and build limits, cus
 
 # Free and Pro plans
 
-Layero has two public plans: **Free** (no charge) and **Pro** (990 ₽/mo).
-The plan applies at the account level.
+Layero has two public plans: **Free** (no charge) and **Pro** — 990 ₽ a month
+or 9 480 ₽ a year in one payment. The plan applies to an **organization**: Pro
+is taken out for a specific organization and paid from its balance. An account
+has no plan of its own.
+
+Pro can be tried free for 14 days — once, with a card linked.
 
 ## What's included
 
 | Capability | Free | Pro |
 |---|---|---|
-| Price | 0 ₽ | **990 ₽/mo** |
+| Price | 0 ₽ | **990 ₽/mo** or 9 480 ₽/yr |
 | Projects | up to **5** | unlimited |
 | Builds | 100 a month | 1,000 a month |
 | Serving on a platform address (`*.layero.app`) | ✅ | ✅ |
@@ -58,23 +62,30 @@ ability to run dynamic apps.
 
 ## Team seats
 
-Pro includes **1 seat**. Extra seats in a team organization cost
-**490 ₽/mo** each. Seats are only needed for collaboration in
-[organizations](../team/organizations) — one seat is enough for personal
-projects.
+Pro includes **one seat for a colleague**: the organization's owner does not
+take a seat. Extra seats cost **490 ₽/mo** each. Seats are only needed for
+collaboration in [organizations](../team/organizations).
 
 ## How to pay
 
-Payment goes through ЮKassa (YooKassa): card, SBP, T-Pay, SberPay, ЮMoney or Alfa Pay —
-you pick the method when you link it. Billed monthly with auto-renewal.
-Upgrade in the dashboard: **Account settings → Plan → Upgrade to Pro**.
+Pro is paid from the **organization's balance**. The balance is topped up
+through ЮKassa (YooKassa): card, SBP, T-Pay, SberPay, ЮMoney or Alfa Pay. To
+take out Pro, open the organization's **«Оплата и тариф»** (Billing & plan)
+page → **«Перейти на Pro»** (Upgrade to Pro).
+
+On the renewal day the amount is taken from the balance. If it falls short and
+a card is set up for auto top-up, the card tops the balance up by the missing
+amount. With neither money nor a card, a grace period starts — see
+[Expiry & renewal of Pro](./lifecycle.md#grace-period).
 
 ## Changing plans
 
 - **Free → Pro.** Activates right after payment; all Pro capabilities
   become available immediately.
-- **Pro → Free.** You can cancel auto-renewal — the plan stays Pro until
-  the end of the paid period, then the account moves to Free. What happens
+- **Pro → Free.** The **«Отменить подписку»** (Cancel subscription) button
+  keeps Pro until the end of the paid period, then the organization moves to
+  Free. You can also end Pro at once — the cost of the unused days then goes
+  back to the balance. What happens
   to projects over the limit and to custom domains is covered in
   [Expiry & renewal of Pro](./lifecycle).
 

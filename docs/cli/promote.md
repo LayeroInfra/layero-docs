@@ -29,8 +29,11 @@ Production-флоу в Layero «как у Vercel»:
 ## Использование
 
 ```bash
-# promote последнего ready-деплоя default-ветки
+# последняя готовая загрузка из CLI (ветка cli)
 layero promote
+
+# последняя готовая сборка основной ветки репозитория
+layero promote --branch=main
 
 # promote по commit SHA (первые 7+ символов) или полному deploy id
 layero promote a3f9c2b
@@ -45,9 +48,15 @@ layero promote <commit-sha>
 layero promote --yes
 ```
 
+:::warning[Без аргумента — ветка `cli`]
+Без SHA и без `--branch` команда берёт последнюю готовую загрузку из CLI,
+а не сборку основной ветки. У проекта с репозиторием это может выкатить
+в продакшен старую загрузку. Указывайте SHA или `--branch=main`.
+:::
+
 ## Что происходит
 
-1. CLI находит deploy (по позиционному sha, по последнему ready в `--branch`, или по последнему ready в default-ветке).
+1. CLI находит deploy (по позиционному sha, по последнему ready в `--branch`, а без них — по последнему ready в ветке `cli`).
 2. Показывает план:
    ```
    promote plan:
@@ -85,7 +94,7 @@ layero promote ff0d1b86 --yes      # вернуть на него апекс
 Если хочется одной командой: build → promote, не дожидаясь ready'я в UI:
 
 ```bash
-layero deploy --branch=hot-fix --promote --yes
+layero deploy --promote --yes
 ```
 
 Билд завершится, CLI автоматом перейдёт в promote и подтвердит. Эквивалентно `layero deploy ... && layero promote <last-sha>`, но без второй ручной команды.

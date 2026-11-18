@@ -125,15 +125,25 @@ Removes the token from `~/.layero/config.json`. It revokes nothing server-side �
 
 ## CI / non-interactive
 
-CI usually has no browser. Get a JWT with `layero login` on a dev machine, copy it out of `~/.layero/config.json` and pass it to CI as a secret:
+CI has no browser, and a login token lives 7 days — CI built on it breaks
+within a week. Issue a long-lived token on your machine and store it in the
+CI secrets as `LAYERO_TOKEN`:
 
 ```bash
-# In CI
-npx layero@latest token set "$LAYERO_TOKEN"
-npx layero@latest deploy --prod --yes --project alice-my-site
+npx layero@latest token create ci     # scopes: read and deploy
 ```
 
-`layero token set` is the manual escape hatch for CI and dev scenarios. In normal use, sign in with `login`.
+The token is shown **once**. You can revoke it in the panel at
+[app.layero.ru/settings/cli](https://app.layero.ru/settings/cli). In CI the
+environment variable is enough — the CLI picks the token up from it:
+
+```bash
+# Don't print the token: anything in the build log is visible to everyone
+# with access to the runs, and stays there after the secret is rotated.
+LAYERO_TOKEN="$LAYERO_TOKEN" npx layero@latest deploy --prod --yes --project my-site
+```
+
+How token scopes work is covered in [Deploying from GitHub Actions](./github-actions.md).
 
 ## Next
 

@@ -6,8 +6,8 @@ description: What happens to your projects, domains, settings, and shared databa
 
 # Expiry & renewal of Pro
 
-Short answer: **projects aren't deleted when Pro ends.** The account moves to
-Free, and whatever exceeds the Free limits is temporarily **suspended**
+Short answer: **projects aren't deleted when Pro ends.** The organization
+moves to Free, and whatever exceeds the Free limits is temporarily **suspended**
 (not erased). After you pay again, everything is restored automatically.
 
 There's one exception — the [shared database](../database/pricing.md#if-pro-isnt-renewed):
@@ -15,14 +15,18 @@ after the grace period, access to it closes and its data is deleted.
 
 ## What happens when Pro ends
 
-The account moves to [Free](./plans). All deploys, artifacts, settings,
+The organization moves to [Free](./plans). All deploys, builds, settings,
 environment variables, and history stay in place. Only what isn't part of
-Free gets suspended:
+Free gets suspended or turned off:
 
 - **Projects over the limit.** Free allows **5 projects**. If you had more
   on Pro, the **5 oldest** stay active and the rest become "suspended".
 - **Custom domains.** These are a Pro capability, so all linked custom
   domains are suspended.
+- **Search indexing.** It is turned off for every project: the sites stop
+  appearing in Yandex and Google.
+- **The Layero badge** comes back on sites where it was removed.
+- **A team organization** is suspended: teams are a Pro capability.
 - **The shared database.** It's part of Pro and keeps working until the end
   of the [grace period](#grace-period). After that, access to the database
   closes and its data will be deleted — download a backup in advance.
@@ -58,25 +62,46 @@ A project is deleted only if **you** delete it (or [delete the whole
 account](#delete-your-account)). Subscription expiry has nothing to do with deleting
 projects. The shared database is the exception, see above.
 
+## How Pro renews
+
+Pro renews from the **organization's balance** on the day the paid period
+ends. Three days before renewal you get an email with the amount and where it
+will come from (for annual Pro, also seven days before).
+
+| On the balance | Card set for auto top-up | What happens |
+|---|---|---|
+| enough | doesn't matter | the amount is taken from the balance |
+| not enough | yes | the card tops the balance up by the missing amount, Pro renews |
+| not enough | no | a [grace period](#grace-period) starts |
+
+Cards are charged only during the day, Moscow time. If a card payment fails,
+it is retried a few more times over five days.
+
 ## Grace period
 
-In some cases there is a **7-day** soft window during which Pro features
-keep working:
+If Pro could not be renewed, it still works in full: **7 days** for a monthly
+subscription and **30 days** for an annual one. Top up the balance in that time
+and Pro renews from the original date, as if there had been no gap. If you
+don't, the organization moves to Free.
 
-- **A charge failed.** If an auto-renewal payment fails (e.g. insufficient
-  funds), you get 7 days — Pro keeps working while the system retries the
-  charge.
-- **A trial ended.** The same 7-day window applies after a trial expires.
+There is **no** grace period:
 
-There is **no** grace period if you **cancel** the subscription yourself or
-pay one-off without auto-renewal — in those cases the move to Free happens
-right at the end of the paid period.
+- after the **free trial** — if payment fails when it ends, the organization
+  moves to Free at once;
+- if you **cancelled the subscription** with «Отменить подписку» (Cancel
+  subscription) — Pro runs to the end of the paid period, then the
+  organization moves to Free.
+
+**To end Pro at once**, use the «Оплата и тариф» (Billing & plan) page: the
+organization moves to Free right away, and the cost of the unused days goes
+back to the balance.
 
 ## Paying again restores everything automatically
 
-On a successful Pro payment the account returns to the plan and **all**
-previously suspended resources come back — projects, custom domains,
-settings. Because nothing was deleted, exactly the same projects and domains
+Once Pro is paid, the organization returns to Pro and **all**
+previously suspended resources come back — projects, custom domains, the team
+organization. Indexing and the hidden badge come back on the projects where
+they were on before the move to Free. Because nothing was deleted, exactly the same projects and domains
 are restored, with nothing to set up again. Sites start serving again
 within seconds.
 
@@ -112,7 +137,7 @@ Then delete the account as usual.
 
 | Event | What happens |
 |---|---|
-| Pro ended | Account → Free; projects over 5 and custom domains suspended (not deleted) |
+| Pro ended | Organization → Free; projects over 5 and custom domains suspended (not deleted), indexing off |
 | Sites on platform-issued addresses | 5 oldest keep working; suspended ones show a placeholder (503) |
 | Custom domain | Turned off; the project lives on, DNS and link preserved |
 | Deletion by timer after Pro ends | **None.** Suspended projects are kept indefinitely |
@@ -120,7 +145,7 @@ Then delete the account as usual.
 | [Deleting the account](#delete-your-account) | Projects and databases are deleted immediately, the account after 30 days |
 
 :::tip[How to avoid downtime]
-If you keep more than 5 projects or rely on a custom domain, leave
-auto-renewal on. Then there are no "Free ↔ Pro" transitions or suspensions
-at all.
+If you keep more than 5 projects or rely on a custom domain, keep the renewal
+amount on the balance or set a card up for auto top-up. Then there are no
+"Free ↔ Pro" transitions or suspensions at all.
 :::

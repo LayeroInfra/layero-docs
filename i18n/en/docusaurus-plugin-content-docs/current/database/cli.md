@@ -84,7 +84,7 @@ changes along with the payment state:
 | `доступ закрыт за неоплату, удалим 15 октября` | "access closed for non-payment, we'll delete it on 15 October": the database is stopped and will be deleted on this date |
 
 What's behind each state is explained on the
-[Pricing](./pricing.md#if-payment-fails) page.
+[Pricing](./pricing.md#if-the-balance-runs-short) page.
 
 ## Creating a database
 
@@ -137,9 +137,9 @@ to the wizard in the dashboard:
 
 ("a dedicated instance can't be ordered from the terminal").
 
-A dedicated database has a price and a hold on your card, and there's
-nowhere in the terminal to confirm the amount. The dashboard shows the
-configurations, the price, and the next charge date — order it there, see
+A dedicated database has a price, and there's nowhere in the terminal to
+confirm it. The panel shows the configurations and the price — order it
+there, see
 [Creating a database](./create.md#from-the-dashboard).
 
 The `--gb` flag no longer works either. A shared database's size is set by

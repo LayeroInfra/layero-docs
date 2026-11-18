@@ -28,7 +28,7 @@ page.
    database; for a dedicated one — any of the offered versions, the newest
    by default.
 8. Click **Create database** if the database is shared, or
-   **Order for N ₽/mo** if it's dedicated.
+   **«Создать за N ₽/мес»** (Create for N ₽/mo) if it's dedicated.
 
 If the dialog was opened from a project page (**Project → Database →
 Create database**), the new database is connected to that project right
@@ -83,31 +83,24 @@ tabs to the right of the "Configuration" heading:
   are shown under each one, and the price is calculated instantly.
 
 A dedicated database is available **on any plan**, no Pro subscription
-needed. It's billed separately, once a month. Prices and how a custom
+needed. It's billed separately, by the hour from the organization's balance. Prices and how a custom
 configuration is calculated — on the
 ["Pricing"](./pricing.md#dedicated-database) page.
 
 ### Payment when ordering
 
-The amount is shown in the dialog footer before you click the button:
-"N ₽ per month" and an approximate daily price. The "?" sign next to it
-explains when we charge:
+The amount is shown in the dialog footer before you click the button: the
+price per month and per hour. It is taken from the organization's balance
+every hour while the database runs.
 
-- **by card** — the amount is held immediately and charged when the
-  database is ready. If the database fails to come up, we release the hold;
-- **by another method** (SBP, T-Pay, SberPay, ЮMoney, Alfa Pay) — the
-  amount is charged immediately on ordering. If the database fails to come
-  up, we refund it in full.
+You can order a database if the balance holds its monthly price. This is not a
+prepayment: the money stays on the balance and goes out hour by hour. If it
+falls short, the panel opens a top-up with the missing amount filled in and
+brings you back to the order.
 
-The **organization owner** pays — with the payment method linked to their
-account. If there's no payment method, the button reads "Link a card": the
-dashboard takes you to link one and brings you back to the order with your
-choices saved.
-
-By clicking "Order for N ₽/mo", you accept the
+By clicking «Создать» (Create), you accept the
 [offer](https://layero.ru/offer) and the [database
-terms](https://layero.ru/databases-terms), and agree to monthly automatic
-charges. Details — ["Pricing"](./pricing.md#how-payment-works).
+terms](https://layero.ru/databases-terms). Details — ["Pricing"](./pricing.md#how-payment-works).
 
 ## From the CLI
 
@@ -157,10 +150,9 @@ More — ["Working in the dashboard"](./panel.md#extensions).
 | No Shared CPU tile | The organization already has a shared database. Create the next one as dedicated |
 | "the organization already has a Shared CPU database" | The CLI's response to a second shared database — same thing |
 | The Shared CPU tile opens the Pro checkout | A shared database is only included in Pro. A dedicated one can be ordered on Free too |
-| "A paid instance is paid for by the account owner…" | Any administrator can order, but the organization owner pays. Ask them to link a payment method |
 | "the previous instance is still being prepared" | Only one order runs at a time. Wait until the first database is ready |
 | A "didn't come up" card with a reason | Creation failed; the money wasn't charged or was refunded. In the card menu — "Order again" |
-| Provisioning takes longer than 20 minutes | Message us. After 90 minutes the order is canceled automatically and the money is refunded |
+| Provisioning takes longer than 20 minutes | Message us. After 90 minutes the order is canceled automatically |
 
 The dashboard explains the failure reason in plain words. If it's unclear
 what to do, copy the full failure text and send it to us in the chat.

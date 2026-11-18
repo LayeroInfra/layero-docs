@@ -56,7 +56,7 @@ The database's state is shown right on the card:
 | "deleted for non-payment" | the database is gone. If a backup was taken before deletion, it can be downloaded in the settings |
 
 What's behind the payment rows — on the
-["Pricing"](./pricing.md#if-payment-fails) page.
+["Pricing"](./pricing.md#if-the-balance-runs-short) page.
 
 ## Overview
 
@@ -279,6 +279,6 @@ name to confirm.
 immediately. If you need a backup, download it first in the
 ["Backups"](./backups.md#download-a-backup) section.
 
-For a dedicated database, the deletion dialog on the database page shows
-how much we'll refund for the unused days. How the refund is calculated —
-on the ["Pricing"](./pricing.md#deletion-and-refunds) page.
+For a dedicated database, charges stop from the hour of deletion; there is no
+prepayment, so there is nothing to refund — see
+[Pricing](./pricing.md#deletion).

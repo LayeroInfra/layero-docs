@@ -44,17 +44,15 @@ Backups of a dedicated database are a **paid option**, off by default.
 1. **Backups → Enable**.
 2. Choose how many backups to keep: 1 to 14. A backup is taken once a day
    at night; the oldest one is pushed out by the new one.
-3. The dialog shows the calculation: database, backups, and the monthly
-   total. The extra amount for the remaining days of the current period is
-   charged right away, and the dialog names it before you confirm.
+3. The dialog shows the calculation before you confirm: database, backups,
+   and the monthly total.
 
 The price of backups depends on the disk and the number of backups — see
 the examples on the [Pricing](./pricing.md#dedicated-database-backups) page.
-From the next period it's included in the monthly charge together with the
-database.
+The cost of backups is taken from the balance together with the database
+charge.
 
-You can turn backups off at any time. Backups already taken aren't deleted,
-but the money for the remaining days of the current period isn't refunded.
+You can turn backups off at any time: backups already taken aren't deleted.
 
 ## Make a backup manually
 
@@ -159,5 +157,5 @@ irreversibly. If you might need a backup, download it **before** deleting.
 
 If a database is deleted for non-payment, we try to save a backup before
 deleting it, but we don't guarantee it — see
-[If payment fails](./pricing.md#if-payment-fails). It's safer not to let it
+[If the balance runs short](./pricing.md#if-the-balance-runs-short). It's safer not to let it
 come to that: turn backups on and download a fresh one from time to time.

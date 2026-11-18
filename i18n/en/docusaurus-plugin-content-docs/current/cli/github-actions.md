@@ -85,8 +85,8 @@ to the wrong account.
 | `token` | yes | — | Layero CI token |
 | `project` | no | from `.layero/project.json` | Target project (id or slug) |
 | `name` | no | — | Project name, used when the project is created on the first deploy |
-| `prod` | no | `false` | Publish to production |
-| `branch` | no | — | A specific branch environment; takes precedence over `prod` |
+| `prod` | no | `false` | Publish to production. Only needed for a project with a connected repository: for a project without one, every run publishes to the main address anyway |
+| `branch` | no | — | Do not use: the current CLI rejects it and the step fails. Branch previews come from a connected repository, not from the Action |
 | `prebuilt` | no | — | Directory with a finished build |
 | `type` | no | auto-detect | Framework: `vite`, `next`, `astro`, `static`… |
 | `root` | no | — | Monorepo: subdirectory to treat as the app root |
@@ -127,22 +127,16 @@ without reading the logs.
 
 ## Previews for pull requests
 
-```yaml
-on: [pull_request]
+The Action does not create previews: everything it uploads lands in a single
+environment of the project. To give every branch and pull request its own
+address, [connect the repository](../deploys/git-providers.md) — previews are
+then built on every push.
 
-jobs:
-  preview:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: LayeroInfra/deploy-action@v1
-        with:
-          token: ${{ secrets.LAYERO_TOKEN }}
-          branch: pr-${{ github.event.number }}
-```
-
-Without `prod` the deploy goes to a preview environment and leaves production
-alone.
+:::warning[A project without a repository]
+For a project without a connected repository, every Action run publishes to
+the main address — even without `prod`. Do not run such a workflow on pull
+requests: every PR would replace the live site.
+:::
 
 ## Several examples in one workflow
 
@@ -211,5 +205,5 @@ nothing but the environment variable:
 LAYERO_TOKEN=... npx layero@latest deploy --prod --yes
 ```
 
-`--yes` skips confirmations; without it the command in CI waits for input that
-will never come.
+`--yes` skips confirmations. In CI the CLI asks nothing anyway, but with
+`--yes` the command behaves the same in CI and in a terminal.

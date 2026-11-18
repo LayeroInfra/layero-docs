@@ -66,9 +66,11 @@ as `authenticated`. The roles are the same as in Supabase — policies and grant
 from its migrations work as written.
 
 🚨 **A key does not grant rights.** It selects a role, and what that role can
-access is decided by grants and RLS policies inside the database itself. A
-fresh database exposes zero tables over the API: access is granted table by
-table, explicitly, together with a policy.
+access is decided by grants and RLS policies inside the database itself. As
+in Supabase, a new table in `public` is open to `anon` and `authenticated`
+right away: without RLS it returns every row to anyone holding the public key.
+Turn RLS on as soon as you create a table — see
+[Tables and REST](./rest.md).
 
 Get the keys onto your machine:
 

@@ -173,6 +173,6 @@ specific host.
 
 Per-path redirects are configured with the sibling **`_redirects`** file
 (also Netlify-compatible, matched by path). Note that `_redirects` matches
-by **path**, not host, so a host-based redirect like `www.site.com →
-site.com` can't be done with it — configure that at the DNS/registrar level
-(see [Custom domains](./custom-domains)).
+by **path**, not host, so a redirect like `www.site.com → site.com` can't be done with it. For that,
+tick **«Подключить также `www.…`»** (Also connect www) when you connect the
+domain — see [Custom domains](./custom-domains).

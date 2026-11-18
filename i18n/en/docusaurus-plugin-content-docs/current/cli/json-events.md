@@ -6,14 +6,16 @@ description: The full list of events and error codes the Layero CLI emits on std
 
 # JSON events schema
 
-The CLI switches to JSON-lines mode automatically when it runs inside an AI
-agent (Cursor, Claude Code) or when stdout is not a TTY. You can also turn it
-on explicitly with the `--json` flag or `LAYERO_JSON=1`.
+The CLI switches to JSON-lines mode by itself when it sees an AI agent's
+environment variable: `CLAUDECODE`, `CLAUDE_CODE_SESSION`, `CURSOR_AGENT`,
+`AIDER_CHAT`, `CONTINUE_CLI`, `LAYERO_AGENT`. You turn it on explicitly with
+the `--json` flag or `LAYERO_JSON=1`. Otherwise — in CI and outside a terminal —
+the CLI prints plain text, though it asks no questions there either.
 
 In this mode the CLI:
 
-- **asks no questions** — every interactive confirmation is skipped (`--prod`
-  still needs `--yes`);
+- **asks no questions** — every confirmation is skipped, `--prod` included:
+  the production deploy goes ahead without asking;
 - prints one `{"event":"…", …}` line per action on stdout;
 - reports errors with a stable `code` and a `next_action`;
 - adds a `ts` field (ISO-8601 timestamp) to every event;

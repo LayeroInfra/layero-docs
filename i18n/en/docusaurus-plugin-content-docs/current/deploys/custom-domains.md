@@ -15,11 +15,15 @@ starts serving the project, with its own HTTPS certificate.
 A custom domain behaves like the main address: it shows whichever deploy the
 production pointer refers to. Promote and rollback work on it unchanged.
 
-:::note[Beta]
-The "Domains" section is currently in beta. It is marked "Coming soon" in the
-project sidebar — press the **"Beta"** button in the dialog that opens to
-reach the working setup wizard.
+:::info[Plan]
+Custom domains are available on the [Pro](../billing/plans.md) plan. On Free
+the **«Домены»** (Domains) item in the project menu carries a Pro badge.
 :::
+
+Once a domain is connected you can make it the **primary** one — the
+«Сделать основным» (Make primary) switch on the domain card. The `layero.app`
+address and the project's other domains then redirect visitors to the primary
+domain (a 301 redirect).
 
 ## How to connect one
 
@@ -27,6 +31,9 @@ reach the working setup wizard.
 2. Enter the domain — `my-site.ru` or `shop.my-site.ru`. Layero works out
    whether it is an apex domain or a subdomain and recognises your registrar
    from DNS.
+   For an apex domain the wizard offers a **«Подключить также `www.…`»**
+   (Also connect www) checkbox: the `www` address will redirect to the apex.
+   It needs one more record — a CNAME for `www`.
 3. Press **Connect**. A domain card appears with a step-by-step checklist and
    the **two DNS records** you need to add.
 4. Open your registrar's control panel, add the records (the wizard shows
@@ -158,35 +165,30 @@ yellow bar above the checklist.
 In total: from a couple of minutes to an hour, and nearly all of it is waiting
 on DNS at your registrar — something Layero cannot influence.
 
-## Bring your own certificate (BYOC)
+## Your own certificate
 
-If you already have a TLS certificate for the domain (an EV certificate from
-your provider, for instance), you can upload it instead of issuing one through
-Let's Encrypt. The domain card has an **"I already have a certificate"**
-section: paste the PEM certificate and the private key. HTTPS works
-immediately, with no call to Let's Encrypt. Domain ownership verification (the
-`TXT` record) is still required.
+Layero issues a Let's Encrypt certificate by itself. Uploading a ready-made
+certificate (an EV one from your provider, for instance) is not available in
+the panel yet — if you need it, [contact support](../support.md).
 
 ## Where the domain points
 
-By default a custom domain shows the project's production deploy — the same as
-the main address. On the domain card, under **"Where this domain points"**,
-you can attach the domain to a **specific branch** — handy for putting the
-`staging` branch on its own subdomain, for example.
+A custom domain shows the project's production build — the same as the main
+address. Attaching a domain to a separate branch is not available in the panel
+yet.
 
 ## Certificate renewal
 
 A Let's Encrypt certificate is valid for 90 days. Layero **renews it
 automatically** roughly 30 days before expiry — without your involvement and
-without downtime. Manually uploaded (BYOC) certificates you renew yourself.
+without downtime.
 
 ## What Layero does not do
 
 - **It does not buy domains.** Register them with any registrar.
 - **It does not manage your DNS zone.** Layero gives exact instructions, but
   you add the records.
-- **It does not set up a `www` ↔ apex redirect.** That is handled at the
-  registrar or in the application.
+
 
 ## Detaching
 

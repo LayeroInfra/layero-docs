@@ -140,7 +140,7 @@ For data exports and anything that hits these limits, connect directly with
 
 | | Shared database | Dedicated database |
 |---|---|---|
-| By default | off | off |
+| By default | on | off |
 | How often | once a day, you choose the hour | once a day, at night |
 | How long they're kept | 1 to 7 days | 1 to 14 backups |
 | Price | included in Pro | paid option |

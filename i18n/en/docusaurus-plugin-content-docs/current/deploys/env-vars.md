@@ -6,9 +6,10 @@ description: Env vars are encrypted with AES-256-GCM and available at build time
 
 # Environment variables
 
-Env vars are set in the project dashboard (**Project → Environment
-Variables**) or through the API. They are available to the build process and
-end up in `process.env`.
+Env vars are set in the panel — the project's **«Переменные окружения»**
+(Environment variables) section — with `layero env`, or through the API. They
+are available to the build process and end up in `process.env`. Changes are
+picked up by the **next build**: the version already published does not see them.
 
 ## Where they apply
 
@@ -35,8 +36,9 @@ The key **never reaches your containers**, neither the build one nor the
 runtime one. Only the decrypted values of the variables you added to that
 project do.
 
-In the UI values are hidden by default; you can reveal a specific record when
-viewing.
+Once saved, a value is never shown again — not in the panel, the CLI or the
+API: you see the name and the length, and for long values the first few
+characters.
 
 ## What not to store
 
@@ -48,15 +50,29 @@ viewing.
   `REACT_APP_*`.** Those prefixes mean "goes into the client bundle". Use them
   only for public values — public API endpoints, analytics tokens and so on.
 
-## CLI / API
+## CLI and API
 
-The UI is the simplest path. If you need a script:
+From a terminal, use `layero env`. `set` adds or changes only the variables
+you name; the rest stay as they were:
+
+```bash
+npx layero@latest env list
+npx layero@latest env set API_URL=https://api.example.com
+npx layero@latest env unset API_URL
+```
+
+:::warning[The API replaces the whole set]
+`PUT` writes the set you send **as a whole**: any key missing from the request
+is deleted. To keep an existing value, send its key with `null`. To change one
+variable, `layero env set` is safer.
+:::
 
 ```bash
 curl -X PUT https://api.layero.ru/projects/{id}/env \
   -H "Authorization: Bearer $LAYERO_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"vars": [{"key": "API_URL", "value": "https://api.example.com"}]}'
+  -d '{"vars": {"API_URL": "https://api.example.com", "SECRET_KEY": null}}'
 ```
 
-(The full API specification is published separately.)
+Here `API_URL` gets the new value, `SECRET_KEY` keeps its old one, and every
+other variable of the project is deleted.

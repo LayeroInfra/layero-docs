@@ -124,16 +124,25 @@ npx layero@latest logout
 
 ## CI / non-interactive
 
-В CI обычно нет браузера. Получите JWT через `layero login` на dev-машине, скопируйте из `~/.layero/config.json` и передайте в CI как секрет:
+В CI нет браузера, а токен входа живёт 7 дней — через неделю деплой из CI
+перестанет работать. Выпустите на своей машине долгоживущий токен и сохраните его
+в секретах CI под именем `LAYERO_TOKEN`:
 
 ```bash
-# В CI. Токен не печатаем: всё, что попало в лог сборки, видно всем,
-# у кого есть доступ к раннам, и остаётся там после ротации секрета.
-npx layero@latest token set "$LAYERO_TOKEN"
-npx layero@latest deploy --prod --yes --project alice-my-site
+npx layero@latest token create ci     # права: чтение и деплой
 ```
 
-`layero token set` — это «ручное окно» для CI и dev-сценариев. В обычной работе используйте `login`.
+Токен показывается **один раз**. Отозвать его можно в панели, на странице
+[app.layero.ru/settings/cli](https://app.layero.ru/settings/cli). В CI
+достаточно переменной окружения — CLI возьмёт токен из неё сам:
+
+```bash
+# Токен не печатаем: всё, что попало в лог сборки, видно всем,
+# у кого есть доступ к запускам, и остаётся там после смены секрета.
+LAYERO_TOKEN="$LAYERO_TOKEN" npx layero@latest deploy --prod --yes --project my-site
+```
+
+Как устроены права токенов — в [«Деплой из GitHub Actions»](./github-actions.md#токен).
 
 ## Что дальше
 

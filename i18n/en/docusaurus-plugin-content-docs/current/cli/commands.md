@@ -244,7 +244,8 @@ Point the project's production apex at a specific ready deploy. Details in
 [`layero promote`](./promote).
 
 ```bash
-npx layero@latest promote                        # default branch → latest ready
+npx layero@latest promote                        # latest ready upload from the CLI (the cli branch)
+npx layero@latest promote --branch=main          # latest ready build of main
 npx layero@latest promote --branch=staging       # latest ready of the staging branch
 npx layero@latest promote a3f9c2b                # a specific deploy by commit_sha (positional)
 npx layero@latest promote --yes                  # no confirmation (CI)

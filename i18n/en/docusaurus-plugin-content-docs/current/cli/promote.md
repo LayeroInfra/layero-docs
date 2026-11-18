@@ -33,8 +33,11 @@ auto-promote is off for the team.
 ## Usage
 
 ```bash
-# promote the latest ready deploy of the default branch
+# the latest ready upload from the CLI (the cli branch)
 layero promote
+
+# the latest ready build of the repository's main branch
+layero promote --branch=main
 
 # promote by commit SHA (the first 7+ characters) or a full deploy id
 layero promote a3f9c2b
@@ -49,10 +52,17 @@ layero promote <commit-sha>
 layero promote --yes
 ```
 
+:::warning[No argument means the `cli` branch]
+Without a sha and without `--branch` the command takes the latest ready upload
+from the CLI, not the build of the main branch. For a project with a
+repository this can put an old upload into production. Pass a sha or
+`--branch=main`.
+:::
+
 ## What happens
 
 1. The CLI finds the deploy (by the positional sha, by the latest ready deploy
-   in `--branch`, or by the latest ready deploy of the default branch).
+   in `--branch`, and without either — by the latest ready deploy of the `cli` branch).
 2. It shows the plan:
    ```
    promote plan:
@@ -94,7 +104,7 @@ If you want build → promote in one command, without waiting for `ready` in the
 UI:
 
 ```bash
-layero deploy --branch=hot-fix --promote --yes
+layero deploy --promote --yes
 ```
 
 The build finishes, the CLI moves straight to the promote and confirms it. It is

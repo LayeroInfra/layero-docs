@@ -223,7 +223,8 @@ layero hooks delete <id>                  # отзывается сразу
 Перевести production apex проекта на конкретный ready-деплой. Подробно — [`layero promote`](./promote.md).
 
 ```bash
-npx layero@latest promote                        # default-ветка → последний ready
+npx layero@latest promote                        # последняя готовая загрузка из CLI (ветка cli)
+npx layero@latest promote --branch=main          # последняя готовая сборка ветки main
 npx layero@latest promote --branch=staging       # последний ready ветки staging
 npx layero@latest promote a3f9c2b                # конкретный деплой по commit_sha (позиционный аргумент)
 npx layero@latest promote --yes                  # без подтверждения (CI)

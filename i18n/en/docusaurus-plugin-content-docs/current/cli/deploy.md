@@ -103,7 +103,7 @@ them as your choice.
 | `--name <name>` | Project name. Only on the first deploy. |
 | `--project <id_or_slug>` | Deploy into a specific project, ignoring `./.layero/project.json`. Handy for CI. |
 | `--org <slug>` | Create the project in a given Layero organization (on the first deploy). |
-| `--yes`, `-y` | Skip the `--prod` / `--promote` confirmation and interactive questions. |
+| `--yes`, `-y` | Skip the `--prod` / `--promote` confirmation and interactive questions. Only needed in a terminal: agents and CI get no questions. |
 | `--json` | JSON lines on stdout (for AI agents and CI). |
 | `--config` | Legacy alias for the current behaviour (auto-detection + `.layero/project.json`). |
 | `--confirm-repeated-failure` | Proceed although recent deploys keep failing with the **same** error: the platform stops such repeats until you confirm you know what changed. A flag for a person, not for an agent. |
@@ -252,8 +252,10 @@ answered — see `npx layero@latest logs --runtime`. `dashboard_url` is the
 management page, **not** the site. More in the
 [JSON events schema](./json-events).
 
-JSON mode turns on automatically when the CLI runs inside Cursor / Claude Code
-/ any process with a non-TTY stdout. More in
+JSON mode turns on by itself when the CLI runs inside an AI agent (Claude Code,
+Cursor and others that set their own environment variable), or explicitly with
+`--json`. In CI and outside a terminal the CLI prints plain text and asks
+nothing: `--prod` deploys to production there without a confirmation. More in
 [Deploying from AI agents](./agents); the full event list is in the
 [JSON events schema](./json-events).
 
