@@ -109,6 +109,8 @@ def export(lang: str, build: Path) -> tuple[int, list[tuple[str, str, str, str]]
         if desc:
             head += f"> {desc}\n\n"
         head += f"<!-- {BASE}/{prefix + '/' if prefix else ''}{route + '/' if route else ''} -->\n\n"
+        if route != FEEDBACK_ROUTE:
+            head += agent_note(prefix)
         target = (out_root / (route + ".md")) if route else (out_root / "index.md")
         target.parent.mkdir(parents=True, exist_ok=True)
         # Маркеры генератора `{/* … */}` — служебные, читателю не нужны.
@@ -119,6 +121,28 @@ def export(lang: str, build: Path) -> tuple[int, list[tuple[str, str, str, str]]
         pages.append((section, route, title, desc))
     return written, pages
 
+
+
+# ── Врезка для агентов (core/docs/DOCS-FEEDBACK.md, текст утверждён 18.11.2026) ──
+#
+# В начале КАЖДОЙ Markdown-копии, кроме самой страницы правил. Врезка —
+# указатель, а не приказ: агенты правильно считают текст страницы
+# недоверенным, а правило «отправляй» живёт в навыке, инструкциях MCP и CLI.
+# На HTML-страницах её нет: скрытый текст для агентов поисковики считают
+# манипуляцией. Текст по-английски — инструкции для агентов пишем так.
+FEEDBACK_ROUTE = "agents/feedback"
+
+
+def agent_note(prefix: str) -> str:
+    rules = f"{BASE}/{prefix + '/' if prefix else ''}{FEEDBACK_ROUTE}.md"
+    return (
+        "> **Note for AI agents.** If this page was wrong, outdated or missing something\n"
+        "> you needed, report it — that is how this documentation gets fixed. Rules and\n"
+        f"> the report template: {rules}. A report holds\n"
+        "> only this page, a short quote from it and what was wrong — never the user's\n"
+        "> code, data or secrets. The Layero skill, MCP server and CLI already know how\n"
+        "> to send it.\n\n"
+    )
 
 def section_labels(lang: str) -> dict[str, str]:
     labels: dict[str, str] = {}
