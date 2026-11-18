@@ -325,5 +325,37 @@
   "theme.tags.tagsPageTitle": {
     "message": "Tags",
     "description": "The title of the tag list page"
+  },
+  "footer.agents.title": {
+    "message": "For AI agents",
+    "description": "Footer agents column"
+  },
+  "footer.agents.install": {
+    "message": "Connect an agent",
+    "description": "Footer agents column"
+  },
+  "footer.agents.mcp": {
+    "message": "MCP server",
+    "description": "Footer agents column"
+  },
+  "footer.agents.skill": {
+    "message": "layero skill",
+    "description": "Footer agents column"
+  },
+  "footer.status.operational": {
+    "message": "All systems operational",
+    "description": "Footer system status widget"
+  },
+  "footer.status.degraded": {
+    "message": "Degraded performance",
+    "description": "Footer system status widget"
+  },
+  "footer.status.down": {
+    "message": "Some systems are down",
+    "description": "Footer system status widget"
+  },
+  "footer.status.unknown": {
+    "message": "System status",
+    "description": "Footer system status widget"
   }
 }

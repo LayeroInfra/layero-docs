@@ -67,6 +67,8 @@ const config: Config = {
         blog: {
           showReadingTime: true,
           blogTitle: 'Блог Layero',
+          // Без этого в русской локали над списком постов стояло «Recent posts».
+          blogSidebarTitle: 'Последние записи',
           blogDescription: 'Новости, обновления и заметки команды Layero',
           postsPerPage: 10,
           feedOptions: {
@@ -220,7 +222,14 @@ const config: Config = {
     colorMode: {
       respectPrefersColorScheme: true,
     },
+    // Шапка по образцу панели: слева — чем являемся и поиск (главное
+    // действие читателя), справа — второстепенные разделы, настройки и одна
+    // кнопка. До 18.11.2026 здесь было восемь элементов в одну строку:
+    // «Документация» дублировала логотип, ссылка на layero.ru уводила с доков
+    // посреди чтения (она есть в подвале), а поиск стоял последним, после
+    // кнопки и переключателя темы.
     navbar: {
+      title: 'Документация',
       logo: {
         alt: 'Layero',
         src: 'img/logo.svg',
@@ -228,23 +237,22 @@ const config: Config = {
         srcDark: 'img/logo-dark.svg',
       },
       items: [
+        {type: 'search', position: 'left'},
+        // На широком экране не нужна — её роль играет «Документация» у
+        // логотипа (custom.css прячет). В мобильном меню без неё со страницы
+        // блога в доки не вернуться.
         {
           type: 'docSidebar',
           sidebarId: 'docsSidebar',
           position: 'left',
           label: 'Документация',
+          className: 'navbar__docs-link',
         },
-        {to: '/blog', label: 'Блог', position: 'left'},
-        {to: '/contacts', label: 'Контакты', position: 'left'},
-        {
-          href: 'https://layero.ru',
-          label: 'layero.ru',
-          position: 'right',
-        },
-        {type: 'localeDropdown', position: 'right'},
+        {to: '/blog', label: 'Блог', position: 'right'},
+        {to: '/contacts', label: 'Контакты', position: 'right'},
+        {type: 'localeDropdown', position: 'right', className: 'navbar__locale'},
         // Читатель документации — самый тёплый трафик, какой у нас есть: он
-        // уже разбирается, как всё устроено. До этого нажать ему было
-        // некуда — в навбаре стояли только разделы и ссылка на лендинг.
+        // уже разбирается, как всё устроено. Кнопка одна и стоит последней.
         {
           href: 'https://app.layero.ru',
           label: 'Начать',
@@ -253,35 +261,46 @@ const config: Config = {
         },
       ],
     },
+    // Сам подвал рисует src/theme/Footer: слева знак «layero × Docusaurus»,
+    // справа эти колонки и колонка «Для агентов» (она в компоненте: llms.txt
+    // и sitemap.md — файлы, у каждой локали свои). Отсюда берутся только
+    // ссылки — так их переводы остаются в i18n/en/.../footer.json.
     footer: {
-      style: 'dark',
+      style: 'light',
       links: [
         {
           title: 'Документация',
           items: [
             {label: 'Введение', to: '/'},
-            {label: 'Блог', to: '/blog'},
+            {label: 'Быстрый старт', to: '/getting-started/quickstart'},
+            {label: 'CLI', to: '/cli'},
+            {label: 'Деплой и окружения', to: '/deploys'},
           ],
         },
         {
           title: 'Layero',
           items: [
-            {label: 'layero.ru', href: 'https://layero.ru'},
-            {label: 'app.layero.ru', href: 'https://app.layero.ru'},
+            {label: 'Сайт', href: 'https://layero.ru'},
+            {label: 'Панель управления', href: 'https://app.layero.ru'},
+            {label: 'Блог', to: '/blog'},
+            {label: 'Контакты', to: '/contacts'},
           ],
         },
         {
-          title: 'Code',
+          title: 'Разработчикам',
           items: [
             {label: 'GitHub', href: 'https://github.com/LayeroInfra'},
+            {label: 'npm', href: 'https://www.npmjs.com/package/layero'},
           ],
         },
       ],
-      copyright: `© ${new Date().getFullYear()} Layero. Built with Docusaurus.`,
     },
     prism: {
+      // Фон блока кода задаёт custom.css (--prism-background-color = карточка
+      // дизайн-системы); тема даёт только раскраску токенов. Dracula с
+      // фиолетовым фоном выбивалась из палитры.
       theme: prismThemes.github,
-      darkTheme: prismThemes.dracula,
+      darkTheme: prismThemes.vsDark,
     },
   } satisfies Preset.ThemeConfig,
 };

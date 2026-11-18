@@ -64,6 +64,10 @@ def sections(lang: str) -> list[tuple[str, str]]:
                 label = en_labels[label]
             elif en_cat.is_file():
                 label = json.loads(en_cat.read_text(encoding="utf-8")).get("label", label)
+        # На сайте бета — значок β в меню, а не слово в подписи. Агенту
+        # значка не видно, поэтому в llms.txt она остаётся словом.
+        if meta.get("customProps", {}).get("beta"):
+            label += " (beta)" if lang == "en" else " (бета)"
         out.append((int(meta.get("position", 999)), key, label))
     return [(k, l) for _, k, l in sorted(out)]
 

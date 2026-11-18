@@ -1,4 +1,8 @@
 {
-  "label": "Базы данных (бета)",
-  "position": 8
+  "label": "Базы данных",
+  "position": 8,
+  "className": "menu-beta",
+  "customProps": {
+    "beta": true
+  }
 }

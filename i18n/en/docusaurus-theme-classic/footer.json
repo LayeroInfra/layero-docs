@@ -7,10 +7,6 @@
     "message": "Layero",
     "description": "The title of the footer links column with title=Layero in the footer"
   },
-  "link.title.Code": {
-    "message": "Code",
-    "description": "The title of the footer links column with title=Code in the footer"
-  },
   "link.item.label.Введение": {
     "message": "Introduction",
     "description": "The label of footer link with label=Введение linking to /"
@@ -19,20 +15,40 @@
     "message": "Blog",
     "description": "The label of footer link with label=Блог linking to /blog"
   },
-  "link.item.label.layero.ru": {
-    "message": "layero.ru",
-    "description": "The label of footer link with label=layero.ru linking to https://layero.ru"
-  },
-  "link.item.label.app.layero.ru": {
-    "message": "app.layero.ru",
-    "description": "The label of footer link with label=app.layero.ru linking to https://app.layero.ru"
-  },
   "link.item.label.GitHub": {
     "message": "GitHub",
     "description": "The label of footer link with label=GitHub linking to https://github.com/LayeroInfra"
   },
-  "copyright": {
-    "message": "© 2026 Layero. Built with Docusaurus.",
-    "description": "The footer copyright"
+  "link.title.Разработчикам": {
+    "message": "Developers",
+    "description": "The title of the footer links column Разработчикам"
+  },
+  "link.item.label.Быстрый старт": {
+    "message": "Quick start",
+    "description": "The label of footer link Быстрый старт"
+  },
+  "link.item.label.CLI": {
+    "message": "CLI",
+    "description": "The label of footer link CLI"
+  },
+  "link.item.label.Сайт": {
+    "message": "Website",
+    "description": "The label of footer link Сайт"
+  },
+  "link.item.label.Панель управления": {
+    "message": "Dashboard",
+    "description": "The label of footer link Панель управления"
+  },
+  "link.item.label.Контакты": {
+    "message": "Contact",
+    "description": "The label of footer link Контакты"
+  },
+  "link.item.label.npm": {
+    "message": "npm",
+    "description": "The label of footer link npm"
+  },
+  "link.item.label.Деплой и окружения": {
+    "message": "Deploys and environments",
+    "description": "The label of footer link Деплой и окружения"
   }
 }

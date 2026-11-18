@@ -1,0 +1,184 @@
+.footer {
+  border-top: 1px solid var(--border-soft);
+  background: var(--bg);
+  font-size: 0.875rem;
+}
+
+.inner {
+  max-width: var(--ifm-container-width-xl);
+  margin: 0 auto;
+  padding: 3rem 1.5rem 2rem;
+}
+
+.top {
+  display: grid;
+  /* Левая колонка по содержимому, ссылки — на всю остальную ширину: при
+     `1fr auto` колонки жались вправо, а слева висела пустота. */
+  grid-template-columns: 15rem minmax(0, 1fr);
+  gap: 3rem;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1.25rem;
+}
+
+.lockup {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.lockupLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--ink);
+  text-decoration: none !important;
+  transition: opacity 0.15s;
+}
+
+.lockupLink:hover {
+  color: var(--ink);
+  opacity: 0.75;
+}
+
+.layeroLogo {
+  height: 20px;
+  width: auto;
+  display: block;
+}
+
+.times {
+  color: var(--stone);
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.docusaurusLogo {
+  height: 22px;
+  width: 22px;
+  display: block;
+}
+
+.docusaurusName {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+.columns {
+  display: grid;
+  /* Колонки по ширине содержимого с ровным промежутком, а не по 1fr:
+     растянутые на всю ширину, они расходились на 250 px друг от друга. */
+  grid-template-columns: repeat(4, max-content);
+  column-gap: clamp(2rem, 4vw, 3.5rem);
+  row-gap: 2rem;
+  justify-content: end;
+}
+
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--graphite);
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-decoration: none !important;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.status:hover {
+  border-color: var(--border-strong);
+  color: var(--ink);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex: none;
+  background: var(--stone);
+}
+
+/* Цвета — как на status.layero.app: системные green/orange/red. */
+.dot_operational { background: rgb(var(--c-green)); box-shadow: 0 0 0 3px rgb(var(--c-green) / 0.18); }
+.dot_degraded { background: rgb(var(--c-orange)); box-shadow: 0 0 0 3px rgb(var(--c-orange) / 0.18); }
+.dot_down { background: rgb(var(--c-red)); box-shadow: 0 0 0 3px rgb(var(--c-red) / 0.18); }
+.dot_unknown,
+.dot_loading { background: var(--stone); }
+
+.columnTitle {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.columnList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.link {
+  color: var(--dusty);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.link:hover {
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 2.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border-soft);
+  color: var(--stone);
+  font-size: 0.8rem;
+}
+
+.bottom .link {
+  color: var(--stone);
+}
+
+.bottom .link:hover {
+  color: var(--ink);
+}
+
+@media (max-width: 996px) {
+  .top {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 2.25rem;
+  }
+  .columns {
+    justify-content: start;
+  }
+}
+
+@media (max-width: 560px) {
+  .inner {
+    padding: 2.25rem 1rem 1.5rem;
+  }
+  .columns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.75rem 1.5rem;
+  }
+  .bottom {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}

@@ -1,4 +1,8 @@
 {
-  "label": "Databases (beta)",
-  "position": 8
+  "label": "Databases",
+  "position": 8,
+  "className": "menu-beta",
+  "customProps": {
+    "beta": true
+  }
 }

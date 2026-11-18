@@ -1,260 +1,409 @@
 /**
- * Layero Docs — vellum palette, в едином стиле с layero.ru / app.layero.ru.
+ * Layero Docs — токены дизайн-системы, как в панели app.layero.ru.
+ *
+ * Источник правды — design-system/src/index.css (`:root` и `.dark`).
+ * Здесь те же имена и те же значения; у Docusaurus тёмная тема включается
+ * атрибутом [data-theme='dark'], а не классом .dark. Правишь цвет — правь
+ * сначала в дизайн-системе, потом здесь. До 18.11.2026 у доков была своя
+ * палитра (терракота и тёплая тёмная тема), и они выглядели отдельным
+ * продуктом.
  */
 
 /* Шрифты — свои файлы из static/fonts, а не fonts.googleapis.com (LEGAL-01,
    T-20260924-4): запрос к Google отдавал ему IP читателя до какого-либо
-   согласия, а шрифты на лендинге и в панели и так самохостом.
-   Inter и JetBrains Mono (SIL OFL 1.1) — те же вариативные файлы, что
-   раздавал Google, подмножества cyrillic, cyrillic-ext, latin, latin-ext;
-   unicode-range сохранён, браузер качает только нужное. */
+   согласия. Geist и Geist Mono (SIL OFL 1.1) — те же файлы, что в панели
+   (frontend/control-plane/public/fonts), unicode-range сохранён, браузер
+   качает только нужное подмножество. */
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Geist';
   font-style: normal;
-  font-weight: 400 700;
+  font-weight: 300 700;
   font-display: swap;
-  src: url('/fonts/inter-cyrillic.woff2') format('woff2');
-  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 400 700;
-  font-display: swap;
-  src: url('/fonts/inter-cyrillic-ext.woff2') format('woff2');
+  src: url('/fonts/geist-cyrillic-ext.woff2') format('woff2');
   unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
 }
 @font-face {
-  font-family: 'Inter';
+  font-family: 'Geist';
   font-style: normal;
-  font-weight: 400 700;
+  font-weight: 300 700;
   font-display: swap;
-  src: url('/fonts/inter-latin.woff2') format('woff2');
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
-}
-@font-face {
-  font-family: 'Inter';
-  font-style: normal;
-  font-weight: 400 700;
-  font-display: swap;
-  src: url('/fonts/inter-latin-ext.woff2') format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
-}
-@font-face {
-  font-family: 'JetBrains Mono';
-  font-style: normal;
-  font-weight: 400 600;
-  font-display: swap;
-  src: url('/fonts/jetbrains-mono-cyrillic.woff2') format('woff2');
+  src: url('/fonts/geist-cyrillic.woff2') format('woff2');
   unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
 }
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'Geist';
   font-style: normal;
-  font-weight: 400 600;
+  font-weight: 300 700;
   font-display: swap;
-  src: url('/fonts/jetbrains-mono-cyrillic-ext.woff2') format('woff2');
-  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+  src: url('/fonts/geist-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'Geist';
   font-style: normal;
-  font-weight: 400 600;
+  font-weight: 300 700;
   font-display: swap;
-  src: url('/fonts/jetbrains-mono-latin.woff2') format('woff2');
+  src: url('/fonts/geist-latin.woff2') format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'Geist Mono';
   font-style: normal;
-  font-weight: 400 600;
+  font-weight: 400 500;
   font-display: swap;
-  src: url('/fonts/jetbrains-mono-latin-ext.woff2') format('woff2');
+  src: url('/fonts/geist-mono-cyrillic-ext.woff2') format('woff2');
+  unicode-range: U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/geist-mono-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+/* Псевдографика (├── └──) в выводе CLI и деревьях папок. */
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/geist-mono-symbols2.woff2') format('woff2');
+  unicode-range: U+2000-2001, U+2004-2008, U+200A, U+23B8-23BD, U+2500-259F;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/geist-mono-latin-ext.woff2') format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Geist Mono';
+  font-style: normal;
+  font-weight: 400 500;
+  font-display: swap;
+  src: url('/fonts/geist-mono-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
+/* ——— Токены дизайн-системы ——— */
 :root {
-  /* Surfaces — Claude vellum palette */
-  --layero-bg:           #faf9f5;
-  --layero-bg-card:      #ffffff;
-  --layero-bg-soft:      #f3f1ea;
-  --layero-bg-mute:      #ecebe3;
+  --bg: #fcfcfa;
+  --bg-card: #ffffff;
+  --bg-soft: #f3f1ea;
+  --bg-mute: #ecebe3;
 
-  /* Text */
-  --layero-ink:          #141413;
-  --layero-onyx:         #1f1e1d;
-  --layero-graphite:     #3d3d3a;
-  --layero-dusty:        #73726c;
-  --layero-stone:        #9c9a92;
+  --ink: #141413;
+  --onyx: #1f1e1d;
+  --graphite: #3d3d3a;
+  --dusty: #73726c;
+  --stone: #9c9a92;
 
-  /* Lines */
-  --layero-border:       #dedcd1;
-  --layero-border-soft:  #e9e7dd;
-  --layero-border-strong:#c9c6b6;
+  --border: #dedcd1;
+  --border-soft: #e9e7dd;
+  --border-strong: #c9c6b6;
 
-  /* Accents */
-  --layero-terra:        #d97757;
-  --layero-terra-soft:   #f4dccd;
-  --layero-terra-deep:   #b85f3f;
+  --primary: #141413;
+  --primary-foreground: #fafafa;
+  --hover-overlay: rgba(135, 115, 45, 0.1);
+  --ring: #141413;
 
-  /* Docusaurus tokens */
-  --ifm-color-primary: var(--layero-terra);
-  --ifm-color-primary-dark: var(--layero-terra-deep);
-  --ifm-color-primary-darker: #ad593a;
-  --ifm-color-primary-darkest: #8e4a31;
-  --ifm-color-primary-light: #df8a6f;
-  --ifm-color-primary-lighter: #e69987;
-  --ifm-color-primary-lightest: #f1bca9;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 16px;
 
-  --ifm-font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --ifm-font-family-monospace: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
-  --ifm-font-size-base: 16px;
-  --ifm-line-height-base: 1.65;
-
-  --ifm-background-color: var(--layero-bg);
-  --ifm-background-surface-color: var(--layero-bg-card);
-  --ifm-color-content: var(--layero-ink);
-  --ifm-color-content-secondary: var(--layero-graphite);
-
-  --ifm-heading-color: var(--layero-ink);
-  --ifm-heading-font-weight: 600;
-  --ifm-h1-font-size: 2.25rem;
-  --ifm-h2-font-size: 1.7rem;
-  --ifm-h3-font-size: 1.3rem;
-
-  --ifm-link-color: var(--layero-terra-deep);
-  --ifm-link-hover-color: var(--layero-terra);
-
-  --ifm-code-font-size: 0.88em;
-  --ifm-code-background: var(--layero-bg-soft);
-  --ifm-code-color: var(--layero-onyx);
-  --ifm-code-padding-horizontal: 0.35em;
-  --ifm-code-padding-vertical: 0.15em;
-  --ifm-code-border-radius: 4px;
-
-  --ifm-pre-background: var(--layero-onyx);
-  --ifm-pre-color: #f3f1ea;
-
-  --ifm-navbar-background-color: rgba(250, 249, 245, 0.82);
-  --ifm-navbar-shadow: none;
-  --ifm-navbar-height: 64px;
-  --ifm-navbar-link-color: var(--layero-graphite);
-  --ifm-navbar-link-hover-color: var(--layero-ink);
-
-  --ifm-footer-background-color: var(--layero-onyx);
-  --ifm-footer-color: #d8d6cc;
-  --ifm-footer-link-color: #d8d6cc;
-  --ifm-footer-title-color: #ffffff;
-
-  --ifm-toc-border-color: var(--layero-border-soft);
-  --ifm-table-border-color: var(--layero-border);
-  --ifm-hr-border-color: var(--layero-border-soft);
-
-  --ifm-menu-color: var(--layero-graphite);
-  --ifm-menu-color-active: var(--layero-ink);
-  --ifm-menu-color-background-active: var(--layero-bg-soft);
-  --ifm-menu-color-background-hover: var(--layero-bg-soft);
-
-  --docusaurus-highlighted-code-line-bg: rgba(217, 119, 87, 0.12);
+  /* Системные цвета — только для статусов (плашки-подсказки). */
+  --c-red: 255 56 60;
+  --c-orange: 255 141 40;
+  --c-green: 52 199 89;
+  --c-blue: 0 122 255;
 }
 
 [data-theme='dark'] {
-  --layero-bg:           #1a1a18;
-  --layero-bg-card:      #232220;
-  --layero-bg-soft:      #2a2926;
-  --layero-bg-mute:      #33312d;
-  --layero-ink:          #f3f1ea;
-  --layero-onyx:         #ecebe3;
-  --layero-graphite:     #c4c2b8;
-  --layero-dusty:        #9c9a92;
-  --layero-border:       #3a3834;
-  --layero-border-soft:  #2e2c29;
+  --bg: #131316;
+  --bg-card: #1e1e22;
+  --bg-soft: #2e2e35;
+  --bg-mute: #3c3c44;
 
-  --ifm-color-primary: #e69987;
-  --ifm-color-primary-dark: var(--layero-terra);
-  --ifm-color-primary-darker: var(--layero-terra-deep);
-  --ifm-color-primary-darkest: #8e4a31;
-  --ifm-color-primary-light: #efb29f;
-  --ifm-color-primary-lighter: #f1bca9;
-  --ifm-color-primary-lightest: #f7d7c7;
+  --ink: #f5f5f7;
+  --onyx: #e2e2e7;
+  --graphite: #c2c2cb;
+  --dusty: #9b9ba6;
+  --stone: #6e6e78;
 
-  --ifm-background-color: var(--layero-bg);
-  --ifm-background-surface-color: var(--layero-bg-card);
-  --ifm-color-content: var(--layero-ink);
-  --ifm-color-content-secondary: var(--layero-graphite);
-  --ifm-heading-color: var(--layero-ink);
+  --border: #3c3c44;
+  --border-soft: #2e2e35;
+  --border-strong: #4c4c55;
 
-  --ifm-code-background: var(--layero-bg-soft);
-  --ifm-code-color: var(--layero-ink);
-  --ifm-pre-background: #0d0d0c;
+  --primary: #f5f5f7;
+  --primary-foreground: #18181b;
+  --hover-overlay: rgba(255, 255, 255, 0.08);
+  --ring: #d4d4d8;
 
-  --ifm-navbar-background-color: rgba(26, 26, 24, 0.82);
-  --ifm-footer-background-color: #0d0d0c;
-  --ifm-toc-border-color: var(--layero-border-soft);
-  --ifm-menu-color-background-active: var(--layero-bg-soft);
-  --ifm-menu-color-background-hover: var(--layero-bg-soft);
+  --c-red: 255 66 69;
+  --c-orange: 255 146 48;
+  --c-green: 48 209 88;
+  --c-blue: 10 132 255;
+}
 
-  --docusaurus-highlighted-code-line-bg: rgba(230, 153, 135, 0.18);
+/* ——— Токены Docusaurus (Infima) поверх токенов дизайн-системы ——— */
+:root {
+  /* Акцент — чернила, как кнопки в панели. Оттенки Infima берёт для
+     наведения и активных состояний; цветного акцента в системе нет. */
+  --ifm-color-primary: var(--primary);
+  --ifm-color-primary-dark: #000000;
+  --ifm-color-primary-darker: #000000;
+  --ifm-color-primary-darkest: #000000;
+  --ifm-color-primary-light: var(--graphite);
+  --ifm-color-primary-lighter: var(--dusty);
+  --ifm-color-primary-lightest: var(--stone);
+
+  --ifm-font-family-base: 'Geist', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --ifm-font-family-monospace: 'Geist Mono', 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.65;
+
+  --ifm-background-color: var(--bg);
+  --ifm-background-surface-color: var(--bg-card);
+  --ifm-color-content: var(--ink);
+  --ifm-color-content-secondary: var(--graphite);
+  --ifm-color-emphasis-300: var(--border);
+
+  --ifm-heading-color: var(--ink);
+  --ifm-heading-font-weight: 600;
+  --ifm-h1-font-size: 2.25rem;
+  --ifm-h2-font-size: 1.6rem;
+  --ifm-h3-font-size: 1.25rem;
+
+  --ifm-link-color: var(--ink);
+  --ifm-link-hover-color: var(--ink);
+
+  --ifm-code-font-size: 0.875em;
+  --ifm-code-background: var(--bg-soft);
+  --ifm-code-color: var(--onyx);
+  --ifm-code-padding-horizontal: 0.35em;
+  --ifm-code-padding-vertical: 0.15em;
+  --ifm-code-border-radius: var(--r-sm);
+
+  --ifm-global-radius: var(--r-md);
+  --ifm-button-border-radius: var(--r-md);
+
+  --ifm-navbar-background-color: color-mix(in srgb, var(--bg) 82%, transparent);
+  --ifm-navbar-shadow: none;
+  --ifm-navbar-height: 64px;
+  --ifm-navbar-link-color: var(--graphite);
+  --ifm-navbar-link-hover-color: var(--ink);
+  --ifm-navbar-link-active-color: var(--ink);
+
+  --ifm-footer-background-color: var(--bg);
+  --ifm-footer-color: var(--dusty);
+  --ifm-footer-link-color: var(--graphite);
+  --ifm-footer-link-hover-color: var(--ink);
+  --ifm-footer-title-color: var(--ink);
+
+  --ifm-toc-border-color: var(--border-soft);
+  --ifm-table-border-color: var(--border);
+  --ifm-hr-border-color: var(--border-soft);
+
+  --ifm-menu-color: var(--graphite);
+  --ifm-menu-color-active: var(--ink);
+  --ifm-menu-color-background-active: var(--bg-soft);
+  --ifm-menu-color-background-hover: var(--hover-overlay);
+
+  --ifm-breadcrumb-item-background-active: var(--bg-soft);
+  --ifm-breadcrumb-color-active: var(--ink);
+
+  --docusaurus-highlighted-code-line-bg: var(--hover-overlay);
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary-dark: #ffffff;
+  --ifm-color-primary-darker: #ffffff;
+  --ifm-color-primary-darkest: #ffffff;
+  --ifm-color-primary-light: var(--graphite);
+  --ifm-color-primary-lighter: var(--dusty);
+  --ifm-color-primary-lightest: var(--stone);
 }
 
 html, body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: var(--layero-bg);
+  background: var(--bg);
+}
+body { letter-spacing: -0.01em; }
+
+::selection { background: var(--bg-mute); color: var(--ink); }
+
+/* Фокус — ореол как у кнопок панели, а не синяя рамка браузера. */
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 35%, transparent);
+  outline-offset: 2px;
 }
 
-::selection { background: var(--layero-terra-soft); color: var(--layero-ink); }
-[data-theme='dark'] ::selection { background: rgba(217, 119, 87, 0.35); color: #ffffff; }
+/* ——— Navbar ———
+   Слева: логотип, «Документация», поиск. Справа: Блог, Контакты, язык
+   значком, тема, кнопка «Начать» — последней. */
 
-/* ——— Navbar ——— */
+/* Размытие под шапкой — на псевдоэлементе, а НЕ на самой .navbar.
+   backdrop-filter делает элемент контейнером для position: fixed потомков,
+   а выезжающее мобильное меню (.navbar-sidebar) живёт внутри шапки: с
+   фильтром на .navbar оно сжималось до её высоты (63 px) и было пустым. */
 .navbar {
+  border-bottom: 1px solid var(--border-soft);
+  background: transparent;
+  padding: 0 1.25rem;
+}
+.navbar::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--ifm-navbar-background-color);
   backdrop-filter: saturate(180%) blur(12px);
   -webkit-backdrop-filter: saturate(180%) blur(12px);
-  border-bottom: 1px solid var(--layero-border-soft);
 }
-.navbar__brand { gap: 0.55rem; }
+.navbar-sidebar--show::before,
+.navbar-sidebar--show.navbar::before { backdrop-filter: none; }
+
+.navbar__brand { margin-right: 0; gap: 0; }
+.navbar__logo { height: 20px; margin-right: 0; display: flex; align-items: center; }
+.navbar__logo img { height: 20px; width: auto; }
+/* «Документация» рядом с логотипом — через тонкий разделитель, как
+   название раздела, а не второй логотип. */
 .navbar__title {
-  font-weight: 600;
-  letter-spacing: -0.015em;
-  font-size: 0.98rem;
-}
-.navbar__logo { height: 18px; display: flex; align-items: center; }
-.navbar__logo img { height: 18px; width: auto; }
-.navbar__link {
-  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
   font-weight: 500;
-  padding: 0.5rem 0.75rem;
-  border-radius: 8px;
+  letter-spacing: -0.01em;
+  color: var(--dusty);
+}
+.navbar__title::before {
+  content: '';
+  width: 1px;
+  height: 18px;
+  margin: 0 0.75rem;
+  background: var(--border);
+}
+
+.navbar__link {
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.4rem 0.65rem;
+  border-radius: var(--r-sm);
   transition: color 0.15s, background 0.15s;
 }
-.navbar__link:hover { background: rgba(31, 30, 29, 0.04); }
-[data-theme='dark'] .navbar__link:hover { background: rgba(255, 255, 255, 0.05); }
+.navbar__link:hover { background: var(--hover-overlay); }
+.navbar__link--active { color: var(--ink); }
+.navbar__items--right { gap: 0.15rem; }
+
+/* Язык — значком глобуса, полное название — в раскрывающемся списке. */
+.navbar__items--right > .dropdown > .navbar__link {
+  display: flex;
+  align-items: center;
+  font-size: 0;
+  padding: 0.45rem;
+  color: var(--graphite);
+}
+.navbar__items--right > .dropdown > .navbar__link svg { width: 18px; height: 18px; margin: 0; }
+.navbar__items--right > .dropdown > .navbar__link::after { display: none; }
+.dropdown__menu {
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 0.3rem;
+  min-width: 9rem;
+}
+.dropdown__link {
+  border-radius: var(--r-sm);
+  font-size: 0.88rem;
+  color: var(--graphite);
+}
+.dropdown__link:hover { background: var(--hover-overlay); color: var(--ink); }
+.dropdown__link--active { background: var(--bg-soft); color: var(--ink); }
+
+/* Переключатель темы — как кнопка-значок, кнопка «Начать» — после него. */
+.navbar__items--right > [class*='colorModeToggle'] { order: 1; }
+.navbar__items--right > [class*='colorModeToggle'] button {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-sm);
+  color: var(--graphite);
+}
+.navbar__items--right > [class*='colorModeToggle'] button:hover { background: var(--hover-overlay); }
+.navbar__items--right > [class*='colorModeToggle'] svg { width: 18px; height: 18px; }
+
+/* Кнопка «Начать» — .btn-primary панели. */
+.navbar__cta {
+  order: 2;
+  padding: 0.4rem 0.85rem;
+  margin-left: 0.5rem;
+  border-radius: var(--r-md);
+  background: var(--primary);
+  color: var(--primary-foreground) !important;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  transition: opacity 0.15s;
+}
+.navbar__cta:hover {
+  background: var(--primary);
+  opacity: 0.9;
+  text-decoration: none;
+}
+/* Значок внешней ссылки у кнопки лишний — это главное действие, не уход. */
+.navbar__cta svg { display: none; }
+
+/* Мобильное меню */
+.navbar__items .navbar__item.navbar__docs-link { display: none; }
+.navbar-sidebar { background: var(--bg); box-shadow: none; border-right: 1px solid var(--border-soft); }
+.navbar-sidebar__brand { padding: 0 1rem; border-bottom: 1px solid var(--border-soft); }
+/* В шапке меню и так тесно: логотип, тема, крестик. Название раздела лишнее. */
+.navbar-sidebar__brand .navbar__title { display: none; }
+.navbar-sidebar__items .menu__link { font-size: 0.95rem; }
+.navbar-sidebar__back {
+  background: transparent;
+  color: var(--dusty);
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: var(--r-sm);
+}
+/* В выезжающем меню кнопка «Начать» — строка списка, а не плашка. */
+.navbar-sidebar .navbar__cta,
+.navbar-sidebar .menu__link.navbar__cta {
+  margin: 0.75rem 0 0;
+  justify-content: center;
+}
 
 /* ——— Sidebar ——— */
 .theme-doc-sidebar-container {
-  border-right: 1px solid var(--layero-border-soft) !important;
+  border-right: 1px solid var(--border-soft) !important;
 }
 .menu {
   padding: 1.2rem 0.75rem;
   font-size: 0.9rem;
 }
 .menu__link {
-  border-radius: 6px;
-  font-weight: 430;
-  color: var(--layero-graphite);
-  padding: 0.45rem 0.65rem;
+  border-radius: var(--r-sm);
+  font-weight: 400;
+  color: var(--graphite);
+  padding: 0.4rem 0.65rem;
   line-height: 1.4;
 }
 .menu__link--active {
   font-weight: 500;
-  color: var(--layero-ink);
+  color: var(--ink);
 }
 .menu__link--active:not(.menu__link--sublist) {
-  background: var(--layero-bg-soft);
+  background: var(--bg-soft);
 }
+.menu__caret:before,
+.menu__link--sublist-caret:after { opacity: 0.55; }
 
 /* ——— Главный контент ——— */
-.main-wrapper { background: var(--layero-bg); }
+.main-wrapper { background: var(--bg); }
 
 article { font-size: 0.98rem; }
 article h1 {
@@ -264,128 +413,243 @@ article h1 {
 }
 article h2 {
   font-weight: 600;
-  letter-spacing: -0.015em;
-  border-top: 1px solid var(--layero-border-soft);
+  letter-spacing: -0.02em;
+  border-top: 1px solid var(--border-soft);
   padding-top: 2rem;
   margin-top: 2.5rem;
 }
 article h2:first-of-type { border-top: none; padding-top: 0; margin-top: 2rem; }
-article h3 { font-weight: 600; letter-spacing: -0.01em; }
-article p { color: var(--layero-graphite); }
-article a {
-  text-underline-offset: 3px;
+article h3 { font-weight: 600; letter-spacing: -0.015em; }
+article p, article li { color: var(--graphite); }
+article strong { color: var(--ink); font-weight: 600; }
+
+/* Ссылки чёрные, поэтому отличаются подчёркиванием — всегда, а не по
+   наведению. Иначе ссылку в тексте не найти глазами. */
+.markdown a,
+.theme-admonition a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
   text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s;
 }
-article strong { color: var(--layero-ink); font-weight: 600; }
+.markdown a:hover,
+.theme-admonition a:hover { text-decoration-color: var(--ink); }
+/* Якоря заголовков — без подчёркивания. */
+.markdown a.hash-link { text-decoration: none; }
 
 /* Inline-код */
 :not(pre) > code {
   font-weight: 500;
-  border: 1px solid var(--layero-border-soft);
-  background: var(--layero-bg-soft);
+  border: 1px solid var(--border-soft);
+  background: var(--bg-soft);
 }
 
 /* Блоки кода */
-pre, .prism-code, div[class^='codeBlockContainer_'] {
-  border-radius: 10px !important;
-  border: 1px solid var(--layero-border-soft);
+pre, .prism-code, .theme-code-block {
+  border-radius: var(--r-md) !important;
+}
+/* Docusaurus пишет фон темы Prism инлайном в --prism-background-color;
+   !important у переменной перебивает инлайн — фон всегда карточка системы. */
+.theme-code-block {
+  --prism-background-color: var(--bg-card) !important;
+  border: 1px solid var(--border-soft);
+  box-shadow: none;
+}
+/* <pre> получает фон темы ещё и собственным инлайн-стилем. */
+.theme-code-block pre.prism-code { background-color: var(--bg-card) !important; }
+.theme-code-block [class*='codeBlockTitle'] {
+  background: var(--bg-soft) !important;
+  border-bottom: 1px solid var(--border-soft) !important;
+  color: var(--graphite);
+  font-size: 0.82rem;
 }
 
 /* Таблицы */
 table {
   display: table;
   width: 100%;
-  border: 1px solid var(--layero-border-soft);
-  border-radius: 8px;
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-md);
   overflow: hidden;
   border-collapse: separate;
   border-spacing: 0;
 }
-table thead { background: var(--layero-bg-soft); }
+table thead { background: var(--bg-soft); }
+table tr { background: transparent; }
+table tr:nth-child(2n) { background: transparent; }
 table th, table td {
   border: none;
-  border-bottom: 1px solid var(--layero-border-soft);
+  border-bottom: 1px solid var(--border-soft);
   padding: 0.6rem 0.85rem;
   font-size: 0.92rem;
 }
 table tr:last-child td { border-bottom: none; }
-table th { font-weight: 500; color: var(--layero-graphite); text-align: left; }
+table th { font-weight: 500; color: var(--graphite); text-align: left; }
 
-/* Admonitions */
+/* ——— Плашки-подсказки ———
+   Нейтральная карточка, цвет — только у значка и тонкой полосы слева.
+   Цвета статусов — системные из дизайн-системы, а не зелёный/жёлтый
+   Infima. note/info — нейтральные: это просто врезка, не тревога. */
 .theme-admonition {
-  border-radius: 10px;
-  border: 1px solid var(--layero-border-soft);
+  --adm-c: var(--dusty);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border-soft);
+  border-left: 3px solid var(--adm-c);
+  background: var(--bg-card);
+  color: var(--graphite);
   font-size: 0.94rem;
+  box-shadow: none;
 }
+.theme-admonition [class*='admonitionHeading'] {
+  color: var(--ink);
+  font-weight: 600;
+  text-transform: none;
+  font-size: 0.9rem;
+  letter-spacing: 0;
+}
+.theme-admonition [class*='admonitionIcon'] svg {
+  fill: var(--adm-c);
+  stroke: none;
+}
+.theme-admonition code {
+  background: var(--bg-soft);
+  border-color: var(--border-soft);
+}
+.alert--success { --adm-c: rgb(var(--c-green)); }
+.alert--info { --adm-c: rgb(var(--c-blue)); }
+.alert--warning { --adm-c: rgb(var(--c-orange)); }
+.alert--danger { --adm-c: rgb(var(--c-red)); }
+.alert--secondary { --adm-c: var(--dusty); }
 
 /* Кнопки */
 .button--primary {
-  background: var(--layero-ink);
-  border-color: var(--layero-ink);
-  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
   font-weight: 500;
-  border-radius: 10px;
+  border-radius: var(--r-md);
 }
 .button--primary:hover {
-  background: #2a2927;
-  border-color: #2a2927;
-  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+  opacity: 0.9;
 }
 .button--secondary {
   background: transparent;
-  border: 1px solid var(--layero-border-strong);
-  color: var(--layero-ink);
+  border: 1px solid var(--border-strong);
+  color: var(--ink);
   font-weight: 500;
-  border-radius: 10px;
+  border-radius: var(--r-md);
+}
+
+/* Карточки разделов — src/theme/DocCardList. */
+
+/* Хлебные крошки — без цветной плашки */
+.breadcrumbs__link {
+  border-radius: var(--r-sm);
+  font-size: 0.82rem;
+}
+.breadcrumbs__item--active .breadcrumbs__link {
+  background: var(--bg-soft);
+  color: var(--ink);
 }
 
 /* TOC */
 .table-of-contents {
   font-size: 0.85rem;
-  border-left-color: var(--layero-border-soft);
+  border-left-color: var(--border-soft);
 }
 .table-of-contents__link {
-  color: var(--layero-dusty);
+  color: var(--dusty);
   padding: 0.25rem 0.5rem;
   border-radius: 4px;
 }
 .table-of-contents__link--active,
 .table-of-contents__link:hover {
-  color: var(--layero-ink);
+  color: var(--ink);
 }
+.table-of-contents__link--active { font-weight: 500; }
 
 /* Pagination */
 .pagination-nav__link {
-  border-radius: 10px;
-  border-color: var(--layero-border-soft);
-  background: var(--layero-bg-card);
+  border-radius: var(--r-md);
+  border-color: var(--border-soft);
+  background: var(--bg-card);
 }
 .pagination-nav__link:hover {
-  border-color: var(--layero-border-strong);
+  border-color: var(--border-strong);
 }
-.pagination-nav__sublabel { color: var(--layero-dusty); font-size: 0.8rem; }
-.pagination-nav__label { color: var(--layero-ink); font-weight: 500; }
+.pagination-nav__sublabel { color: var(--dusty); font-size: 0.8rem; }
+.pagination-nav__label { color: var(--ink); font-weight: 500; }
+
+/* Поиск — сразу после названия, главное действие читателя. На телефоне
+   плагин сворачивает поле в значок, рамка там рисовала пустой
+   прямоугольник — поэтому оформление только для широкого экрана. */
+@media (min-width: 997px) {
+  .navbar__items:not(.navbar__items--right) > [class*='navbarSearchContainer'] {
+    margin-left: 1.5rem;
+  }
+  .navbar__search-input {
+    width: 16rem !important;
+    height: 34px;
+    padding-right: 3.75rem !important; /* под подсказку ⌘K */
+    background-color: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--r-md) !important;
+    color: var(--ink);
+    font-size: 0.88rem;
+    transition: border-color 0.15s;
+  }
+  .navbar__search-input:hover { border-color: var(--border-strong) !important; }
+  .navbar__search-input::placeholder { color: var(--dusty); }
+  /* Только сами клавиши: у их контейнера класс тоже начинается с
+     searchHint, и фон с рамкой на нём перекрывал правый край поля. */
+  .navbar__search kbd[class*='searchHint'] {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 4px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: 4px;
+    box-shadow: none;
+    color: var(--dusty);
+    font-family: var(--ifm-font-family-base);
+    font-size: 0.72rem;
+    line-height: 1;
+  }
+  .navbar__search [class*='searchHintContainer'] {
+    align-items: center;
+    gap: 3px;
+    right: 8px;
+  }
+}
+
+/* ——— Footer ——— — src/theme/Footer. */
 
 /* ——— Блог ——— */
-/* Заголовок поста и список постов — чёрные, не терракотовые */
 .markdown > h1:first-child,
 [class*='blogPostTitle'] > a,
 [class*='blogPostTitle'] {
-  color: var(--layero-ink) !important;
+  color: var(--ink) !important;
 }
 [class*='blogPostTitle'] a:hover {
-  color: var(--layero-ink) !important;
+  color: var(--ink) !important;
   text-decoration: underline;
   text-underline-offset: 4px;
 }
 
-/* Автор поста — ink, не terra */
 [class*='authorName'],
 [class*='authorName'] a {
-  color: var(--layero-ink) !important;
+  color: var(--ink) !important;
   font-weight: 500;
 }
-[class*='authorTitle'] { color: var(--layero-dusty); }
+[class*='authorTitle'] { color: var(--dusty); }
 
 /* Обложка над постом — округлая, тонкая граница */
 [class*='blogPostContainer'] article > header img,
@@ -393,47 +657,68 @@ table th { font-weight: 500; color: var(--layero-graphite); text-align: left; }
   display: block;
   width: 100%;
   height: auto;
-  border-radius: 12px;
-  border: 1px solid var(--layero-border-soft);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border-soft);
   margin: 0 0 1.75rem 0;
 }
 
-/* «Читать дальше» — приглушённая ссылка, не цветная плашка */
 [class*='readMore'] a {
-  color: var(--layero-graphite);
+  color: var(--graphite);
   font-weight: 500;
-  border-bottom: 1px solid var(--layero-border);
+  border-bottom: 1px solid var(--border);
   padding-bottom: 1px;
 }
 [class*='readMore'] a:hover {
-  color: var(--layero-ink);
-  border-color: var(--layero-ink);
+  color: var(--ink);
+  border-color: var(--ink);
 }
 
 /* Тег-чипы — нейтральные */
 [class*='tag_'] {
-  border-color: var(--layero-border) !important;
-  color: var(--layero-graphite) !important;
+  border-color: var(--border) !important;
+  color: var(--graphite) !important;
 }
 [class*='tag_']:hover {
-  background: var(--layero-bg-soft) !important;
-  color: var(--layero-ink) !important;
+  background: var(--bg-soft) !important;
+  color: var(--ink) !important;
 }
 
-
-/* ——— Призыв в навбаре ——— */
-/* Единственный элемент навбара, который должен читаться как кнопка: до него
-   там были только разделы и ссылка на лендинг, и тёплому читателю нажать
-   было некуда. Цвета берём из темы, чтобы не разъезжалось со светлой/тёмной. */
-.navbar__cta {
-  padding: 0.35rem 0.85rem;
-  border-radius: 8px;
-  background: var(--ifm-color-primary);
-  color: #fff !important;
+/* ——— Пометка беты в боковом меню ———
+   Как BetaBadge в панели (frontend/control-plane/src/components/BetaBadge.tsx):
+   курсивная β вместо слова «(бета)» в подписи. В покое серая — в колонке из
+   десятка пунктов цветная буква тянула бы взгляд к разделу, который человек
+   не выбирал; синяя на открытом разделе и под курсором. Синий info, а не
+   оранжевый: бета — «мы объясняем», а не «внимание, проблема».
+   Раздел помечается в _category_.json: "className": "menu-beta".
+   β — ::before с order: 1, потому что ::after у пункта занят стрелкой. */
+.menu-beta > .menu__list-item-collapsible > .menu__link,
+.menu-beta > .menu__link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* β сразу за подписью, а не у стрелки */
+}
+/* Подпись раздела-ссылки обёрнута в span, растянутый на всю строку
+   (ради многоточия) — сжимаем до текста, иначе β уезжает к стрелке. */
+.menu-beta > .menu__list-item-collapsible > .menu__link > [class*='categoryLinkLabel'] {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+.menu-beta > .menu__list-item-collapsible > .menu__link::before,
+.menu-beta > .menu__link::before {
+  content: 'β';
+  order: 1;
+  margin-left: 0.4rem;
+  font-size: 13px;
+  font-style: italic;
   font-weight: 500;
-  transition: opacity 0.15s;
+  line-height: 1;
+  color: var(--stone);
+  transition: color 0.15s;
 }
-.navbar__cta:hover {
-  opacity: 0.88;
-  text-decoration: none;
+.menu-beta > .menu__list-item-collapsible > .menu__link::after,
+.menu-beta > .menu__link::after { order: 2; margin-left: auto; }
+.menu-beta > .menu__list-item-collapsible:hover > .menu__link::before,
+.menu-beta > .menu__list-item-collapsible > .menu__link--active::before,
+.menu-beta > .menu__link:hover::before {
+  color: #3b82f6; /* info-500 дизайн-системы */
 }

@@ -135,6 +135,10 @@ def section_labels(lang: str) -> dict[str, str]:
                 labels[key] = en[label]
             elif en_cat.is_file():
                 labels[key] = json.loads(en_cat.read_text(encoding="utf-8")).get("label", label)
+    # Бета на сайте — значок β в меню; в sitemap.md для агентов — словом.
+    for cat in (ROOT / "docs").glob("*/_category_.json"):
+        if json.loads(cat.read_text(encoding="utf-8")).get("customProps", {}).get("beta"):
+            labels[cat.parent.name] += " (beta)" if lang == "en" else " (бета)"
     return labels
 
 
