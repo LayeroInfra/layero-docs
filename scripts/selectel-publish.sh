@@ -19,14 +19,18 @@ _selectel_curl() {
 }
 
 # selectel_put <file> <bucket> <key> <content-type> <cache-control>
+# Safe to run in parallel (deploy.sh uploads through `xargs -P`): each call has
+# its own error file, and an outcome is one short line appended with O_APPEND.
 selectel_put() {
   selectel_enabled || return 0
+  local err; err="$(mktemp)"
   if _selectel_curl -o /dev/null -T "$1" -H "Content-Type: $4" -H "Cache-Control: $5" \
-       "$SELECTEL_S3_ENDPOINT/$2/$(_selectel_path "$3")" 2>/tmp/selectel-publish.err; then
+       "$SELECTEL_S3_ENDPOINT/$2/$(_selectel_path "$3")" 2>"$err"; then
     echo ok >> "$SELECTEL_OUTCOMES"
   else
-    echo "  ✗ Selectel: $3: $(head -c 200 /tmp/selectel-publish.err)" >&2; echo fail >> "$SELECTEL_OUTCOMES"
+    echo "  ✗ Selectel: $3: $(head -c 200 "$err")" >&2; echo fail >> "$SELECTEL_OUTCOMES"
   fi
+  rm -f "$err"
 }
 
 # selectel_rm <bucket> <key>
@@ -47,6 +51,28 @@ import sys, xml.etree.ElementTree as E
 r = E.fromstring(sys.stdin.read()); n = "{http://s3.amazonaws.com/doc/2006-03-01/}"
 for c in r.findall(n + "Contents"): print(c.find(n + "Key").text)
 for c in r.findall(n + "CommonPrefixes"): print("prefix:" + c.find(n + "Prefix").text)
+t = r.findtext(n + "NextContinuationToken") if r.findtext(n + "IsTruncated") == "true" else ""
+print("token:" + (t or ""))')" || return 1
+    printf '%s\n' "$page" | grep -v '^token:' || true
+    token="$(printf '%s\n' "$page" | sed -n 's/^token://p')"
+    [ -n "$token" ] || break
+  done
+}
+
+# selectel_list_etags <bucket> -> "<key>\t<etag>" per object, etag without quotes.
+# For a single-part PUT the ETag is the MD5 of the body — checked 18.11.2026 on
+# docs.layero.ru (favicon.svg: ETag == md5 of the committed file). deploy.sh
+# uses it to skip files that are already there byte for byte.
+selectel_list_etags() {
+  local token="" page
+  while :; do
+    page="$(_selectel_curl -G "$SELECTEL_S3_ENDPOINT/$1" --data-urlencode "list-type=2" \
+            ${token:+--data-urlencode "continuation-token=$token"})" || return 1
+    page="$(printf '%s' "$page" | python3 -c '
+import sys, xml.etree.ElementTree as E
+r = E.fromstring(sys.stdin.read()); n = "{http://s3.amazonaws.com/doc/2006-03-01/}"
+for c in r.findall(n + "Contents"):
+    print(c.find(n + "Key").text + "\t" + (c.findtext(n + "ETag") or "").strip(chr(34)))
 t = r.findtext(n + "NextContinuationToken") if r.findtext(n + "IsTruncated") == "true" else ""
 print("token:" + (t or ""))')" || return 1
     printf '%s\n' "$page" | grep -v '^token:' || true

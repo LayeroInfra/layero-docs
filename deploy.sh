@@ -69,33 +69,95 @@ printf '%s\n' "$BUILD_ID" > "$BUILD_DIR/build-id.txt"
 source "$(dirname "${BASH_SOURCE[0]}")/scripts/selectel-publish.sh"
 
 selectel_enabled || { echo "✘ SELECTEL_S3_ACCESS_KEY/SELECTEL_S3_SECRET_KEY не заданы — выкладывать некуда" >&2; exit 1; }
-echo "==> Uploading $BUILD_DIR to Selectel: $BUCKET"
-cd "$BUILD_DIR"
-failed=0
-uploaded=0
-# 🚨 Без конвейера: `find | while` уводит тело в подоболочку, и счётчик отказов
-# оттуда не возвращается — ровно поэтому 403 на каждом файле оставался
-# незамеченным, а выкатка зеленела.
-while IFS= read -r -d '' path; do
-  key="${path#./}"
-  ct=$(content_type "$key")
-  cc=$(cache_control "$key")
-  selectel_put "$key" "$BUCKET" "$key" "$ct" "$cc"
-  if [[ "$(tail -1 "$SELECTEL_OUTCOMES")" == ok ]]; then
-    uploaded=$((uploaded + 1))
-  else
-    failed=$((failed + 1))
-  fi
-done < <(find . -type f -print0)
-cd - >/dev/null
+# ── Заливка ──────────────────────────────────────────────────────────────────
+#
+# До 18.11.2026 здесь по одному, подряд перезаливались ВСЕ файлы сборки
+# (663 штуки) — заливка занимала 4–11 минут из 15 у всей выкатки, при том что
+# сборка шла 30 секунд. Теперь:
+#
+#  1. Сверка с бакетом. ETag объекта, залитого одним PUT, — это MD5 тела
+#     (проверено на docs.layero.ru). Совпал с MD5 локального файла — файл уже
+#     лежит байт в байт, повторно не шлём. Список получить не вышло — шлём всё:
+#     пропустить файл можно только по доказательству, что он на месте.
+#  2. Параллельно: UPLOAD_JOBS запросов разом (по умолчанию 8).
+#  3. Порядок: сначала всё, кроме страниц, потом страницы, build-id.txt —
+#     последним. Новая страница не должна попасть к читателю раньше скриптов
+#     и картинок, на которые ссылается, а Verify смотрит на build-id.txt.
+#
+# ⚠️ Сверка смотрит только на содержимое. Если поменялись правила
+# content_type/cache_control выше, неизменённые файлы останутся со старыми
+# заголовками — тогда FORCE_FULL_UPLOAD=1 перезальёт всё.
+UPLOAD_JOBS="${UPLOAD_JOBS:-8}"
+FORCE_FULL_UPLOAD="${FORCE_FULL_UPLOAD:-0}"
 
-echo "==> Выложено файлов: $uploaded, отказов: $failed"
+remote_etags="$(mktemp)"
+if [[ "$FORCE_FULL_UPLOAD" == 1 ]]; then
+  echo "==> FORCE_FULL_UPLOAD=1 — заливаю все файлы"
+  : > "$remote_etags"
+elif selectel_list_etags "$BUCKET" > "$remote_etags"; then
+  echo "==> В бакете объектов: $(wc -l < "$remote_etags" | tr -d ' ')"
+else
+  echo "==> Список бакета не получен — заливаю все файлы"
+  : > "$remote_etags"
+fi
+
+assets_list="$(mktemp)"; pages_list="$(mktemp)"
+# Печатает план, а в файлы кладёт ключи через NUL: сначала ассеты, затем страницы.
+BUILD_DIR="$BUILD_DIR" REMOTE="$remote_etags" ASSETS="$assets_list" PAGES="$pages_list" python3 - <<'PY'
+import hashlib, os
+build, remote_path = os.environ["BUILD_DIR"], os.environ["REMOTE"]
+remote = {}
+with open(remote_path, encoding="utf-8") as f:
+    for line in f:
+        key, _, etag = line.rstrip("\n").partition("\t")
+        remote[key] = etag
+PAGE_EXT = (".html", ".xml", ".md", ".txt")
+assets, pages, same = [], [], 0
+for root, _, files in os.walk(build):
+    for name in files:
+        path = os.path.join(root, name)
+        key = os.path.relpath(path, build).replace(os.sep, "/")
+        if key == "build-id.txt":
+            continue  # всегда, последним — отдельно
+        with open(path, "rb") as fh:
+            md5 = hashlib.md5(fh.read()).hexdigest()
+        if remote.get(key) == md5:
+            same += 1
+            continue
+        (pages if key.endswith(PAGE_EXT) else assets).append(key)
+for out, keys in ((os.environ["ASSETS"], assets), (os.environ["PAGES"], pages)):
+    with open(out, "wb") as fh:
+        fh.write(b"".join(k.encode() + b"\0" for k in sorted(keys)))
+print(f"==> План: ассетов {len(assets)}, страниц {len(pages)}, без изменений {same}")
+PY
+
+upload_one() {
+  selectel_put "$1" "$BUCKET" "$1" "$(content_type "$1")" "$(cache_control "$1")"
+}
+export -f upload_one selectel_put selectel_enabled _selectel_path _selectel_curl content_type cache_control
+export BUCKET SELECTEL_S3_ENDPOINT SELECTEL_S3_ACCESS_KEY SELECTEL_S3_SECRET_KEY SELECTEL_OUTCOMES
+
+echo "==> Заливаю в Selectel: $BUCKET (параллельно: $UPLOAD_JOBS)"
+upload_started=$(date +%s)
+cd "$BUILD_DIR"
+for list in "$assets_list" "$pages_list"; do
+  if [[ -s "$list" ]]; then
+    xargs -0 -n 1 -P "$UPLOAD_JOBS" bash -c 'upload_one "$1"' _ < "$list"
+  fi
+done
+upload_one build-id.txt
+cd - >/dev/null
+rm -f "$remote_etags" "$assets_list" "$pages_list"
+
+uploaded=$(grep -c '^ok$' "$SELECTEL_OUTCOMES" || true)
+failed=$(grep -c '^fail$' "$SELECTEL_OUTCOMES" || true)
+echo "==> Выложено файлов: $uploaded, отказов: $failed, за $(( $(date +%s) - upload_started )) с"
 if (( failed > 0 )); then
   echo "✘ выкатка НЕ состоялась: $failed файлов не залилось (см. выше)." >&2
   exit 1
 fi
 if (( uploaded == 0 )); then
-  echo "✘ не залито ни одного файла — сборки нет?" >&2
+  echo "✘ не залито ни одного файла — даже build-id.txt?" >&2
   exit 1
 fi
 

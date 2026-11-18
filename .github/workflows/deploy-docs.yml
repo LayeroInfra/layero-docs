@@ -2,6 +2,11 @@ name: Deploy docs
 
 on:
   workflow_dispatch:
+    inputs:
+      full_upload:
+        description: 'Перезалить все файлы, а не только изменённые (после правки заголовков в deploy.sh)'
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:
@@ -15,6 +20,9 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'deploy.sh'
+      # Заливку (selectel-publish.sh), llms.txt и Markdown-копии делают
+      # скрипты отсюда — их правка тоже меняет то, что лежит на сайте.
+      - 'scripts/**'
       - '.github/workflows/deploy-docs.yml'
 
 concurrency:
@@ -37,10 +45,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      # Без `cache: npm`. На своём раннере кэш npm и так лежит на диске
+      # (~/.npm), а встроенный кэш actions перед каждым прогоном качал его
+      # архив из хранилища GitHub — 271 МБ, и 17.11.2026 это заняло 10 минут
+      # из 16 (скорость 0 МБ/с). `npm ci` берёт пакеты из локального ~/.npm.
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install deps
         run: npm ci
@@ -58,6 +69,7 @@ jobs:
       - name: Deploy docs
         env:
           BUILD_ID: ${{ github.sha }}
+          FORCE_FULL_UPLOAD: ${{ inputs.full_upload && '1' || '0' }}
           # Единственная точка публикации с 14.10 — бакет в Selectel ru-6
           # (T-20261013-6). Без ключа deploy.sh отказывается выкладывать.
           SELECTEL_S3_ACCESS_KEY: ${{ secrets.SELECTEL_S3_ACCESS_KEY }}
