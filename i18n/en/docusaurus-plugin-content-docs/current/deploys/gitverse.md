@@ -1,69 +1,70 @@
 ---
-sidebar_position: 1.6
-title: Deploying from GitVerse
-description: Step by step — issue a token in GitVerse, connect it to your Layero organisation, import a repository and get builds on push.
+sidebar_position: 3
+title: GitVerse
+description: How to issue a token in GitVerse, connect it to a Layero organization and import a repository. How GitVerse differs from GitHub.
 ---
 
-# Deploying from GitVerse
+# GitVerse
 
-GitVerse connects with a personal access token — it has no GitHub App
-equivalent. Three steps: issue a token, connect it to the organisation, import
-a repository.
+**GitVerse connects with a personal token in three steps:** issue the token,
+connect it to the organization, import the repository.
 
 ## 1. Issue a token in GitVerse
 
 Open [gitverse.ru/settings/tokens](https://gitverse.ru/settings/tokens)
-(**Settings → Token management**).
+(«Настройки» → «Управление токенами», Settings → Token management).
 
 1. Enter a token name, for example `layero`.
-2. Tick the permissions in the table — sections in rows, "Read" and "Write"
-   in columns:
+2. Tick the rights in the table — sections in rows, «Чтение» (Read) and
+   «Запись» (Write) in columns:
 
-   | Section | Permission | Why |
+   | Section | Right | Why |
    |---|---|---|
-   | Repositories | Read and Write | reading the code and creating the webhook for builds on push |
-   | Users | Read | to tell whose token it is |
+   | «Репозитории» (Repositories) | Read and Write | read the code and create a webhook for builds on push |
+   | «Пользователи» (Users) | Read | find out whose token it is |
 
-3. Press **"Generate token"** and copy the value — it is shown once. The token
-   looks like 40 characters, letters and digits.
+3. Click «Генерировать токен» (Generate token) and copy the value: it's
+   shown once. The token is 40 letters and digits.
 
-## 2. Connect the token to your Layero organisation
+## 2. Connect the token to the organization
 
-1. In the dashboard [app.layero.ru](https://app.layero.ru) open **Settings →
-   Linked accounts**.
-2. Press **"Connect repository"**, pick **GitVerse**, paste the token.
-3. Layero verifies the token with a request to GitVerse and shows the login of
-   its owner.
+1. In the [dashboard](https://app.layero.ru), open the organization settings
+   → «Git».
+2. Click «Подключить репозиторий» (Connect a repository), choose GitVerse
+   and paste the token.
+3. Layero checks the token and shows its owner's login.
 
-The connection belongs to the organisation: all its members see the
-repositories. But builds rest on this token — if the owner revokes it or leaves
-GitVerse, they stop. For a team, issue the token from a service account.
+The connection belongs to the organization: all its members see the
+repositories. But builds rely on this token — if its owner revokes it or loses access to the repositories in GitVerse, builds stop. For a team, issue the token from a service
+account.
 
-## 3. Import a repository
+## 3. Import the repository
 
-1. **"Create project" → "Import from repository"**.
-2. Pick the GitVerse connection and the repository; if the site is not in the
-   root, pick the subfolder.
-3. Check the detected framework and build commands, press **Deploy**.
+1. «Новый проект» (New project) → «Импорт из репозитория» (Import from a
+   repository).
+2. Choose the GitVerse connection and the repository, and the subfolder if
+   the site isn't at the root.
+3. Check which framework the platform detected and which build commands it
+   suggests, and start the build.
 
 Layero creates a webhook in the repository and starts the first build. From
-then on every `git push` builds the site: the production branch goes to
-production, the others to a preview at `<project>-<branch>.layero.app`.
+then on every push builds the site: the main branch goes to the main
+address, the others to previews at `<project>-<branch>.layero.app`.
 
-## What differs from GitHub
+## How GitVerse differs from GitHub
 
-- **No archive by commit.** The GitVerse API has no archive download
-  (checked 2026-09-17: `archive`, `tarball` and `statuses` answer 400), so
-  the builder fetches the needed commit with a shallow `git fetch` — usually a
-  fraction of a second even on large repositories. Commit statuses are not
-  posted to GitVerse either: the API has no such endpoint.
+- **The code is fetched by commit.** GitVerse's API can't download a
+  repository archive, so Layero fetches just the commit it needs.
+- **Commit statuses aren't published.** GitVerse doesn't show whether a
+  build passed: its API has no way to do that. Check the status in the
+  dashboard.
+- **The token expires.** When it does, builds on push stop, and the
+  connections list shows «токен недействителен» (token invalid). Issue a new
+  one and update the connection — projects don't need relinking.
 
-## If the webhook was not created
+The webhook is protected by a secret token in its address that only Layero
+and GitVerse know. No one else can start a build.
 
-If the token lacks "Write" on repositories, Layero cannot create the webhook
-and says so during import. Issue a token with the right permissions and retry
-— or create the webhook in GitVerse by hand at the address the dashboard
-shows.
+## If the webhook wasn't created
 
-An overview of all providers and their differences:
-[Connecting a repository](./git-providers.md).
+If the token lacks the Write right in the «Репозитории» (Repositories) section, Layero can't create the webhook and warns you during import. Issue a token with that right and import again. Another way is to create the webhook in GitVerse by hand at the address the dashboard shows.

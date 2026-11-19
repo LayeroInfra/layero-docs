@@ -62,7 +62,7 @@ npx layero@latest init
 на [docs.layero.ru/agents](./index.md) и в навык.
 
 Настройки сборки `init` не записывает: они живут в
-[`layero.json`](../deploys/layero-json.md) или в настройках проекта. Чтобы
+[`layero.json`](../build/layero-json.md) или в настройках проекта. Чтобы
 не трогать файлы инструкций, добавьте флаг `--skip-agent-docs`.
 
 ## Как проверить, что навык работает

@@ -1,8 +1,9 @@
 {
-  "label": "Деплой и окружения",
-  "position": 5,
+  "label": "Deploys",
+  "position": 5.3,
   "link": {
     "type": "generated-index",
-    "description": "Деплой из GitHub, окружения, preview-URL, переменные окружения и кастомные домены."
+    "slug": "/deploys",
+    "description": "Deploys from GitHub, GitVerse, GitLab, GitFlic and SourceCraft, environments and branch previews, build retention."
   }
 }

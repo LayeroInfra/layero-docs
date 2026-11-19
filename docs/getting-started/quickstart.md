@@ -31,7 +31,7 @@ npx layero@latest deploy --dry-run
 ```
 
 Если проект определился неверно, поправьте одно значение в
-[`layero.json`](../deploys/layero-json.md) и запустите проверку снова.
+[`layero.json`](../build/layero-json.md) и запустите проверку снова.
 
 ## 2. Опубликуйте
 
@@ -82,7 +82,7 @@ npx layero@latest deploy
 
 - [Подключение репозитория](../deploys/git-providers.md) — превью для каждой
   ветки и сборка по пушу.
-- [Переменные окружения](../deploys/env-vars.md) — ключи и адреса API для
+- [Переменные окружения](../build/env-vars.md) — ключи и адреса API для
   сборки.
-- [Свои домены](../deploys/custom-domains.md) — на тарифе Pro.
+- [Свои домены](../addresses/custom-domains.md) — на тарифе Pro.
 - [Команды CLI](../cli/commands.md) — всё, что умеет `layero`.

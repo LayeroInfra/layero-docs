@@ -1,46 +1,44 @@
 ---
-sidebar_position: 4
-title: Custom domains
-description: Attach a domain you own to a project and Layero issues the Let's Encrypt HTTPS certificate itself — no manual certbot, no steps in the Cloudflare panel.
+slug: /deploys/custom-domains
+sidebar_position: 1
+title: Custom domain
+description: How to connect your own domain to a project on Pro — which DNS records to add, how Layero issues the certificate, what to do with your previous hosting's records and what happens to the domain if Pro ends.
 ---
 
-# Custom domains
+# Custom domain
 
-Every project gets an address from the platform (`<project>.layero.app`, or
-`<org>-<project>.layero.app` under the [naming scheme](./environments)). You
-can also attach **your own domain**, bought from any registrar — `my-site.ru`
-or `shop.my-site.ru`, say. This is not a redirect: your domain genuinely
-starts serving the project, with its own HTTPS certificate.
-
-A custom domain behaves like the main address: it shows whichever deploy the
-production pointer refers to. Promote and rollback work on it unchanged.
+**You can connect your own domain, bought from any registrar, to a project —
+for example `my-site.ru` or `shop.my-site.ru`.** It isn't a redirect: your
+domain serves the site itself, with its own HTTPS certificate.
 
 :::info[Plan]
 Custom domains are available on the [Pro](../billing/plans.md) plan. On Free
-the **«Домены»** (Domains) item in the project menu carries a Pro badge.
+the «Домены» (Domains) item in the project menu carries a Pro badge.
 :::
 
-Once a domain is connected you can make it the **primary** one — the
-«Сделать основным» (Make primary) switch on the domain card. The `layero.app`
-address and the project's other domains then redirect visitors to the primary
-domain (a 301 redirect).
+A custom domain shows the same as the project's main address: when a new
+build is published or rolled back, it changes along with it.
+
+A connected domain can be made **primary** — the «Сделать основным» (Make
+primary) button on the domain card. The `layero.app` address and the
+project's other domains then redirect visitors to the primary domain (a 301
+redirect).
 
 ## How to connect one
 
-1. Open the project → **Domains** in the sidebar.
+1. Open the project → «Домены» (Domains) in the project menu.
 2. Enter the domain — `my-site.ru` or `shop.my-site.ru`. Layero works out
    whether it is an apex domain or a subdomain and recognises your registrar
    from DNS.
-   For an apex domain the wizard offers a **«Подключить также `www.…`»**
-   (Also connect www) checkbox: the `www` address will redirect to the apex.
+   For an apex domain the wizard offers a «Подключить также `www.…`» (Also connect www) checkbox: the `www` address will redirect to the apex.
    It needs one more record — a CNAME for `www`.
-3. Press **Connect**. A domain card appears with a step-by-step checklist and
+3. Click «Добавить» (Add). A domain card appears with a step-by-step checklist and
    the **two DNS records** you need to add.
 4. Open your registrar's control panel, add the records (the wizard shows
    instructions for your specific registrar) and save.
 5. There is nothing else to do: Layero re-checks DNS by itself roughly
    every 15 minutes, then issues the certificate and connects the domain.
-   You do not have to wait — the **"Check"** button on the card runs the
+   You do not have to wait — the «Проверить» (Check) button on the card runs the
    check right away.
 
 ## Which DNS records are needed
@@ -53,8 +51,7 @@ subdomain.
 | Apex (`my-site.ru`) | `A` → Layero's IP address | `TXT` `_layero-verify` |
 | Subdomain (`shop.my-site.ru`) | `CNAME` → `cname.layero.ru` | `TXT` `_layero-verify.shop` |
 
-The exact values (the IP address, the TXT value) are shown on the domain card
-— each is copied in one click.
+The exact values (the IP address, the TXT value) are shown on the domain card — each is copied in one click. If your registrar's panel won't let you create the `_layero-verify` name, add the same value as a TXT record on the domain itself.
 
 No third record is needed for the certificate: Layero verifies domain
 ownership over HTTP as soon as the domain starts pointing at the platform.
@@ -94,7 +91,7 @@ A few things worth knowing:
 Records from the previous host stay in the zone and keep working — adding your
 own on top is not enough. While the old records are there, they route both
 visitors and the Let's Encrypt check to someone else's server. **Delete them
-before you press "Check".**
+before you click «Проверить» (Check).**
 
 What to look for in the registrar's panel:
 
@@ -108,7 +105,7 @@ What to look for in the registrar's panel:
 - **A `CAA` record.** It lists the certificate authorities allowed to issue for
   the domain. The previous host may have put its own CA there — and then Let's
   Encrypt will not issue a certificate no matter how many times you press
-  "Check". Either delete the `CAA` record or add another `CAA` record with the
+  «Проверить». Either delete the `CAA` record or add another `CAA` record with the
   value `0 issue "letsencrypt.org"`. Layero checks `CAA` both on the domain
   itself and on its parent zones: for `shop.my-site.com`, also on
   `my-site.com`.
@@ -182,6 +179,10 @@ yet.
 A Let's Encrypt certificate is valid for 90 days. Layero **renews it
 automatically** roughly 30 days before expiry — without your involvement and
 without downtime.
+
+## If Pro ends
+
+After the organization moves to Free, custom domains are suspended. The DNS records and the link to the project are kept, and the site opens at `<project>.layero.app`. Once Pro is paid again, the domains turn back on by themselves — see [Balance and renewal](../billing/lifecycle.md#what-happens-after-moving-to-free).
 
 ## What Layero does not do
 

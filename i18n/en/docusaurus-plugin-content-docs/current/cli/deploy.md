@@ -68,7 +68,7 @@ and what to do:
 | What is in the folder | What the CLI suggests |
 |---|---|
 | an app in a subfolder (`apps/web`) | `--root apps/web` |
-| an app in a subfolder that imports a neighbour workspace package | [`layero.json`](../deploys/layero-json.md) at the root: `"framework": "generic"`, `buildCommand`, `outputDirectory` |
+| an app in a subfolder that imports a neighbour workspace package | [`layero.json`](../build/layero-json.md) at the root: `"framework": "generic"`, `buildCommand`, `outputDirectory` |
 | `frontend/` and `backend/` side by side | `layero.json` with the `frontend` and `backend` blocks |
 | a custom build script with no known framework | `"framework": "generic"` — static files are never built |
 | a server with no known framework | `-t node_web` / `-t python_web` |
@@ -77,7 +77,7 @@ If detection gets it wrong, pass `--type` explicitly: a static preset
 (`--type vite`) or a runtime kind for a server (`-t node_web`,
 `-t python_web`). If the app lives in a monorepo subfolder — `--root apps/web`.
 To make the fix travel with the code, put a
-[`layero.json`](../deploys/layero-json.md) into the repository — that page also
+[`layero.json`](../build/layero-json.md) into the repository — that page also
 has the symptom-to-fix table. Values from `layero.json` are reflected in
 `detected` and in `--dry-run`.
 
@@ -98,7 +98,7 @@ them as your choice.
 | `--branch <name>` | **Refused** with `branch_unsupported` (exit code 4): archive uploads always land in the `cli` environment (see below), so the flag cannot give you a preview. Only meaningful for `layero promote --branch`. |
 | `--claim` | Deploy without an account: a temporary site for 1 hour and a `claim_url` for a human to take the site over. Static sites and SPAs only: a server app (SSR, fullstack, container) is refused before upload with `claim_static_only` (exit code 4). The address is random — the folder name and `--name` do not go into it; the site is closed to search engines (`robots.txt` with `Disallow: /` and `X-Robots-Tag: noindex, nofollow`). Only with this flag: without `--claim` and without a token `deploy` asks for a login (`auth_required`) — in an agent environment too. The token, the claim code and the link are kept in `~/.layero/config.json`, not in `.layero/project.json`: that file goes to git. Taking the site into an account clears the environment variables, deploy hooks and build settings set up without an account. Together with `--project` it is refused with `claim_with_project` (exit code 4). |
 | `--prebuilt [dir]` | Ship an already-built artifact instead of building on the platform. Without an argument it picks the first existing of `dist/`, `build/`, `public/`, `out/`, `_site/`. `.gitignore` and `.layeroignore` rules are **not applied** — see the note below. |
-| `-t`, `--type <preset>` | Override auto-detection. A **static preset** says what to build with: `vite`, `vitepress`, `next`, `astro`, `cra`, `sveltekit`, `nuxt`, `gatsby`, `docusaurus`, `storybook`, `eleventy`, `hugo`, `static` (no build runs at all), `generic` (your own build script: `buildCommand` and `outputDirectory` from [`layero.json`](../deploys/layero-json.md) are executed). A **runtime kind** says the app has to run in a container instead of being served as files: `node_web`, `python_web`, `ssr_next`, `streamlit`, `gradio`, `flask`; aliases — `express`, `fastapi`, `django`, `node`, `python`. An unknown value is refused with `invalid_type`. |
+| `-t`, `--type <preset>` | Override auto-detection. A **static preset** says what to build with: `vite`, `vitepress`, `next`, `astro`, `cra`, `sveltekit`, `nuxt`, `gatsby`, `docusaurus`, `storybook`, `eleventy`, `hugo`, `static` (no build runs at all), `generic` (your own build script: `buildCommand` and `outputDirectory` from [`layero.json`](../build/layero-json.md) are executed). A **runtime kind** says the app has to run in a container instead of being served as files: `node_web`, `python_web`, `ssr_next`, `streamlit`, `gradio`, `flask`; aliases — `express`, `fastapi`, `django`, `node`, `python`. An unknown value is refused with `invalid_type`. |
 | `--root <dir>` | Monorepo: the subdirectory of the repository that the builder treats as the app root, e.g. `--root apps/web`. **Saved on the project** — push and hook builds use the same value. `layero.json` has no key for this. |
 | `--name <name>` | Project name. Only on the first deploy. |
 | `--project <id_or_slug>` | Deploy into a specific project, ignoring `./.layero/project.json`. Handy for CI. |
@@ -128,7 +128,7 @@ because user sites go straight to the platform edge.
 What the address looks like depends on which domain zone the project lives in
 (`<project>.layero.app`, or `<org>-<project>.layero.app` for projects older
 than 26 July 2026) — see
-[Environments, previews and production](../deploys/environments). Do not
+[Environments and previews](../deploys/environments). Do not
 assemble the address from a template: take it from the `url` field of the
 `ready` event.
 
@@ -357,7 +357,7 @@ Once `ready` arrives:
   auto-promote of the default branch or `--promote`. `--branch` changes none of this — see the note
   above.
 
-See [Environments, previews and production](../deploys/environments) for the
+See [Environments and previews](../deploys/environments) for the
 full picture.
 
 ## The postinstall banner

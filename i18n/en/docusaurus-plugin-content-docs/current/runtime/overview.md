@@ -48,7 +48,7 @@ server for a static site, there are three ways:
   { "runtime": "node_web", "startCommand": "node dist/server.js", "port": 3000 }
   ```
 
-  All keys are on the [`layero.json`](../deploys/layero-json.md) page.
+  All keys are on the [`layero.json`](../build/layero-json.md) page.
 - **A CLI flag** — one-off, no file: `npx layero@latest deploy -t node_web`
   (or `-t python_web`, `-t ssr_next`).
 - **The dashboard** — **Project → Runtime type**.

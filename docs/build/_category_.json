@@ -1,0 +1,9 @@
+{
+  "label": "Сборка",
+  "position": 5,
+  "link": {
+    "type": "generated-index",
+    "slug": "/build",
+    "description": "Как Layero определяет фреймворк и собирает проект: layero.json, версии Node.js и Python, переменные окружения."
+  }
+}

@@ -30,7 +30,7 @@ the platform builds it and serves it at `<project>.layero.app`.
   servers, Streamlit, Gradio. The app starts on the first request and goes to
   sleep when nobody uses it. See [Runtime apps](./runtime/overview.md).
 - **Custom domains** with automatic HTTPS — on the Pro plan.
-  See [Custom domains](./deploys/custom-domains.md).
+  See [Custom domain](./addresses/custom-domains.md).
 - **Postgres databases** and the **Data API** — HTTP access to the database
   straight from the frontend. See [Databases](./database/index.md) and
   [Data API](./data-api/index.md).
@@ -43,7 +43,7 @@ the platform builds it and serves it at `<project>.layero.app`.
 |---|---|
 | Where it runs | build and delivery servers in Russia |
 | Project address | `<project>.layero.app` with HTTPS; a custom domain after a DNS check |
-| What it builds with | Node.js 20, 22 or 24 (22 by default), Python 3.10–3.13 (3.12 by default) — see [Node.js and Python versions](./deploys/runtime-versions.md) |
+| What it builds with | Node.js 20, 22 or 24 (22 by default), Python 3.10–3.13 (3.12 by default) — see [Node.js and Python versions](./build/runtime-versions.md) |
 | Plans | Free and Pro, paid in rubles from the organization's balance — see [Plans](./billing/plans.md) |
 
 ## Where to start

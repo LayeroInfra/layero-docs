@@ -69,7 +69,7 @@ the [CLI JSON events](../cli/json-events.md) page.
 **If the project was detected wrong.** The first publish goes without
 `layero.json`. If the build failed or a server was published as a static
 site, the agent fixes one field using the symptom table on the
-[`layero.json`](../deploys/layero-json.md) page and does not publish again
+[`layero.json`](../build/layero-json.md) page and does not publish again
 with the same error.
 
 ### The site is already on Layero

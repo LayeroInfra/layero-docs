@@ -107,7 +107,7 @@ client-x            team      (member)
 Under the older naming scheme the organization slug was a prefix of the
 hostname (`<org>-<project>.layero.app`). For projects created after the move
 the address consists of the project slug alone — see
-[Environments, previews and production](../deploys/environments).
+[Environments and previews](../deploys/environments).
 
 ## `layero projects list`
 

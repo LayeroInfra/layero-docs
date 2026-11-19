@@ -134,4 +134,4 @@ moved to "one apex per project" (V071), a rollback had to move the project's
 old, per-branch path. Hence the success report while the apex never changed.
 
 Related: [`layero promote`](./promote),
-[Environments, previews and production](../deploys/environments).
+[Environments and previews](../deploys/environments).

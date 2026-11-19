@@ -31,7 +31,7 @@ command says so and suggests a flag:
   → npx layero@latest deploy --root apps/web
 ```
 
-Detected something wrong? Fix one value in [`layero.json`](../deploys/layero-json.md)
+Detected something wrong? Fix one value in [`layero.json`](../build/layero-json.md)
 and run the check again.
 
 ## 2. Publish
@@ -89,7 +89,7 @@ as `layero deploy`.
 
 - [Connecting a repository](../deploys/git-providers.md) — a preview for every
   branch and a build on every push.
-- [Environment variables](../deploys/env-vars.md) — keys and API addresses for
+- [Environment variables](../build/env-vars.md) — keys and API addresses for
   the build.
-- [Custom domains](../deploys/custom-domains.md) — on the Pro plan.
+- [Custom domain](../addresses/custom-domains.md) — on the Pro plan.
 - [CLI commands](../cli/commands.md) — everything `layero` can do.

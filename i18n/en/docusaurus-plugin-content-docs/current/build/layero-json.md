@@ -1,4 +1,5 @@
 ---
+slug: /deploys/layero-json
 sidebar_position: 2
 title: layero.json — configuration in the repository
 description: A file in the repository sets the framework, the build and start commands, the output folder, the Node version, the app type and the frontend + backend layout. When you need it, the complete key list, a symptom-to-fix table and how to verify in the build log.
@@ -6,9 +7,7 @@ description: A file in the repository sets the framework, the build and start co
 
 # `layero.json` — configuration in the repository
 
-An optional file at the root of the app. It sets what Layero would otherwise
-detect on its own, and it lives next to your code — so it travels with it and
-can differ per branch.
+**`layero.json` is an optional file at the root of the app that sets what Layero would otherwise detect on its own.** It lives next to your code, so it travels with it and can differ per branch.
 
 There is one rule:
 
@@ -17,8 +16,7 @@ There is one rule:
 
 ## Deploy without the file first
 
-**Make the first deploy without `layero.json`.** By platform data over 90
-days, 84% of new projects go live on the first build with no file at all: Layero finds the framework, the package
+**Make the first deploy without `layero.json`.** Most projects go live on the first build with no file at all: Layero finds the framework, the package
 manager, the build script, the output folder and the Node version, and for a
 server app — the start command and the port.
 
@@ -28,7 +26,7 @@ The file is an answer to one specific failure: **one symptom, one field**.
   [locked in the dashboard](#a-field-from-the-file-is-not-editable-in-the-dashboard).
   A value copied "just in case" becomes a lie the day the project changes its
   bundler.
-- About 60% of failed builds are not fixable by the file at all — they are
+- Many failed builds are not fixable by the file at all — they are
   fixed elsewhere, see [what the file does not fix](#what-the-file-does-not-fix).
 
 When a build or a launch fails:
@@ -93,7 +91,8 @@ with a note in the log, see [mistakes inside the file](#mistakes-inside-the-file
 
 | Key (short name) | Applies to | What it sets |
 |---|---|---|
-| `framework` | build | Framework name; wins over detection. Values — in the [framework list](../getting-started/frameworks). |
+| `$schema` | editor | Schema address for hints in your editor. Doesn't affect the build. |
+| `framework` | build | Framework name; wins over detection. Values — in the [framework list](./frameworks.md). |
 | `installCommand` (`install`) | build | Dependency install command. |
 | `buildCommand` (`build`) | build | The whole build command. |
 | `outputDirectory` (`output`) | static only | Folder with `index.html` after the build. |
@@ -107,6 +106,7 @@ with a note in the log, see [mistakes inside the file](#mistakes-inside-the-file
 | `frontend` | full-stack | The half served as files. |
 | `backend` | full-stack | The half that runs in a container. |
 | `apiPrefix` (`api_prefix`) | full-stack | Path prefix routed to the backend, e.g. `"/api"`. |
+| `ignore` | — | Reserved, does nothing yet. |
 
 ### `framework`
 
@@ -131,9 +131,7 @@ Fix the repository first: commit an up-to-date lockfile and an exact
 `packageManager` — and only then set the field. `npm ci` without a lockfile is
 a ready-made failure.
 
-For an app in a container the field applies to Python only: it replaces the
-`pip install -r requirements.txt` step. A Node server (`node_web`, `ssr_next`)
-never executes it — install is chosen from the lockfile.
+For an app in a container the field applies to Python (it replaces the `pip install -r requirements.txt` step) and to a Node.js server (`node_web`). Next.js with server rendering (`ssr_next`) doesn't run it: install is chosen from the lockfile.
 
 ### `buildCommand`
 
@@ -154,16 +152,14 @@ such an app a [`startCommand`](#startcommand).
 
 ### `nodeVersion`
 
-The Node.js version to build on. Accepts a major `"22"`, an exact version
-`"22.14.0"` or `"lts"`. The field overrides `.nvmrc` and `engines.node`: if the
+The Node.js version to build on, for example `"22"`. Only the major counts: `"22.14.0"` builds on the current Node.js 22. The word `"lts"` doesn't work — the build falls back to the default version. The field overrides `.nvmrc` and `engines.node`: if the
 version is already set there, fix it there — otherwise the project ends up
 with two sources of truth.
 
 ### `runtime`
 
 The type of an app that Layero **runs in a container**: `ssr_next`, `node_web`,
-`python_web`, `streamlit`, `gradio` (the last two require `app.py`). There are
-no other values.
+`python_web`, `streamlit`, `gradio` (the last two require `app.py`). `ssr_node` and `flask` are accepted too.
 
 Layero normally switches a project between static and container by itself when
 it recognises the server: Next without `output: 'export'`, Express, Fastify,
@@ -286,7 +282,7 @@ fix lives:
 | Symptom | Fix |
 |---|---|
 | `собранный сайт не содержит index.html в '.'` · `сборка отработала, но папки 'dist' нет. После сборки в каталоге есть: …` · `[output] в 'dist' нет index.html` | `outputDirectory` — the folder that holds `index.html` after the build. The error lists what is on disk — take the path from there. |
-| `Сборка НЕ запускалась: проект собирается как статический сайт (фреймворк «static») …` ("the build did NOT run") · the log says `[config] ВНИМАНИЕ: buildCommand из layero.json (…) НЕ выполняется` or `static framework: skipping install/build` | The build never ran: `framework: "static"` means "no install and no build". Use `"framework": "generic"`. The output path was never the problem. |
+| `сборка НЕ запускалась: проект собирается как статический сайт (фреймворк «static») …` ("the build did NOT run") · the log says `[config] ВНИМАНИЕ: buildCommand из layero.json (…) НЕ выполняется` or `static framework: skipping install/build` | The build never ran: `framework: "static"` means "no install and no build". Use `"framework": "generic"`. The output path was never the problem. |
 | `npm error Missing script: "build"` · `не знаем, чем собирать этот проект: команда сборки не задана` | `buildCommand` with a script that exists. No build needed at all — `"framework": "static"`. If it is a server or a bot — see the next row. |
 | A Node or Python server is published as a static site: files are served, nothing runs | `runtime` + `startCommand`, plus `port` if needed. Without a file: `deploy -t node_web`. |
 | `launch/boot: container failed to start in time`, with `ERR_MODULE_NOT_FOUND /app/…` in the log or the app listening on `127.0.0.1` | `startCommand`: a path relative to `/app`, a file that exists after the build, address `0.0.0.0`, port `$PORT`. A different port — `port`. |
@@ -315,7 +311,7 @@ fix lives:
 For each field independently:
 
 ```
-layero.json → project settings → CLI hint (--type) → found in the repository → framework default
+layero.json → project settings (the --type flag writes here too) → found in the repository → framework default
 ```
 
 The first one that is set wins. For example, with this `package.json`:

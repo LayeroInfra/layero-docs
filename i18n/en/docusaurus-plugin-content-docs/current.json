@@ -19,14 +19,6 @@
     "message": "The `layero` npm package — deploy and manage projects from the terminal.",
     "description": "The generated-index page description for category 'CLI' in sidebar 'docsSidebar'"
   },
-  "sidebar.docsSidebar.category.Деплой и окружения": {
-    "message": "Deploys & environments",
-    "description": "The label for category 'Деплой и окружения' in sidebar 'docsSidebar'"
-  },
-  "sidebar.docsSidebar.category.Деплой и окружения.link.generated-index.description": {
-    "message": "Deploying from GitHub, GitVerse, GitLab, GitFlic and SourceCraft, environments, preview URLs, env vars and custom domains.",
-    "description": "The generated-index page description for category 'Деплой и окружения' in sidebar 'docsSidebar'"
-  },
   "sidebar.docsSidebar.category.Runtime-приложения": {
     "message": "Runtime apps",
     "description": "The label for category 'Runtime-приложения' in sidebar 'docsSidebar'"
@@ -74,5 +66,29 @@
   "sidebar.docsSidebar.category.Базы данных": {
     "message": "Databases",
     "description": "The label for category 'Базы данных' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Сборка": {
+    "message": "Build",
+    "description": "The label for category 'Сборка' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Сборка.link.generated-index.description": {
+    "message": "How Layero detects the framework and builds the project: layero.json, Node.js and Python versions, environment variables.",
+    "description": "The generated-index page description for category 'Сборка' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Деплой": {
+    "message": "Deploys",
+    "description": "The label for category 'Деплой' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Деплой.link.generated-index.description": {
+    "message": "Deploys from GitHub, GitVerse, GitLab, GitFlic and SourceCraft, environments and branch previews, build retention.",
+    "description": "The generated-index page description for category 'Деплой' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Адреса": {
+    "message": "Addresses",
+    "description": "The label for category 'Адреса' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Адреса.link.generated-index.description": {
+    "message": "Custom domains, HTTP headers, the 404 page and redirects.",
+    "description": "The generated-index page description for category 'Адреса' in sidebar 'docsSidebar'"
   }
 }

@@ -61,9 +61,9 @@ Build statuses in the dashboard:
 | «Ошибка» (Failed) | the build failed; the log or `npx layero@latest diagnose` shows why |
 | «Отменён» (Cancelled) | the build was stopped |
 
-What builds the project and how — [Supported frameworks](./frameworks.md),
-[Node.js and Python versions](../deploys/runtime-versions.md) and
-[`layero.json`](../deploys/layero-json.md).
+What builds the project and how — [Frameworks](../build/frameworks.md),
+[Node.js and Python versions](../build/runtime-versions.md) and
+[`layero.json`](../build/layero-json.md).
 
 ## Main address
 

@@ -64,7 +64,7 @@ events and error codes, the rules. An agent in a new session reads it first
 and knows how to publish even without the skill installed. For details the
 block points to [docs.layero.ru/agents](./index.md) and the skill.
 
-`init` records no build settings: they live in [`layero.json`](../deploys/layero-json.md)
+`init` records no build settings: they live in [`layero.json`](../build/layero-json.md)
 or in the project settings. To leave the instruction files alone, add
 `--skip-agent-docs`.
 

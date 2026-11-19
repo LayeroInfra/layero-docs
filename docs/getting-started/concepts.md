@@ -55,9 +55,9 @@ description: Организация, проект, окружение, сбор�
 | «Ошибка» | сборка упала; причину покажет лог или `npx layero@latest diagnose` |
 | «Отменён» | сборку остановили |
 
-Чем и как собирается проект — [Поддерживаемые фреймворки](./frameworks.md),
-[Версии Node.js и Python](../deploys/runtime-versions.md) и
-[`layero.json`](../deploys/layero-json.md).
+Чем и как собирается проект — [Фреймворки](../build/frameworks.md),
+[Версии Node.js и Python](../build/runtime-versions.md) и
+[`layero.json`](../build/layero-json.md).
 
 ## Основной адрес
 

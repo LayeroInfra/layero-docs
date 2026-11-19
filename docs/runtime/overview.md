@@ -48,7 +48,7 @@ description: SSR Next.js, любой Node-сервер (Express, NestJS, Fastify
   { "runtime": "node_web", "startCommand": "node dist/server.js", "port": 3000 }
   ```
 
-  Все ключи — на странице [`layero.json`](../deploys/layero-json.md).
+  Все ключи — на странице [`layero.json`](../build/layero-json.md).
 - **Флаг CLI** — разово, без файла: `npx layero@latest deploy -t node_web`
   (или `-t python_web`, `-t ssr_next`).
 - **Панель** — **Project → Runtime type**.
