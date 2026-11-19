@@ -69,7 +69,7 @@ The mode is the same for shared and dedicated databases: both connect
 through the shared entry point `db.layero.ru`, and encryption terminates at
 our certificate.
 
-⚠️ **Except a database on your own server** that you added to the dashboard yourself. We know neither who signed that server's certificate nor whether you have its root, so there is nothing to verify against. Its connection string is shown exactly as you saved it,
+⚠️ **Except a database you brought yourself** — one on your own server that you added to the dashboard. We know neither who signed that server's certificate nor whether you have its root, so there is nothing to verify against. Its connection string is shown exactly as you saved it,
 and the mode switch in the dashboard is disabled for it.
 
 ⚠️ `verify-full` has a cost worth knowing about upfront: the mode requires
