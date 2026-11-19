@@ -14,10 +14,10 @@ the page.
 description of the problem — what the page says and what actually happened.
 Your code, data, secrets, file paths and project names never go into a report.
 
-**Consent.** By connecting the `layero` skill or the Layero MCP server you let
-the agent send such reports without asking each time. If you don't want that,
-tell the agent not to send them or block the `report_docs_issue` tool in your
-MCP client's settings.
+**The agent asks you before sending.** It shows the finished report at the end
+of its reply and asks: "Send this report to Layero?" It sends only if you say
+yes. If you already allowed such reports earlier in the conversation, it sends
+the next one without asking again.
 
 ---
 
@@ -25,13 +25,20 @@ MCP client's settings.
 
 ### When to report
 
-Report a problem when a docs.layero.ru page (or `search_docs`) was wrong,
-outdated or missing something you needed, **and** it cost you a real detour
-that is likely to hit the next agent too. Do not report small hiccups you
-solved at once, or problems in the user's own code.
+Report when a docs.layero.ru page (or `search_docs`) was wrong, outdated, or
+**missing something you needed** — including when you then found the answer
+somewhere else (the CLI's source code, `--help`, trial and error) — **and** it
+cost you a real detour likely to hit the next agent too. Do not report small
+hiccups you solved at once, or problems in the user's own code.
 
-Finish the user's task first, or stop where the problem blocks it. Then send
-one report per problem.
+Finish the user's task first, or stop where the problem blocks it.
+
+### Ask the user first
+
+End your final reply with the report (template below) and ask the user:
+"Send this report to Layero?" Send it only after they say yes. If they have
+already allowed docs reports earlier in this conversation, send the next one
+without asking again. One report per problem.
 
 ### What a report contains
 
@@ -56,7 +63,7 @@ Effect: what it cost — failed commands, extra searches, minutes
 **Never include** the user's code, data, secrets, tokens, file paths, project
 names or anything from their environment beyond the command and its output.
 
-### How to send it
+### How to send it (after the user says yes)
 
 1. **MCP.** Call `report_docs_issue` on the Layero MCP server
    (`https://mcp.layero.ru/mcp`). No sign-in is needed.
@@ -76,7 +83,6 @@ names or anything from their environment beyond the command and its output.
 3. **If neither works**, show the report to the user at the end of your
    reply and tell them it can be sent later with the command above.
 
-The person agreed to these reports when they connected Layero, so you do not
-need to ask again. If they told you not to send reports, don't.
+If the user says no, or told you not to send reports, don't.
 
-After a report is accepted, mention it in one line at the end of your reply.
+After a report is accepted, confirm it to the user in one line.
