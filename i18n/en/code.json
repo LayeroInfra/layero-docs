@@ -390,5 +390,29 @@
   },
   "notFound.home": {
     "message": "To the docs home"
+  },
+  "footer.tagline": {
+    "message": "Deploy sites and apps from Git, the terminal or an AI agent."
+  },
+  "footer.github": {
+    "message": "Docs source on GitHub"
+  },
+  "footer.gitverse": {
+    "message": "Docs source on GitVerse"
+  },
+  "footer.telegram": {
+    "message": "Layero news on Telegram"
+  },
+  "footer.status.operational.short": {
+    "message": "All good"
+  },
+  "footer.status.degraded.short": {
+    "message": "Degraded"
+  },
+  "footer.status.down.short": {
+    "message": "Outage"
+  },
+  "footer.status.unknown.short": {
+    "message": "Status"
   }
 }

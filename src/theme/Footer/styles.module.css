@@ -14,16 +14,72 @@
   display: grid;
   /* Левая колонка по содержимому, ссылки — на всю остальную ширину: при
      `1fr auto` колонки жались вправо, а слева висела пустота. */
-  grid-template-columns: 15rem minmax(0, 1fr);
+  grid-template-columns: max-content minmax(0, 1fr);
   gap: 3rem;
 }
 
 .brand {
+  /* По ширине фразы в одну строку, но не шире экрана: на телефоне фраза
+     переносится. Строка со статусом и значками тянется на ту же ширину. */
+  width: max-content;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.25rem;
+  justify-content: space-between;
+  gap: 2rem;
 }
+
+.brandTop {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.tagline {
+  margin: 0;
+  color: var(--dusty);
+  line-height: 1.55;
+}
+
+/* Статус слева, значки — одной группой у правого края блока. */
+.tools {
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.links {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+
+/* Кнопка-значок — той же высоты и обводки, что пилюля статуса. */
+.toolIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 2rem;
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  background: var(--bg-card);
+  color: var(--graphite);
+  width: 2rem;
+  text-decoration: none !important;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.toolIcon:hover {
+  border-color: var(--border-strong);
+  color: var(--ink);
+}
+
 
 .lockup {
   display: flex;
@@ -80,6 +136,7 @@
 }
 
 .status {
+  height: 2rem;
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -97,6 +154,22 @@
 .status:hover {
   border-color: var(--border-strong);
   color: var(--ink);
+}
+
+.statusLabel,
+.statusShort {
+  white-space: nowrap;
+}
+
+.statusShort {
+  display: none;
+}
+
+/* Значки и статус в одну строку: на самых узких экранах полная фраза не
+   помещается — показываем короткую. */
+@media (max-width: 360px) {
+  .statusLabel { display: none; }
+  .statusShort { display: inline; }
 }
 
 .statusDot {
@@ -140,26 +213,10 @@
   text-decoration: none;
 }
 
-.bottom {
-  display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-top: 2.5rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid var(--border-soft);
-  color: var(--stone);
-  font-size: 0.8rem;
-}
 
-.bottom .link {
-  color: var(--stone);
-}
-
-.bottom .link:hover {
-  color: var(--ink);
-}
-
-@media (max-width: 996px) {
+/* Одна колонка раньше, чем у Docusaurus (996 px): блок слева по ширине фразы
+   и четыре колонки ссылок рядом умещаются только от 1200 px. */
+@media (max-width: 1199px) {
   .top {
     grid-template-columns: minmax(0, 1fr);
     gap: 2.25rem;
@@ -181,9 +238,5 @@
   .columns {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 1.75rem 1.5rem;
-  }
-  .bottom {
-    flex-direction: column;
-    gap: 0.5rem;
   }
 }

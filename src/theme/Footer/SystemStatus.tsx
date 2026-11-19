@@ -40,6 +40,24 @@ function label(state: State): string {
   }
 }
 
+/**
+ * Короткая подпись — для узкого экрана, где значки и статус стоят в одну
+ * строку и полная фраза не помещается (владелец 19.11: не обрезать
+ * многоточием, а держать короткий вариант). Какую показать, решает CSS.
+ */
+function shortLabel(state: State): string {
+  switch (state) {
+    case 'operational':
+      return translate({id: 'footer.status.operational.short', message: 'Всё работает'});
+    case 'degraded':
+      return translate({id: 'footer.status.degraded.short', message: 'Ухудшения'});
+    case 'down':
+      return translate({id: 'footer.status.down.short', message: 'Сбой'});
+    default:
+      return translate({id: 'footer.status.unknown.short', message: 'Статус'});
+  }
+}
+
 export default function SystemStatus(): ReactNode {
   const [state, setState] = useState<State>('loading');
 
@@ -71,10 +89,18 @@ export default function SystemStatus(): ReactNode {
     };
   }, []);
 
+  const shown: State = state === 'loading' ? 'unknown' : state;
   return (
-    <Link href={STATUS_PAGE} className={styles.status} aria-live="polite">
+    <Link
+      href={STATUS_PAGE}
+      className={styles.status}
+      aria-live="polite"
+      title={label(shown)}>
       <span className={`${styles.statusDot} ${styles[`dot_${state}`]}`} aria-hidden="true" />
-      <span>{state === 'loading' ? label('unknown') : label(state)}</span>
+      <span className={styles.statusLabel}>{label(shown)}</span>
+      <span className={styles.statusShort}>
+        {shortLabel(shown)}
+      </span>
     </Link>
   );
 }
