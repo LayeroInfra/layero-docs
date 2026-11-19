@@ -53,11 +53,17 @@ Only an owner can:
 - move a database;
 - delete a database.
 
+Connecting a database to a project or disconnecting it needs edit access to
+that project.
+
 ## Billing
 
-Only owners see and change billing. When the team reaches a plan limit, developers and guests
-see a notice about it and a «Попросить владельца оплатить» (Ask the owner to
-pay) button.
+Only owners see and change billing. Developers and guests don't have the
+«Оплата и тариф» (Billing and plan) section in the menu; if they open it by a
+link, the dashboard shows the message «Оплатой команды занимаются владельцы» (Owners
+handle the team's billing) and a «Попросить владельца» (Ask the owner) button.
+
+When the team reaches a plan limit, developers and guests see a notice about the limit and a «Попросить владельца оплатить» (Ask the owner to pay) button.
 
 ## Project access
 
@@ -74,3 +80,23 @@ it right away.
 
 Where to set it: «Участники» (Members) → member menu → «Доступ к проектам»
 (Project access). In a terminal — `npx layero@latest team access <email>`, examples are in [In the CLI](./organizations.md#in-the-cli).
+
+### Access to one project
+
+Project → «Настройки» (Settings) → «Доступ» (Access) → the «Команда» (Team)
+card. It shows who in the team sees this project and can change it:
+
+- owners always have «Редактирование» (Edit);
+- everyone else has their level in this project: «как на всех проектах» (as on
+  all projects — the member's level for all projects) or «особый для проекта»
+  (special for this project — an exception set right here).
+
+Owners change the levels on this screen; everyone else can only view them. The
+«Участники и доступ ко всем проектам» (Members and access to all projects)
+link leads to the team settings.
+
+The project's «Участники» (Members) page leads there too: you can't add a
+person to a single project bypassing the team. Rights to a project come only from team membership and the level set for it.
+
+The team's Page Speed feed also shows each person only the projects
+they have access to.

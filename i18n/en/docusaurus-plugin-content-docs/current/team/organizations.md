@@ -59,6 +59,9 @@ owner is included in the team's subscription. Guests are free and unlimited.
 - Seats belong to the team, not to a person. When a member leaves, their seat stays free and keeps renewing until an owner removes that seat.
 - Inviting a developer or an owner, or promoting a guest, needs a free seat.
   A pending invitation to such a role takes a seat too.
+- Members who were in the team before it moved to the new roles take a seat for free while they stay in the team. If such a member is made a
+  guest, this benefit is gone: making them a developer again needs a paid seat.
+  Promoting them to owner keeps the benefit.
 
 Seats are added and removed in «Участники» (Members), in the «Платные места»
 (Paid seats) block, or with `npx layero@latest team seats` — see [In the CLI](#in-the-cli).
