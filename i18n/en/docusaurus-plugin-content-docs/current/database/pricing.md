@@ -37,7 +37,7 @@ to a dedicated server — see [below](#moving-from-a-shared-database-to-a-dedica
 
 ### If Pro isn't renewed
 
-If the subscription couldn't be renewed, Pro and the shared database keep working for the whole grace period: 7 days for a monthly subscription, 30 for a yearly one. Details — [Balance and renewal](../billing/lifecycle.md#grace-period).
+If the subscription couldn't be renewed, Pro and the shared database keep working for the whole grace period: 5 days for a monthly subscription, 10 for a yearly one (if you subscribed before 19.11.2026 — 7 and 30 days). There is no grace period after a trial. Details — [Balance and renewal](../billing/lifecycle.md#grace-period).
 
 After the grace period, access to the shared database is closed, and 3 days after closing the database is deleted with its data. Until it's deleted, pay for Pro and access comes back. If you need the data, [download a backup](./backups.md#download-a-backup) before the grace period ends, or move the database to a dedicated one — that doesn't depend on the subscription.
 

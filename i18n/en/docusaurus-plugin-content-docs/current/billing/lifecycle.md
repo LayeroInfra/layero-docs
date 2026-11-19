@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: Balance and renewal
-description: How to top up an organization's balance and set up auto top-up, how Pro renews, the grace period, what is suspended after moving to Free and how it all comes back. Deleting your account and money on the balance.
+description: How to top up an organization's balance and set up auto top-up, how the subscription renews, what happens after the trial, the grace period, what is suspended after moving to Free and how it all comes back. Deleting your account and money on the balance.
 ---
 
 # Balance and renewal
@@ -38,17 +38,32 @@ tells you how much will be charged and from where.
 | not enough | on | we top up the balance from the card, Pro renews |
 | not enough | off | the [grace period](#grace-period) starts |
 
-We charge cards only in the daytime — from 10:00 to 23:00 Moscow time. If a payment fails, we try
-again after 1, 3 and 5 days.
+We charge cards on the renewal day and only in the daytime — from 10:00 to 23:00 Moscow time. If a payment fails, we try
+again after 1, 3 and 5 days, also in the daytime.
+
+If the bank refuses for good — the card is blocked or restricted, it has
+expired, or you revoked the permission for automatic payments — we stop
+charging that card until you link another payment method.
 
 ## Grace period
 
-If Pro couldn't be renewed, it keeps working in full: 7 days for a monthly
-subscription and 30 days for a yearly one. The same happens when a trial
-ends and the subscription couldn't be paid.
+If the subscription couldn't be renewed, it keeps working in full: 5 more
+days for a monthly subscription and 10 for a yearly one. There is a grace
+period only if the subscription has been paid at least once.
 
-Top up the balance during this time and Pro renews from the original date,
-as if there had been no break. If you don't, the organization moves to Free.
+If you subscribed before 19.11.2026, the old terms stay:
+7 days for a monthly subscription and 30 for a yearly one.
+
+Top up the balance during this time and the subscription renews from the
+original date, as if there had been no break. If you don't, the organization
+moves to Free.
+
+## When the trial ends
+
+There is no grace period after a trial. If the subscription can't be paid,
+the organization moves to Free at once. We keep trying to take the payment
+after 1, 3 and 5 days, and as soon as it goes through, the subscription comes
+back. Projects and domains aren't deleted.
 
 There is no grace period if you cancelled the subscription yourself with
 «Отменить подписку» (Cancel subscription). Pro runs to the end of the paid

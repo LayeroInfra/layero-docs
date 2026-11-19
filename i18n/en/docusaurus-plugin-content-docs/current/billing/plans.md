@@ -11,8 +11,10 @@ or 9 480 ₽ a year.** A plan belongs to an organization, not to a person:
 each organization has its own plan and its own balance, and Pro is paid
 from that balance.
 
-You can try Pro free for 14 days. The trial is given once and needs a card:
-we check it with a 1 ₽ charge and refund it right away.
+You can try Pro free for 7 days. The trial is given once and needs a card:
+we check it with a 1 ₽ charge and refund it right away. If the subscription
+can't be paid when the trial ends, the organization moves to Free at once —
+see [When the trial ends](./lifecycle.md#when-the-trial-ends).
 
 ## What's included
 
