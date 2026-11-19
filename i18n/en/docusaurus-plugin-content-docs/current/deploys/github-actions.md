@@ -85,7 +85,7 @@ If `LAYERO_TOKEN` is set, the CLI takes the token from it, not the sign-in from 
 | `project` | no | from `.layero/project.json` | Target project (id or slug) |
 | `name` | no | — | Project name, used when the project is created on the first deploy |
 | `prod` | no | `false` | Publish to production. Only needed for a project with a connected repository: for a project without one, every run publishes to the main address anyway |
-| `branch` | no | — | Do not use: the current CLI rejects it and the step fails. Branch previews come from a connected repository, not from the Action |
+| `branch` | no | — | Do not use: if it is set, the Action stops the step before uploading, publishes nothing and explains why (exit code 4). Branch previews come from a connected repository, not from the Action |
 | `prebuilt` | no | — | Directory with a finished build |
 | `type` | no | auto-detect | Framework: `vite`, `next`, `astro`, `static`… |
 | `root` | no | — | Monorepo: subdirectory to treat as the app root |
