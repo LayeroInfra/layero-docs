@@ -87,9 +87,10 @@ Project → «Настройки» (Settings) → «Доступ» (Access) → 
 card. It shows who in the team sees this project and can change it:
 
 - owners always have «Редактирование» (Edit);
-- everyone else has their level in this project: «как на всех проектах» (as on
-  all projects — the member's level for all projects) or «особый для проекта»
-  (special for this project — an exception set right here).
+- everyone else has the same level as on all projects in the team's
+  «Участники» (Members), unless it was set separately for this project. An
+  owner picks such a level right here, and the member's line gets the note
+  «отдельно для этого проекта» (separately for this project).
 
 Owners change the levels on this screen; everyone else can only view them. The
 «Участники и доступ ко всем проектам» (Members and access to all projects)
