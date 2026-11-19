@@ -188,3 +188,9 @@ LAYERO_TOKEN=... npx layero@latest deploy --prod --yes
 ```
 
 В CI CLI и так ничего не спрашивает, а `--yes` нужен, чтобы команда работала одинаково и в CI, и в терминале.
+
+Раз в сутки CLI проверяет, не вышла ли новая версия, и пишет об этом в stderr. Если линтер логов в CI на это ругается, добавьте `LAYERO_NO_UPDATE_CHECK=1`:
+
+```bash
+LAYERO_NO_UPDATE_CHECK=1 LAYERO_TOKEN=... npx layero@latest deploy --prod --yes
+```

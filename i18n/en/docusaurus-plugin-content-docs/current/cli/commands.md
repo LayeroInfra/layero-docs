@@ -132,3 +132,4 @@ Details — in the [Data API](../data-api/index.md) section.
 |---|---|
 | `LAYERO_TOKEN` | a token for CI and agents. Wins over the sign-in saved by `login` |
 | `LAYERO_JSON=1` | the same as `--json` |
+| `LAYERO_NO_UPDATE_CHECK=1` | don't check whether a newer CLI version is out. Without it the CLI asks npm for the version once a day and, if there is a newer one, says so on stderr; it never goes to stdout or the JSON events. Useful in CI, where extra stderr lines get in the way |
