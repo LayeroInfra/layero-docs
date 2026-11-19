@@ -424,7 +424,7 @@
     "description": "Line under every docs page: how to report a mistake"
   },
   "docItem.report.agents": {
-    "message": "For AI agents:",
+    "message": "For AI agents:",
     "description": "Line under every docs page: how to report a mistake"
   },
   "docItem.report.rules": {
@@ -490,5 +490,13 @@
   "introHero.src.cliSub": {
     "message": "no Git, one command",
     "description": "Intro page hero"
+  },
+  "docItem.report.updated": {
+    "message": "Updated {date}",
+    "description": "Line under every docs page: how to report a mistake"
+  },
+  "docItem.report.edit": {
+    "message": "Suggest an edit",
+    "description": "Line under every docs page: how to report a mistake"
   }
 }
