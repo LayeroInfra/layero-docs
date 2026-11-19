@@ -1,0 +1,128 @@
+/* Подвал статьи — одна карточка: сверху для людей, снизу для агентов.
+   Только токены из custom.css. */
+
+.tags {
+  margin-top: 2rem;
+}
+
+.card {
+  margin-top: 2.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background: var(--bg-card);
+  overflow: hidden;
+}
+
+/* ── Для людей ───────────────────────────────────────── */
+
+.people {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.15rem;
+}
+
+.lead {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.leadTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.updated {
+  font-size: 0.8rem;
+  color: var(--dusty);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  flex: none;
+}
+
+/* Специфичнее, чем `.markdown a` и ссылки темы: без подчёркивания. */
+.card .button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 2.1rem;
+  padding: 0 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s, border-color 0.15s;
+}
+.card .button:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-soft);
+  color: var(--ink);
+  text-decoration: none;
+}
+.card .button svg {
+  color: var(--graphite);
+}
+
+/* ── Для агентов ─────────────────────────────────────── */
+
+.agents {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.5rem;
+  padding: 0.6rem 1.15rem;
+  border-top: 1px solid var(--border-soft);
+  background: var(--bg-soft);
+  font-size: 0.78rem;
+  color: var(--dusty);
+}
+.agentsLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.agentsLabel svg {
+  width: 13px;
+  height: 13px;
+}
+.agents a {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.74rem;
+  color: var(--graphite);
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 3px;
+}
+.agents a:hover {
+  color: var(--ink);
+  text-decoration-color: var(--ink);
+}
+.sep {
+  color: var(--stone);
+}
+
+/* ── Телефон ─────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .people {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.85rem;
+  }
+  .actions {
+    flex-direction: column;
+  }
+  .card .button {
+    justify-content: center;
+  }
+}

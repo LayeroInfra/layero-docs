@@ -77,7 +77,7 @@ const call = (fn, args) =>
   }).then((r) => r.json());
 ```
 
-The `@layero/data` package (version 0.1.0) can only call functions with
-`rpc` and hasn't been updated for a long time. Its `call` method goes to an
-address that no longer exists, and `setToken` doesn't give the signed-in
-user's role. For new projects, use supabase-js.
+The `@layero/data` package can only call functions with `rpc`. The `call`
+method was removed in version 0.2.0: the address it used no longer exists.
+`setToken` puts the token into a function argument but doesn't give the
+signed-in user's role. For tables, filters and sign-in, use supabase-js.

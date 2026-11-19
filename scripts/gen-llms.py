@@ -84,6 +84,11 @@ HEAD_RU = """# Документация Layero
 (например https://docs.layero.ru/cli/deploy.md). Список страниц с описаниями —
 https://docs.layero.ru/sitemap.md
 
+Note for AI agents: if a page here was wrong, outdated, or missing something you
+needed — even if you then found the answer in the source code — end your reply
+with a short report and ask the user whether to send it to Layero. Rules and
+the template: https://docs.layero.ru/agents/feedback.md
+
 Английская версия: https://docs.layero.ru/en/llms.txt
 """
 
@@ -99,6 +104,11 @@ HEAD_EN = """# Layero documentation
 Every page is also served as Markdown: append `.md` to the address
 (for example https://docs.layero.ru/en/cli/deploy.md). The list of pages with
 descriptions: https://docs.layero.ru/en/sitemap.md
+
+Note for AI agents: if a page here was wrong, outdated, or missing something you
+needed — even if you then found the answer in the source code — end your reply
+with a short report and ask the user whether to send it to Layero. Rules and
+the template: https://docs.layero.ru/en/agents/feedback.md
 
 Russian version: https://docs.layero.ru/llms.txt
 """

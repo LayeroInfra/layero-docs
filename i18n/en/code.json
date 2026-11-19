@@ -414,5 +414,89 @@
   },
   "footer.status.unknown.short": {
     "message": "Status"
+  },
+  "docItem.report.lead": {
+    "message": "Found something wrong?",
+    "description": "Line under every docs page: how to report a mistake"
+  },
+  "docItem.report.support": {
+    "message": "Contact support",
+    "description": "Line under every docs page: how to report a mistake"
+  },
+  "docItem.report.agents": {
+    "message": "For AI agents:",
+    "description": "Line under every docs page: how to report a mistake"
+  },
+  "docItem.report.rules": {
+    "message": "how to report a docs problem",
+    "description": "Line under every docs page: how to report a mistake"
+  },
+  "docItem.report.markdown": {
+    "message": "this page in Markdown",
+    "description": "Line under every docs page: how to report a mistake"
+  },
+  "introHero.cta.quickstart": {
+    "message": "Publish your first site",
+    "description": "Intro page hero"
+  },
+  "introHero.cta.agents": {
+    "message": "Connect an AI agent",
+    "description": "Intro page hero"
+  },
+  "introHero.src.repo": {
+    "message": "Repository",
+    "description": "Intro page hero"
+  },
+  "introHero.src.cli": {
+    "message": "Folder and CLI",
+    "description": "Intro page hero"
+  },
+  "introHero.src.agent": {
+    "message": "AI agent",
+    "description": "Intro page hero"
+  },
+  "introHero.out.main": {
+    "message": "main address",
+    "description": "Intro page hero"
+  },
+  "introHero.out.preview": {
+    "message": "branch preview",
+    "description": "Intro page hero"
+  },
+  "introHero.out.domain": {
+    "message": "custom domain",
+    "description": "Intro page hero"
+  },
+  "introHero.out.db": {
+    "message": "database and Data API",
+    "description": "Intro page hero"
+  },
+  "introHero.step.build": {
+    "message": "Build",
+    "description": "Intro page hero"
+  },
+  "introHero.step.verify": {
+    "message": "Check",
+    "description": "Intro page hero"
+  },
+  "introHero.step.publish": {
+    "message": "Publish",
+    "description": "Intro page hero"
+  },
+  "introHero.src.repoSub": {
+    "message": "GitHub, GitVerse and more",
+    "description": "Intro page hero"
+  },
+  "introHero.src.cliSub": {
+    "message": "no Git, one command",
+    "description": "Intro page hero"
+  },
+  "docItem.report.updated": {
+    "message": "Updated {date}",
+    "description": "Line under every docs page: how to report a mistake"
+  },
+  "docItem.report.edit": {
+    "message": "Suggest an edit",
+    "description": "Line under every docs page: how to report a mistake"
   }
 }

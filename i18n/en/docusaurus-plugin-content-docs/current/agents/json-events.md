@@ -688,6 +688,7 @@ freed immediately.
 | `code` | string — see the table below |
 | `next_action` | string — the concrete command or URL that resolves it |
 | `message` | string — human-readable description |
+| `docs_feedback` | string? — on «not found» (exit 3) and «invalid input» (exit 4) errors: a link to the [report rules](/agents/feedback). If the command failed because the docs said to run it, report the page |
 
 ## Events of other commands
 
