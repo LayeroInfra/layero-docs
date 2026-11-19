@@ -488,6 +488,20 @@ table th, table td {
 table tr:last-child td { border-bottom: none; }
 table th { font-weight: 500; color: var(--graphite); text-align: left; }
 
+/* На узком экране таблица прокручивается внутри своей рамки. С `display:
+   table` выше широкая таблица растягивала страницу, и на телефоне вся
+   страница уезжала вправо (19.11: 26 страниц из 67 на 375 px). Блоку
+   ширина по содержимому, но не шире колонки текста. */
+@media (max-width: 996px) {
+  table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* ——— Плашки-подсказки ———
    Нейтральная карточка, цвет — только у значка и тонкой полосы слева.
    Цвета статусов — системные из дизайн-системы, а не зелёный/жёлтый
