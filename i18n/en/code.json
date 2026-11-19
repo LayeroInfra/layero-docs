@@ -414,5 +414,25 @@
   },
   "footer.status.unknown.short": {
     "message": "Status"
+  },
+  "docItem.report.lead": {
+    "message": "Found something wrong?",
+    "description": "Line under every docs page: how to report a mistake"
+  },
+  "docItem.report.support": {
+    "message": "Contact support",
+    "description": "Line under every docs page: how to report a mistake"
+  },
+  "docItem.report.agents": {
+    "message": "For AI agents:",
+    "description": "Line under every docs page: how to report a mistake"
+  },
+  "docItem.report.rules": {
+    "message": "how to report a docs problem",
+    "description": "Line under every docs page: how to report a mistake"
+  },
+  "docItem.report.markdown": {
+    "message": "this page in Markdown",
+    "description": "Line under every docs page: how to report a mistake"
   }
 }

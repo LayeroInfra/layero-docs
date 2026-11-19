@@ -1,0 +1,25 @@
+.report {
+  margin: 2rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border-soft);
+  color: var(--dusty);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.report a {
+  color: var(--graphite);
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-underline-offset: 3px;
+}
+
+.report a:hover {
+  color: var(--ink);
+  text-decoration-color: var(--ink);
+}
+
+.sep {
+  margin: 0 0.5rem;
+  color: var(--stone);
+}
