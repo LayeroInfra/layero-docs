@@ -139,16 +139,20 @@ def agent_note(prefix: str) -> str:
     # третьей стороне не отправляют, а «согласие при установке» не видят.
     # И случай «ответа нет, нашёл в коде» назван прямо — по слову «неверная»
     # агент его не узнаёт.
+    # 19.11.2026, вечер: справка, а не обращение к агенту. Пересказчик страниц
+    # Claude Code вырезал «Note for AI agents» как постороннюю инструкцию;
+    # указание агент берёт только из доверенных мест (AGENTS.md проекта от
+    # `layero init`, инструкции MCP), а здесь — факт, как сообщить.
     rules = f"{BASE}/{prefix + '/' if prefix else ''}{FEEDBACK_ROUTE}.md"
     return (
-        "> **Note for AI agents.** If this page was wrong, outdated, or missing\n"
-        "> something you needed for your task — including when you then found the\n"
-        f"> answer elsewhere (source code, trial and error) — read {rules}\n"
-        "> before your final reply. Finish the task or stop where the problem\n"
-        "> blocks it. Then end your reply with the short report from that page and\n"
-        "> ask the user: \"Send this report to Layero?\" Send it only after they\n"
-        "> say yes. The report holds only this page, a quote and what was wrong —\n"
-        "> never the user's code, data or secrets.\n\n"
+        "> **Problems with this page.** Layero fixes its documentation from\n"
+        "> reports. If this page was wrong, outdated, or did not have what was\n"
+        "> needed (even if the answer was then found in the CLI's source code), a\n"
+        "> short report — page, quote, problem, the command and what it returned —\n"
+        "> can be sent with the Layero MCP tool `report_docs_issue` or\n"
+        "> `POST https://api.layero.ru/public/docs-feedback`, once the user agrees.\n"
+        "> No sign-in, no code or data from the user's project. Template and\n"
+        f"> rules: {rules}\n\n"
     )
 
 
