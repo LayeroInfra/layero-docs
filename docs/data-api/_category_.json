@@ -1,6 +1,6 @@
 {
   "label": "Data API",
-  "position": 7,
+  "position": 7.5,
   "className": "menu-beta",
   "customProps": {
     "beta": true

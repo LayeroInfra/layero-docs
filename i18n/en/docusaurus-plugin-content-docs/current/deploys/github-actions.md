@@ -2,7 +2,7 @@
 slug: /cli/github-actions
 sidebar_position: 5
 title: From GitHub Actions
-description: The official GitHub Action for deploying to Layero — CI tokens, building the artifact in your pipeline, pull-request previews, step outputs and the errors you are likely to hit.
+description: The official GitHub Action for deploying to Layero — CI tokens, building in your pipeline, pull-request previews, step outputs and the errors you are likely to hit.
 ---
 
 # From GitHub Actions
@@ -39,7 +39,7 @@ You want the Action when **the build has to run in your pipeline**:
 - tests, linters or codegen must pass before publishing;
 - you build a monorepo and publish only one package out of it.
 
-Then you build it yourself and ship the **finished artifact**:
+Then build the project in your pipeline and send the **ready build**:
 
 ```yaml
       - run: npm ci && npm run build

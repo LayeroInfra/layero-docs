@@ -4,6 +4,6 @@
   "link": {
     "type": "generated-index",
     "slug": "/cli",
-    "description": "Installing and signing in, every `layero` CLI command, common flags and variables."
+    "description": "Installing and signing in, every layero CLI command, common flags and variables."
   }
 }

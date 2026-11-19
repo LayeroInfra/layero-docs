@@ -33,7 +33,7 @@ description: Layero собирает и публикует сайты и при�
 - **Базы данных Postgres** и **Data API** — доступ к базе по HTTP прямо из
   фронтенда. См. [Базы данных](./database/index.md) и [Data API](./data-api/index.md).
 - **Скорость и посещаемость** — замер скорости страниц и веб-аналитика.
-  См. [Page Speed](./performance/index.md) и [Аналитика](./team/analytics.md).
+  См. [Page Speed](./performance/index.md) и [Аналитика](./performance/analytics.md).
 
 ## Коротко о платформе
 

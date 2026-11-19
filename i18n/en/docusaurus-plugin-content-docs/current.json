@@ -19,22 +19,6 @@
     "message": "The Free and Pro plans, the balance and subscription renewal, limits and working beyond them.",
     "description": "The generated-index page description for category Тарифы и оплата in sidebar docsSidebar"
   },
-  "sidebar.docsSidebar.category.Производительность": {
-    "message": "Performance",
-    "description": "The label for category Производительность in sidebar docsSidebar"
-  },
-  "sidebar.docsSidebar.category.Производительность.link.generated-index.description": {
-    "message": "Site speed audit: how a run works, the Lighthouse score, Core Web Vitals, comparing runs and schedules.",
-    "description": "The generated-index page description for category Производительность in sidebar docsSidebar"
-  },
-  "sidebar.docsSidebar.category.Команды и интеграции": {
-    "message": "Teams & integrations",
-    "description": "The label for category Команды и интеграции in sidebar docsSidebar"
-  },
-  "sidebar.docsSidebar.category.Команды и интеграции.link.generated-index.description": {
-    "message": "Organisations, the GitHub App, and member access.",
-    "description": "The generated-index page description for category Команды и интеграции in sidebar docsSidebar"
-  },
   "sidebar.docsSidebar.category.AI-агенты": {
     "message": "AI agents",
     "description": "The label for category 'AI-агенты' in sidebar 'docsSidebar'"
@@ -79,10 +63,6 @@
     "message": "CLI reference",
     "description": "The label for category 'Справочник CLI' in sidebar 'docsSidebar'"
   },
-  "sidebar.docsSidebar.category.Справочник CLI.link.generated-index.description": {
-    "message": "Installing and signing in, every `layero` CLI command, common flags and variables.",
-    "description": "The generated-index page description for category 'Справочник CLI' in sidebar 'docsSidebar'"
-  },
   "sidebar.docsSidebar.category.Приложения с сервером": {
     "message": "Apps with a server",
     "description": "The label for category 'Приложения с сервером' in sidebar 'docsSidebar'"
@@ -90,5 +70,21 @@
   "sidebar.docsSidebar.category.Приложения с сервером.link.generated-index.description": {
     "message": "Next.js with server rendering, Node.js and Python servers, Streamlit and Gradio: when you need them, how they run and where to keep data.",
     "description": "The generated-index page description for category 'Приложения с сервером' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Скорость и аналитика": {
+    "message": "Speed and analytics",
+    "description": "The label for category 'Скорость и аналитика' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Справочник CLI.link.generated-index.description": {
+    "message": "Installing and signing in, every layero CLI command, common flags and variables.",
+    "description": "The generated-index page description for category 'Справочник CLI' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Команды и интеграции": {
+    "message": "Teams & integrations",
+    "description": "The label for category Команды и интеграции in sidebar docsSidebar"
+  },
+  "sidebar.docsSidebar.category.Команды и интеграции.link.generated-index.description": {
+    "message": "Organisations, the GitHub App, and member access.",
+    "description": "The generated-index page description for category Команды и интеграции in sidebar docsSidebar"
   }
 }

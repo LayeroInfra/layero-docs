@@ -138,7 +138,7 @@ dependencies and building on the platform side are skipped.
 
 | field | type |
 |---|---|
-| `dir` | string — the directory holding the artifact |
+| `dir` | string — the folder with the ready build |
 
 ### `runtime_type_applied`
 
@@ -227,7 +227,7 @@ hidden in JSON mode; a single marker line arrives instead. Full log:
 
 | field | type | note |
 |---|---|---|
-| `url` | string | **The live public address of the site** — not the dashboard. For a plain `layero deploy` of a CLI project this is the project's production address (CLI uploads auto-promote to the apex). For a project with a repository, where a CLI upload is not promoted, it is the address of the `cli` environment (`--branch` on `deploy` is refused, see `branch_unsupported`). It is reachable straight away; this is the link to open and to show the user. |
+| `url` | string | **The address of the site itself**, not the dashboard. For a project without a repository it's the main address: a folder upload becomes the main build at once. For a project with a repository without `--prod` — the address of the `cli` environment. It works straight away; this is the link to open and to show the user. |
 | `dashboard_url` | string? | The project management page (`https://app.layero.ru/projects/<id>`). This is **not** the site — never hand it over as the link to the finished site. |
 | `preview_url` | string? | An outdated field, not filled in for ordinary projects. Open `url`. |
 | `edge_ready` | bool? | `true` — the address already answers with the site itself: before `ready` the CLI (since 0.11.0) polls `url` while the platform's own page answers instead (header `X-Layero-Screen`), for up to 90 s. So a container app no longer shows the "nothing here yet" placeholder after `ready`. `false` — the app did not answer within that time: see `npx layero@latest logs --runtime`. |
@@ -237,7 +237,7 @@ hidden in JSON mode; a single marker line arrives instead. Full log:
 
 ### `promoted`
 
-The apex now points at the given deploy. Emitted by `layero promote` and by
+The main address now serves the given build. Emitted by `layero promote` and by
 `layero deploy --promote`.
 
 | field | type |

@@ -1,14 +1,13 @@
 ---
-sidebar_position: 3
+slug: /team/analytics
+sidebar_position: 2
 title: Analytics and Russian data law (152-FZ)
 description: Who is responsible for visitor data when Yandex Metrica or the Google Sheets form export is connected, why you need a cookie banner, what session recording (Webvisor) does and how to turn it on or off.
 ---
 
 # Analytics and Russian data law (152-FZ)
 
-Metrica and forms collect data about the visitors of **your** site. Under
-Russian Federal Law 152-FZ you, the site owner, are the operator of that
-data. Layero processes it on your behalf — [see the terms](https://layero.ru/dpa).
+**Metrica and forms collect data about the visitors of your site, and under Russian Federal Law 152-FZ you, the site owner, are the operator of that data.** Web analytics — project → «Веб-аналитика» (Web analytics) — is available on the [Pro](../billing/plans.md) plan. Layero processes it on your behalf — [see the terms](https://layero.ru/dpa).
 
 What you need to do:
 

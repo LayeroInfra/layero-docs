@@ -13,7 +13,7 @@ people's sites there is a third mode — "any site".
 ## 1. Domains of connected projects are allowed automatically
 
 A project connected to the database may call it from the browser
-automatically: its apex (`<project>.layero.app`), its own domains and branch
+automatically: its main address (`<project>.layero.app`), its own domains and branch
 previews. Nothing to configure.
 
 ## 2. Accepted origins — for third-party sites

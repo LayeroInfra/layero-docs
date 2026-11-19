@@ -35,7 +35,7 @@ the platform builds it and serves it at `<project>.layero.app`.
   straight from the frontend. See [Databases](./database/index.md) and
   [Data API](./data-api/index.md).
 - **Speed and traffic** — page speed measurement and web analytics.
-  See [Page Speed](./performance/index.md) and [Analytics](./team/analytics.md).
+  See [Page Speed](./performance/index.md) and [Analytics](./performance/analytics.md).
 
 ## The platform in brief
 
