@@ -1,93 +1,91 @@
 ---
 sidebar_position: 1
 title: Databases
-description: Managed PostgreSQL on Layero — a shared database included with the Pro plan and a dedicated database with its own configuration. What the section can do, how the placements differ, and how to get access to the beta.
+description: Managed PostgreSQL in Layero — a shared database in the Pro plan and a dedicated database with its own configuration. How they differ, what the section can do and where to start.
 ---
 
 # Databases
 
-**Layero databases are plain PostgreSQL right next to your projects:**
-in the same account, on servers in Moscow. You create a database in the
-dashboard or with a single CLI command, and give it to a project with a
-button — the connection string arrives in the build automatically.
+**Layero databases are plain PostgreSQL next to your projects:** in the same
+organization, on servers in Moscow. You create a database in the dashboard (a shared one also with one CLI command), and give it to a project with a button — the
+connection string arrives in the build by itself.
 
 :::info[Beta]
 
-Databases are in beta. Everything described in this section already works, but the interface and some features are still changing, and the page
-may lag behind the dashboard by a few days. If you notice a discrepancy,
-let us know — it helps.
+Databases are in beta. Everything described in this section works, but the
+interface and some features are still changing. If a page differs from the dashboard, write to [support](../support.md).
 
-The section is open to all organizations: the **Databases** item is in the
-[dashboard](https://app.layero.ru) menu, in the "Services" group.
+The section is open to every organization: the «Базы данных» (Databases)
+item is in the [dashboard](https://app.layero.ru) menu, in the «Сервисы»
+(Services) group.
 
 :::
 
-## Two placements
+## Shared and dedicated
 
 | | Shared database | Dedicated database |
 |---|---|---|
-| Where it lives | a shared Layero server | a separate server just for you |
-| Power | shared processor, "Shared CPU" | you choose the cores, memory, and disk |
-| Space | 0.5 GB | 8 to 2,000 GB, the disk can be increased |
+| Where it lives | on a shared Layero server | on a separate server just for you |
+| Compute | shared CPU, «Shared CPU» in the dashboard | you choose cores, memory and disk |
+| Space | 0.5 GB | 8 to 2 000 GB, the disk can grow |
 | Plan | Pro only | any, no subscription needed |
-| Price | included in Pro | from 1 350 ₽ per month, by the hour from the balance |
-| Without a Pro subscription | access closes after the grace period, data is deleted | doesn't depend on the subscription |
+| Price | included in Pro | from 1 350 ₽ a month, hourly from the balance |
+| If Pro ends | access is closed after the grace period, the database is deleted 3 days later | doesn't depend on the subscription |
 | How many | one per organization | as many as you need |
-| Wait time | under a minute | 7–13 minutes |
-| PostgreSQL version | 18 | 14–18, your choice |
-| Backups | free: once a day, up to 7 days | paid option: 1–14 backups |
+| How long to wait | under a minute | 7–13 minutes |
+| PostgreSQL version | 18 | one of those offered, the newest by default |
+| Backups | free: once a day, kept up to 7 days | paid option: 1 to 14 copies |
 | Create from the CLI | yes | dashboard only |
 
 **A shared database** is for getting started: click and go. It's enough
-for a prototype, a small site, or an internal service.
+for a prototype, a small site or an internal service.
 
 **A dedicated database** is for when you need guaranteed resources, more
-space, or a specific PostgreSQL version. You can create one right away or
-move your shared database onto it once that one grows.
+space or another PostgreSQL version. You can create one right away or move
+a shared database onto it when it grows.
 
-Details on prices and payment — ["Pricing"](./pricing.md), on all
-limits — ["Limits"](./limits.md).
+Prices and payment are on [Pricing](./pricing.md), all the limits are on
+[Limits](./limits.md).
 
 ## What the section can do
 
-- **The project connects itself.** Give the database to a project — the
+- **Projects connect by themselves.** Give a database to a project — the
   connection string arrives in the `LAYERO_DATABASE_URL` variable, and the
   project gets its own role in the database.
-- **Tables and relationships** — the database's contents by schema, rows,
-  and a relationship diagram right in the dashboard.
-- **SQL editor** with bookmarks, history, and trial runs of a query as a
+- **Tables and relations** — the database's contents by schema, rows and a
+  relationship diagram right in the dashboard.
+- **SQL editor** with bookmarks, history and a trial run of a query as a
   Data API role.
-- **Roles and RLS policies** — who connects and which rows they see.
-  Access can be granted for a limited time.
-- **Functions** with a test call and version history.
-- **Extensions** with a toggle: `pgcrypto`, `uuid-ossp`, `citext`,
-  `pg_trgm`, `unaccent`, `btree_gin`, `pgvector`.
-- **Monitoring** — space, connections, and load over an hour, a day, or a
+- **Roles and RLS policies** — who connects and which rows they see. Access
+  can be granted for a limited time.
+- **Functions** with a trial call and version history.
+- **Triggers** — functions the database calls by itself on writes to a table.
+- **Extensions** with a switch — the list is on
+  [Working in the dashboard](./panel.md#extensions).
+- **Monitoring** — space, connections and load over an hour, a day or a
   week.
-- **Backups** on a schedule, restore with a button, and download as a
-  regular PostgreSQL dump.
+- **Backups** on a schedule, restore with a button, a dump to download.
 - **Access by address** — from outside, only addresses on your list can
   connect to the database.
-- **[Data API](../data-api/index.md)** — the database over HTTP for your
-  frontend, without your own server. Data API is in beta and available on
-  the Pro plan.
+- **[Data API](../data-api/index.md)** — the database over HTTP for the
+  frontend, with no server of your own. Available on Pro, in beta.
 
 ## Where to start
 
-1. [Create a database](./create.md) — in the dashboard or with the
-   `layero db create` command.
+1. [Create a database](./create.md) — in the dashboard or with
+   `layero db create`.
 2. [Connect it to a project](./create.md#whats-next) or
-   [connect yourself](./connect.md) using the connection string.
-3. Take a look at [working in the dashboard](./panel.md) so you know where
-   everything is.
+   [connect to it yourself](./connect.md) with the connection string.
+3. Look through [Working in the dashboard](./panel.md) to know where things
+   are.
 
-## The whole section
+## Pages in this section
 
 - [Creating a database](./create.md) — the dashboard wizard and the CLI.
-- [Working in the dashboard](./panel.md) — all sections of the database page.
-- [Connecting to a database](./connect.md) — connection string, TLS, access
-  by address.
+- [Working in the dashboard](./panel.md) — every part of the database page.
+- [Connecting to a database](./connect.md) — the connection string,
+  encryption, access by address.
 - [Backups](./backups.md) — schedule, restore, dump.
 - [Databases from the CLI](./cli.md) — `layero db` in the terminal and in CI.
-- [Pricing](./pricing.md) — prices, payment, renewal, refunds.
-- [Limits](./limits.md) — space, connections, queries.
+- [Pricing](./pricing.md) — prices, payment from the balance, deletion.
+- [Limits](./limits.md) — space, connections, query time.

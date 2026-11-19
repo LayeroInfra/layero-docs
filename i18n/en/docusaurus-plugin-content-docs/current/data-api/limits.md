@@ -40,7 +40,7 @@ missing is specifically running your own code on our side.
 |---|---|
 | Concurrent queries per database | shared database — 4 (2 on each of the two entry points), shared between the Data API and your server; dedicated — 20 % of the cluster connection ceiling, at least 4. `layero db list` shows the same number (`data_api_concurrent`). Beyond that — a queue, then a `db_too_busy` refusal |
 | Calls per month | Free — 1 M, Pro — 10 M per organization, counted across all databases; on Pro, above that — 20 ₽ per 1 M with [extra usage](../billing/overage.md), otherwise a refusal (429) until the new period |
-| Calls per day | Free — 50,000, Pro — 1,000,000 per organization, as protection against spikes; beyond that, a `quota_exceeded` refusal (429) until 00:00 UTC |
+| Calls per day | Free — 50,000, Pro — 1,000,000 per database, as protection against spikes; beyond that, a `quota_exceeded` refusal (429) until 00:00 UTC |
 | Sign-in users per database | Free — 10,000, Pro — 100,000; beyond that, new sign-ups are closed, existing users keep working |
 | File in storage | up to 50 MB on any plan |
 | File storage | Free — 1 GB, Pro — 10 GB on average over the month per organization, 100 GB at most in total; on Pro, above that — 10 ₽ per GB |

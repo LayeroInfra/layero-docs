@@ -19,24 +19,20 @@ over the limits, and nothing is capped or charged. The card at the top of
 the page shows the exact date for your organization.
 :::
 
-The **Usage** page in the dashboard shows how much of each resource the
-organization has used in the current billing period and how much the plan
-includes. How to keep working above the limits on Pro is covered in
-[Extra usage](./overage.md).
+**The «Потребление» (Usage) page in the dashboard shows how much of each resource the organization has used in the billing period and how much is left before the plan's limit.** How to keep working above the limits on Pro is covered in [Extra usage](./overage.md).
 
 ## In short
 
 - Limits are counted **per organization**: each organization has its own.
 - On monthly Pro, the period runs from one renewal to the next. Annual Pro
   uses monthly usage windows. Free uses calendar months.
-- At 80 % of a limit you get an email; at 100 % nothing new starts, and
-  whatever is already running keeps running.
+- At 80 % of a limit you get an email. At 100 %, what is restricted depends on the metric — [see below](#what-happens-when-a-limit-runs-out).
 - On Free the limit is hard. On Pro you can keep going above the limit,
   paid from the balance, if you turn on [extra usage](./overage.md).
 
 ## Where to look
 
-**Dashboard → organization → Usage.** For each metric you can see:
+Dashboard → organization → «Потребление» (Usage). For each metric you can see:
 
 - how much has been used since the start of the period and how much the
   plan includes;
@@ -130,8 +126,9 @@ images and scripts is 31 requests.
 ### Data API calls
 
 How many times sites and apps called the organization's databases through
-the [Data API](../data-api/index.md), counted across all databases. Calls
-that failed through our fault (5xx) and limit refusals (429) don't count.
+the [Data API](../data-api/index.md), counted across all databases. Calls that failed through our fault (5xx) and limit refusals (429) don't count.
+
+Besides the monthly limit, each database has a daily one that protects against a spike of requests: 1 M calls a day on Pro. It is counted separately and can't be bought above the plan — see [Data API limits](../data-api/limits.md#boundaries-worth-knowing-about-upfront).
 
 ### File storage
 
@@ -158,13 +155,12 @@ runs are sold in packs of 10: the first run above 500 opens a pack for
 
 | Limit | Free | Pro | At the limit |
 |---|---|---|---|
-| Build retention | last 3 deploys per environment | 10 | older ones are deleted; rollback works within this number |
-| Files in one deploy | 10,000 | 100,000 | the deploy is rejected as a whole |
+| Build retention | the last 10 for the main branch, 3 for each branch with a preview | the same | older ones are deleted; you can roll back to a kept one — see [Build retention](../deploys/retention.md) |
 | Size of one file in storage | 50 MB | 50 MB | the upload is rejected |
 
 ## What happens when a limit runs out
 
-The general rule: **nothing new starts, and what's running is left alone.**
+Usually nothing new starts at the limit, and whatever is already running keeps running. The exception is traffic and site requests: a site can't simply "not start", so for a day it responds slowly, and then it is closed until the new period.
 
 | When | Free | Pro, extra usage off | Pro, extra usage on |
 |---|---|---|---|
@@ -188,9 +184,7 @@ Restrictions by metric:
 on extra usage, raising the budget or topping up the balance, without
 waiting for a new period. With a new period they are lifted on their own.
 
-A refusal is shown as text: the deploy stays in the list with the
-"refused" status and a reason, and the CLI and dashboard show it. Nothing
-already published disappears.
+A refusal is shown as text: the build stays in the list with the "refused" status and a reason, and both the CLI and the dashboard show it.
 
 ## What to do if usage grows
 

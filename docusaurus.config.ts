@@ -120,6 +120,7 @@ const config: Config = {
           {from: '/plugin/catalogue', to: '/agents/mcp-tools'},
           {from: '/cli/agents', to: '/agents/'},
           {from: '/billing/usage/overage', to: '/billing/overage/'},
+          {from: '/category/тарифы-и-оплата', to: '/billing'},
         ],
       },
     ],

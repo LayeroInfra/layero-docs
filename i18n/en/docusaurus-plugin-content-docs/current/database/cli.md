@@ -6,17 +6,7 @@ description: The layero db commands — listing databases, creating one, connect
 
 # Databases from the CLI
 
-:::info[Beta]
-
-Databases are in beta: everything described here works, but the interface
-and some features are still changing. More on the [Databases](./index.md)
-page.
-
-:::
-
-The `layero db` commands let you stay out of the browser in the middle of
-work, and let an agent in CI do the same. Everything they do is visible in
-the dashboard too: a database created from the terminal shows up in the
+**The `layero db` commands create databases, connect them to projects and run SQL right from the terminal** — for you in the middle of work and for an agent in CI. Everything they do is visible in the dashboard too: a database created from the terminal shows up in the
 list right away.
 
 Sign in once — the CLI opens a browser:
@@ -29,14 +19,14 @@ npx layero@latest login
 
 | Command | What it does |
 |---|---|
-| `layero db list` | The organization's databases: name, slug, state, placement, Postgres version, used space, and paid-until date |
+| `layero db list` | The organization's databases: name, slug, state, placement, PostgreSQL version, used space and price |
 | `layero db create <name>` | Create a shared database from your plan. The connection string is printed **once** |
 | `layero db connect <database>` | Connect a project to a database: the connection string arrives in the project's variables |
-| `layero db disconnect <database>` | Disconnect a project from a database: the variable goes away with the next deploy |
-| `layero db sql <database> "<SQL>"` | Run a query or a script |
+| `layero db disconnect <database>` | Disconnect a project from a database: the variable goes away with the next build |
+| `layero db sql <database> "<SQL>"` | Run a query or a script, including from a file |
+| `layero db delete <database>` | Delete a database with its data and backups |
 
-Each of these commands has an `--org <slug>` flag. You can refer to a
-database by name, slug, or id — whichever is convenient.
+Every command has an `--org <slug>` flag. You can refer to a database by name, slug (its short Latin name) or id — whichever is convenient.
 
 ## Which organization
 
@@ -47,8 +37,7 @@ your **personal** one. A team organization has to be specified explicitly:
 npx layero@latest db list --org moya-komanda
 ```
 
-The CLI won't pick "whichever comes first" among team organizations:
-databases cost money and belong to different teams. To list your
+The CLI won't pick a team organization at random: its databases belong to the team, and dedicated ones are paid from its balance. To list your
 organizations — `layero orgs list`.
 
 ## Listing databases
@@ -60,7 +49,7 @@ npx layero@latest db list
 ```
 CRM  crm  active  Shared  PG18  API  проектов: 2  0.01 ГБ из 0.50 ГБ
 Аналитика  analitika  active  выделенный  PG17  без API  проектов: 1  0.09 ГБ из 40.00 ГБ
-  1 750 ₽/мес · спишем 12 октября
+    4 400 ₽/мес
 ```
 
 The CLI prints its output in Russian (`проектов: N` means "projects: N",
@@ -73,15 +62,15 @@ The CLI prints its output in Russian (`проектов: N` means "projects: N",
 - **used space out of the quota** — for a shared database the quota is set
   by the plan, for a dedicated one by its disk.
 
-A paid database has a second line under the main one, about money. It
-changes along with the payment state:
+A dedicated database has a second line under the main one: the monthly
+price. If the balance ran short, it also shows what is happening to the
+database:
 
 | Line | What it means |
 |---|---|
-| `спишем 12 октября` | "we'll charge on 12 October": all is well, the next charge is on this date |
-| `оплачено по 12 октября` | "paid until 12 October": the database is paid up to this date, no auto-renewal |
-| `оплата не прошла, работает по 12 октября` | "payment failed, works until 12 October": the charge didn't go through, the database is still working for now — check your payment method |
-| `доступ закрыт за неоплату, удалим 15 октября` | "access closed for non-payment, we'll delete it on 15 October": the database is stopped and will be deleted on this date |
+| `4 400 ₽/мес` | "4 400 ₽ a month": all is well |
+| `оплата не прошла, работает по 12 декабря` | "payment failed, works until 12 December": the balance ran short, the database still works for now — top up the balance |
+| `доступ закрыт за неоплату, удалим 15 декабря` | "access closed for non-payment, we'll delete it on 15 December": the database is stopped and will be deleted with its data on that date |
 
 What's behind each state is explained on the
 [Pricing](./pricing.md#if-the-balance-runs-short) page.
@@ -92,7 +81,7 @@ What's behind each state is explained on the
 npx layero@latest db create crm
 ```
 
-The command waits for the database to come up (usually about 20 seconds)
+The command waits for the database to be ready (usually about 20 seconds)
 and prints the connection string:
 
 ```
@@ -113,13 +102,13 @@ string, and that the Data API keys for the frontend are available via
 
 The CLI won't print it a second time. If you've lost the string, you can
 view or change the password in the dashboard: database card menu →
-**Connect** → "Show password" or "Reset password". Changing the password
+«Подключить» (Connect) → «Показать пароль» (Show password) or «Сбросить пароль» (Reset password). Changing the password
 disconnects everything connected with the old one, so it's safer to save
 the output right away.
 
 :::
 
-If the database hasn't come up within a minute and a half, the command stops
+If the database isn't ready within a minute and a half, the command stops
 waiting and prints `база ещё готовится — строка подключения ниже заработает,
 как только она поднимется` ("the database is still being prepared — the
 connection string below will work as soon as it's up"). It prints the
@@ -137,9 +126,7 @@ to the wizard in the dashboard:
 
 ("a dedicated instance can't be ordered from the terminal").
 
-A dedicated database has a price, and there's nowhere in the terminal to
-confirm it. The panel shows the configurations and the price — order it
-there, see
+A dedicated database can't be ordered from the CLI: it is paid from the balance, and you need to see the price before ordering. The dashboard shows the configurations and the price — order it there, see
 [Creating a database](./create.md#from-the-dashboard).
 
 The `--gb` flag no longer works either. A shared database's size is set by
@@ -166,7 +153,7 @@ Connecting has two effects:
 1. **The connection string arrives in the project's variables** — in
    `LAYERO_DATABASE_URL`, and for a second database of the same project, in
    `LAYERO_DATABASE_URL_<SLUG>`. The application sees it starting with the
-   next deploy.
+   next build.
 2. **The project's domains become allowed for this database's Data API.**
    If a site calls the database from the browser and gets a CORS refusal,
    first check whether the project is connected.
@@ -181,9 +168,21 @@ npx layero@latest db disconnect crm
 ```
 
 The project's role is deleted immediately, the variable leaves the
-environment with the next deploy, and the project's domains are no longer
-allowed for the Data API. Tables and data stay in the database, and other
-projects keep working.
+environment with the next build, and the project's domains are no longer
+allowed for the Data API. Tables and data stay in the database, and other projects keep working. From another folder, name the project the same way, with `--project`.
+
+## Deleting a database
+
+```bash
+npx layero@latest db delete crm
+```
+
+In a terminal the command asks for confirmation. In CI and for an agent,
+confirm with the `--yes` flag; without it the command refuses with the
+`confirmation_required` code.
+
+⚠️ Deletion can't be undone: data, roles and backups disappear at once. If
+you need a backup, [download it](./backups.md#download-a-backup) first.
 
 ## Running SQL
 
@@ -191,6 +190,13 @@ The query goes right after the database name:
 
 ```bash
 npx layero@latest db sql crm "select count(*) from orders"
+```
+
+A script from a file goes with `--file`. You can also pipe a script in — the command reads standard input by itself. That's handy for running migrations in CI:
+
+```bash
+npx layero@latest db sql crm --file migrations/0001.sql
+cat migrations/*.sql | npx layero@latest db sql crm
 ```
 
 A script of several statements runs as **a single transaction**: if one
@@ -242,6 +248,7 @@ CLI prints JSON-lines events, one per line:
 | `db create` | `database_created` | `org`, `name`, `connection_string` — the only time the string comes with the password |
 | `db connect` | `database_connected` | `org`, `database`, `project` |
 | `db disconnect` | `database_disconnected` | `org`, `database`, `project` |
+| `db delete` | `database_deleted` | `org`, `database` |
 | `db sql` | `query_result` | `columns`, `rows`, `row_count`, `truncated`, `statements` |
 
 Refusals come as an `error` event with a code and a ready-made next step in
@@ -253,6 +260,8 @@ Refusals come as an `error` event with a code and a ready-made next step in
 | `database_unknown` | the organization has no database with that name, slug, or id |
 | `project_unknown` | it's unclear which project to connect — run from the project directory or pass `--project` |
 | `sql_missing` | `db sql` was called without a query |
+| `bad_format` | `db sql` got the query in two ways at once (as text and with `--file`) or couldn't read the file |
+| `confirmation_required` | `db delete` outside a terminal without `--yes` |
 | `gb_not_supported` | `db create --gb`: the size isn't chosen this way |
 | `dedicated_needs_panel` | `db create --dedicated`, `--cpu`, or `--ram`: a dedicated database is ordered in the dashboard |
 

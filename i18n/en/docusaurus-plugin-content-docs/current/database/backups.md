@@ -6,22 +6,9 @@ description: Layero database backups — schedule and retention for a shared dat
 
 # Backups
 
-:::info[Beta]
+**A shared database has backups on from the moment it's created; for a dedicated one they are a paid option.** Backups live on the database page, in the «Резервные копии» (Backups) section: the top shows whether they're on, below are the schedule, retention, cost and the list of finished backups.
 
-Databases are in beta: everything described here works, but the interface
-and some features are still changing. More on the [Databases](./index.md)
-page.
-
-:::
-
-Backups live on the database page, in the **Backups** section. The header
-shows whether they're enabled; below it is a summary: schedule, retention,
-cost, and the list of finished backups.
-
-**A shared database has backups on from the moment it's created** — once a
-day, kept for 7 days. You can turn them off, but then there's nothing to
-restore deleted data from. For a dedicated database, backups are a paid
-option and off by default.
+A shared database is backed up once a day, and backups are kept for 7 days. You can turn them off, but then there's nothing to restore deleted data from.
 
 ## Shared database
 
@@ -34,14 +21,13 @@ option and off by default.
 | Storage space | they don't count toward the database quota |
 | Price | included in the plan |
 
-The backup hour and the retention period change with **Change settings**. If
-backups were turned off, bring them back with **Backups → Enable**.
+The backup hour and the retention period change with «Изменить настройки» (Change settings). If backups were turned off, turn them back on with «Резервные копии» → «Включить» (Backups → Turn on).
 
 ## Dedicated database
 
 Backups of a dedicated database are a **paid option**, off by default.
 
-1. **Backups → Enable**.
+1. «Резервные копии» → «Включить» (Backups → Turn on).
 2. Choose how many backups to keep: 1 to 14. A backup is taken once a day
    at night; the oldest one is pushed out by the new one.
 3. The dialog shows the calculation before you confirm: database, backups,
@@ -56,14 +42,14 @@ You can turn backups off at any time: backups already taken aren't deleted.
 
 ## Make a backup manually
 
-The **Make a backup** button in the header takes an extra, off-schedule
+The «Сделать копию» (Make a backup) button at the top of the section takes an extra, off-schedule
 backup — for example, before a risky migration. The backup appears in the
 list with the status "being taken…", and once it's ready, with its size and
 buttons.
 
 ## Restore
 
-A finished backup has a **Restore** button.
+A finished backup has a «Восстановить» (Restore) button.
 
 ⚠️ The restore goes **into the same database, over the current data**, to the
 moment of the backup. Everything that appeared after the backup will be
@@ -109,8 +95,7 @@ You can take a dump with your own tools for both shared and dedicated
 databases — plain `pg_dump` with the connection string from the dashboard.
 Check three things first.
 
-1. **`pg_dump` 18 or newer.** Layero databases run PostgreSQL 18, and a
-   `pg_dump` older than the server refuses to dump:
+1. **A `pg_dump` version at least as new as the server.** A shared database runs PostgreSQL 18, a dedicated one the version chosen when ordering. An earlier `pg_dump` refuses to dump:
    `aborting because of server version mismatch`. Check the version with
    `pg_dump --version`.
 2. **Your address is on the allowed list.** Otherwise the server answers
@@ -136,9 +121,7 @@ Restore such a file with `psql -f backup.sql`.
 A dedicated database also supports archive formats, for example `-Fc` for
 `pg_restore`. On a shared database the server answers archive formats
 (`-Fc`, `-Fd`, `-Ft`) and the `-C` flag with
-`permission denied for table pg_db_role_setting`. This system catalog holds
-role settings of every database on the server, so it is closed to other
-customers. If you need an archive format for a shared database, download a
+`permission denied for table pg_db_role_setting`: this system table is shared by all databases on the server and is closed to customers. If you need an archive format for a shared database, download a
 backup from the dashboard.
 
 ## Backup types in the list
@@ -147,8 +130,8 @@ A shared database's list can contain backups of two types:
 
 | Type | What it is |
 |---|---|
-| **Storage backup** | uploaded off the server and survives even the loss of the server. It can be restored and downloaded |
-| **Rollback point** | an instant snapshot on the server itself: protects you from a mistake, but not from losing the server |
+| «Копия в хранилище» (Storage backup) | uploaded off the server and survives even the loss of the server. It can be restored and downloaded |
+| «Точка отката» (Rollback point) | a snapshot kept on the database server itself. It takes seconds and protects you from a mistake in the data, but not from losing the server |
 
 ## What happens to backups when a database is deleted
 

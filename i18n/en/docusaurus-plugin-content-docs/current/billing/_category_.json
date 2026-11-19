@@ -3,6 +3,7 @@
   "position": 11,
   "link": {
     "type": "generated-index",
-    "description": "Free and Pro plans, limits, team seats, and what happens to your projects when a subscription expires and renews."
+    "slug": "/billing",
+    "description": "The Free and Pro plans, the balance and subscription renewal, limits and working beyond them."
   }
 }

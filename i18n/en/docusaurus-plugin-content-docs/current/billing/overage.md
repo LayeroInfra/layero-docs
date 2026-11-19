@@ -12,8 +12,7 @@ the feature is enabled and the limits have taken effect for your organization.
 For monthly and annual Pro start dates, see [Usage and limits](./usage.md).
 :::
 
-On Pro you don't have to stop at a limit: you can keep working, paid from
-the balance, at the prices listed in [Usage and limits](./usage.md). Free has
+**On Pro you don't have to stop at a limit: you can keep working, paid from the balance,** at the prices listed in [Usage and limits](./usage.md). Free has
 no extra usage: the limit is hard, and the only way past it is upgrading
 to Pro.
 
@@ -30,12 +29,11 @@ to Pro.
 
 ## How to turn it on
 
-**Dashboard → organization → Billing → Extra usage → Set up budget.**
-Turn on the switch and set the amount.
+Dashboard → organization → «Потребление» (Usage) → the «Дополнительное потребление» (Extra usage) block → «Настроить бюджет» (Set up budget). Turn on the switch and set the amount.
 
 What you need:
 
-- paid Pro — there is no extra usage during the trial;
+- Pro, including during the trial;
 - money on the organization's balance or auto top-up turned on.
 
 The budget is not tied to the balance: it can be larger than what's on the
@@ -52,7 +50,7 @@ balance. You can turn extra usage off or change the budget at any time.
 - Data sometimes arrives late, for example traffic for the previous day.
   Usage from an earlier period may accrue against the budget of the current
   period. The price is based on the date the usage occurred.
-- You can see accrued charges and final settlement in Billing.
+- Accrued charges and the final settlement are shown on the «Оплата и тариф» (Billing and plan) page.
 
 Example: Pro, budget 1,000 ₽. By the middle of the period sites have
 served 112.5 GB against a 100 GB limit. That's 12.5 GB × 8 ₽ = 100 ₽ above
@@ -95,8 +93,7 @@ Each organization has its own limits, budget and balance.
 No. Extra usage is off by default.
 
 **Can I see how much has already been spent?**
-Yes. The Billing page shows how much of the budget is used, and the Usage
-page shows each metric.
+Yes. The «Оплата и тариф» (Billing and plan) page shows how much of the budget is used, and the «Потребление» (Usage) page shows each metric.
 
 **What if a charge looks wrong?**
 Write to support and name the organization. We'll go through the

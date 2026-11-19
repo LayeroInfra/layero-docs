@@ -6,16 +6,7 @@ description: Layero database limits — how many databases, storage and what hap
 
 # Limits
 
-:::info[Beta]
-
-Databases are in beta: everything described here works, but the interface
-and some features are still changing. More on the [Databases](./index.md)
-page.
-
-:::
-
-All the numbers on one page. Data API limits are on a separate one:
-[What's Missing](../data-api/limits.md).
+**All the database limits on one page.** Data API limits are on a separate one: [What's missing](../data-api/limits.md).
 
 ## How many databases
 
@@ -51,7 +42,7 @@ disk — watch the storage chart and increase the disk in advance.
 
 What to do when space is running out:
 
-- look at the five largest tables: **Monitoring → Database storage**;
+- look at the five largest tables: «Мониторинг» → «Место базы» (Monitoring → Database storage);
 - delete what you don't need and run `VACUUM` — deleted rows don't free up
   space right away;
 - move a shared database to a dedicated one or increase a dedicated
@@ -61,46 +52,56 @@ What to do when space is running out:
 ## Compute
 
 A **shared database** shares the server's CPU and memory with other shared
-databases. There's no guaranteed share, so a shared database is good for
-prototypes and small sites, but not for heavy analytics. The platform
-terminates a process that needs more than 128 MB of memory, so that a single
-query doesn't bring down its neighbors.
+databases. There's no guaranteed share, so a shared database is good for prototypes and small sites, but not for heavy analytics.
 
 A **dedicated database** gets all the cores and memory of its
 configuration.
 
 ## Connections
 
-All connections from outside and from applications go through the shared
-entry point `db.layero.ru:5432`.
+All connections — from apps, from your computer, from the Data API — go
+through the shared entry point `db.layero.ru:5432`. Limits apply to the
+database as a whole.
 
-| What | Limit |
+| | Shared database | Dedicated database |
+|---|---|---|
+| Open connections | 100 | depends on the configuration, from 200 |
+| Concurrent transactions | 4 | depends on the configuration, from 20 |
+
+A connection holds a server connection only for the length of a
+transaction, which is why there are many connections and few concurrent
+transactions. A query outside a transaction is a transaction too, for as
+long as the query runs. On a shared database the Data API shares the same four concurrent transactions with your apps.
+
+| What | How much |
 |---|---|
-| Concurrent connections per role | 20. The owner of a dedicated database gets more — it depends on the configuration |
-| Concurrent connections from one address | 50 |
-| New connections from one address | 2 per second on average (120 per minute), up to 60 at once |
 | Waiting for a free connection | 15 seconds, then a refusal |
-| Encryption | mandatory; connections without TLS are rejected |
+| A transaction with no queries | closed after 60 seconds |
+| A connection with no queries | closed after 10 minutes; the driver's pool reconnects by itself |
+| Encryption | mandatory, connections without TLS are rejected |
 
-The database's connection limit is shown as a dashed line on the
-**Monitoring → Connections** chart. From 80%, the chart turns yellow.
+How many connections are open right now is shown on the «Мониторинг» →
+«Подключения» (Monitoring → Connections) chart.
 
-Each connected project has its own role, and therefore its own 20
-connections. Applications on Layero aren't subject to the per-address
-limits.
+### What the client sees at the limit
+
+| Error text | What happened |
+|---|---|
+| `client connections exceeded (max_db_client_connections)` | all the database's connections are open. Make the driver's pool smaller or close extra connections |
+| `query_wait_timeout` | all transactions were busy for more than 15 seconds. Look for long transactions and queries |
+| `idle transaction timeout` | a transaction sat with no queries for more than 60 seconds |
+| `client_idle_timeout` | a connection sat with no queries for 10 minutes |
+| `canceling statement due to statement timeout` | a query ran longer than 30 seconds, see [Query time](#query-time) |
 
 ### Connection pool
 
-The `db.layero.ru` entry point is a pool in transaction mode: each
-transaction may go to a different server connection. For ordinary queries
-and ORMs this is invisible, but a few session-level things don't carry over
-to the next transaction:
+Each transaction may go to a different server connection. For ordinary queries and ORMs this is invisible, but a few things don't carry over from one transaction to the next:
 
 | Doesn't work across transactions | What to do |
 |---|---|
 | `SET` outside a transaction | `SET LOCAL` inside a transaction, or a role setting: `ALTER ROLE … SET` |
 | `LISTEN` / `NOTIFY` | poll on an interval |
-| session-level advisory locks | `pg_advisory_xact_lock` — a lock for the duration of the transaction |
+| advisory locks held for the whole connection (`pg_advisory_lock`) | `pg_advisory_xact_lock` — a lock for the duration of the transaction |
 | temporary tables | create and use them within a single transaction |
 
 ## Query time
@@ -131,7 +132,7 @@ commit;
 | Length of a single value | 4,096 characters |
 | Statements per script | up to 200, run as a single transaction |
 | Query length | up to 20,000 characters |
-| Rows in **Tables** | loaded in chunks as you scroll |
+| Rows in «Таблицы» (Tables) | loaded in chunks as you scroll |
 
 For data exports and anything that hits these limits, connect directly with
 `psql` or a driver using the [connection string](./connect.md).
@@ -154,15 +155,13 @@ Details — [Backups](./backups.md).
 |---|---|
 | Who connects from outside | only addresses from the database's list. Applications on Layero — always |
 | Addresses | IPv4 only |
-| Wrong passwords | 10 in 5 minutes — the address is blocked for 30 minutes; repeat blocks last longer, up to 16 hours |
+
 
 Details — [Who to let in](./connect.md#who-to-let-in).
 
 ## Extensions
 
-The toggle in the **Extensions** section enables `pgcrypto`, `uuid-ossp`,
-`citext`, `pg_trgm`, `unaccent`, `btree_gin`, and `pgvector`. The other
-extensions in the list are locked: they can only be enabled through
+Which extensions are turned on with a switch is listed on [Working in the dashboard](./panel.md#extensions). The other extensions in the list are locked: they can only be enabled through
 support. If an extension isn't in the list at all, it isn't on the server.
 TimescaleDB won't be available: its license prohibits offering it as part
 of a cloud database.
@@ -171,5 +170,5 @@ of a cloud database.
 
 | | Shared database | Dedicated database |
 |---|---|---|
-| Version | 18 | 14, 15, 16, 17, or 18 — chosen when ordering |
+| Version | 18 | one of those offered when ordering, the newest by default |
 | Upgrading the version | — | not possible yet |

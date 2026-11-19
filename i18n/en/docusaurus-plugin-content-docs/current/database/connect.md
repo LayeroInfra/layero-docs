@@ -6,16 +6,7 @@ description: Layero database connection string, network access modes, and server
 
 # Connecting to a database
 
-:::info[Beta]
-
-Databases are in beta: everything described here works, but the interface
-and some features are still changing. More on the [Databases](./index.md)
-page.
-
-:::
-
-The connection string is in the dashboard: database card menu → **Connect**.
-It looks like this:
+**The connection string is in the dashboard: database card menu → «Подключить» (Connect).** It looks like this:
 
 ```
 postgresql://<role>:<password>@db.layero.ru:5432/<database>?sslmode=verify-full
@@ -26,19 +17,12 @@ address of the server your particular database lives on isn't exposed: it
 can change, but the connection string doesn't.
 
 For applications on Layero, the connection string arrives automatically in
-the `LAYERO_DATABASE_URL` variable (with `require` mode, see below), starting
-with the next deploy after you connect the database to the project. You only
+the `LAYERO_DATABASE_URL` variable (with `require` mode, see below), starting with the next build after you connect the database to the project. You only
 need to enter it by hand where the application lives outside Layero.
 
-A second database for the same project gets a suffix based on its slug —
-`LAYERO_DATABASE_URL_<SLUG>` — so the two strings don't compete for one name.
+If a second database is connected to the project, its string arrives in `LAYERO_DATABASE_URL_<SLUG>`, where the slug is the database's short Latin name, as in the connection string.
 
-:::note[Why not `DATABASE_URL`]
-That's the variable name used by half of all hosts and libraries, and if
-we set it ourselves, it would silently override the one the person had set.
-Connections created before this rule keep their old name — the project card
-shows which name your application gets.
-:::
+The platform doesn't touch your own `DATABASE_URL` variable. Connections created earlier may use a different variable name — which name your app gets is shown on the database overview, in the «Подключённые проекты» (Connected projects) block.
 
 ## What an application can do
 
@@ -60,8 +44,7 @@ editor keep working, and the tables stay in the database.
 services:
 
 * **Row-level security (RLS) policies don't apply to the project's user.**
-  If your application relies on them, create a separate role with the
-  needed permissions on the **Roles** page and connect with it instead.
+  If your application relies on them, create a separate role with the needed permissions on the «Роли» (Roles) page and connect with it instead.
 * **The application can change the database owner's password.** After that,
   the SQL editor stops connecting until you reset the password in the
   dashboard.
@@ -86,9 +69,7 @@ The mode is the same for shared and dedicated databases: both connect
 through the shared entry point `db.layero.ru`, and encryption terminates at
 our certificate.
 
-⚠️ **Except a database you brought yourself.** We know neither who signed
-that server's certificate nor whether you have its root, so there is nothing
-to verify against. Its connection string is shown exactly as you saved it,
+⚠️ **Except a database on your own server** that you added to the dashboard yourself. We know neither who signed that server's certificate nor whether you have its root, so there is nothing to verify against. Its connection string is shown exactly as you saved it,
 and the mode switch in the dashboard is disabled for it.
 
 ⚠️ `verify-full` has a cost worth knowing about upfront: the mode requires
@@ -100,9 +81,7 @@ the next section, some clients won't connect with this string, and it will
 look like "the database is down".
 
 The recipe takes two commands. If there's nowhere to put the root
-certificate (someone else's container, a managed runner), switch the mode
-to `require` in the dashboard: database card menu → **Connect**, the
-"Verify server identity" toggle. The channel stays encrypted, but the
+certificate (someone else's container, a CI runner where you can't change files), switch the mode to `require` in the dashboard: database card menu → «Подключить» (Connect), turn off the «Проверять подлинность сервера» (Verify server identity) toggle. The channel stays encrypted, but the
 server's identity won't be verified.
 
 For applications on Layero, the platform sets `require` itself: we
@@ -157,8 +136,7 @@ postgresql://<role>:<password>@db.layero.ru:5432/<database>?sslmode=verify-full&
 ## Who to let in
 
 From outside — from a laptop, from CI, from someone else's hosting — only
-addresses on the database's list can connect: database page →
-**Settings → Allowed addresses**. Your projects' applications on Layero can
+addresses on the database's list can connect: database page → «Настройки» → «Разрешённые адреса» (Settings → Allowed addresses). Your projects' applications on Layero can
 always connect; there's no need to add them to the list.
 
 What the database comes with:
@@ -166,16 +144,15 @@ What the database comes with:
 | Database | List after creation |
 |---|---|
 | **Shared** | one address — the one the database was created from. The dashboard tells you so in a pop-up message |
-| **Dedicated** | a `0.0.0.0/0` row marked "Open to everyone at creation": anyone who knows the password can connect |
+| **Dedicated** | a `0.0.0.0/0` row marked «Открыта всем при создании» (Open to everyone at creation): anyone who knows the password can connect |
 
 ⚠️ If the dedicated database doesn't need to be open to the whole internet,
 delete the `0.0.0.0/0` row right after creation and add your own addresses.
 
 How to add an address:
 
-1. **Settings → Allowed addresses → Add**.
-2. Enter an address or a subnet. There are quick options: "My address"
-   and "Entire internet" (`0.0.0.0/0`); for the latter, the dashboard asks
+1. «Настройки» → «Разрешённые адреса» → «Добавить» (Settings → Allowed addresses → Add).
+2. Enter an address or a subnet. There are quick options: «Мой адрес» (My address) and «Весь интернет» (Entire internet, `0.0.0.0/0`); for the latter, the dashboard asks
    for confirmation.
 3. Optionally, note what the address is for and until what date it's
    valid. An expiry is handy when a contractor needs access for a week, not
@@ -190,20 +167,12 @@ through after switching providers or moving, first check that your
 current address is still on the list.
 :::
 
-### Automatic blocking
-
-After 10 wrong passwords in 5 minutes, an address is blocked for 30
-minutes; repeat blocks last longer, up to 16 hours. This keeps password
-brute-forcing from reaching the database. Blocked addresses are shown in
-the database's **Settings**: you can unblock your own with a button once
-the password has been fixed.
-
 ## If the connection fails
 
 | What the client says | What it means |
 |---|---|
-| `login rejected` | your address isn't on the allowed list or is blocked — check the database's **Settings** |
+| `no authentication method is found` | your address isn't on the allowed list — check the database's «Настройки» (Settings) |
 | `SASL authentication failed` | the address is allowed, but the password didn't match |
 | `no such user` | a typo in the role name |
 | certificate verification error | the string has `verify-full`, but the client doesn't have the root certificate — see step 1 |
-| connection hangs and drops | too many connections from one address, or the database's limit is exhausted — see ["Limits"](./limits.md#connections) |
+| `client connections exceeded`, `query_wait_timeout` and others | the database hit its connection or transaction limit — see [What the client sees at the limit](./limits.md#what-the-client-sees-at-the-limit) |

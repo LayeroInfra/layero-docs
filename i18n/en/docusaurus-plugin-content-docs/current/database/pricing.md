@@ -6,15 +6,7 @@ description: How much Layero databases cost — a shared database in the Pro pla
 
 # Pricing
 
-:::info[Beta]
-
-Databases are in beta: everything described here works, but the interface
-and some features are still changing. More on the [Databases](./index.md)
-page.
-
-:::
-
-In short:
+**A shared database is part of Pro, and a dedicated one is paid by the hour from the organization's balance.** In more detail:
 
 - **A shared database is included in the Pro plan**; nothing extra is charged
   for it.
@@ -45,15 +37,9 @@ to a dedicated server — see [below](#moving-from-a-shared-database-to-a-dedica
 
 ### If Pro isn't renewed
 
-A shared database lives as long as the Pro subscription is active. If the
-subscription couldn't be renewed, the database keeps working until the end of
-the grace period: 7 days for a monthly subscription, 30 for an annual one.
-Details — [Expiry & renewal of Pro](../billing/lifecycle.md#grace-period).
+If the subscription couldn't be renewed, Pro and the shared database keep working for the whole grace period: 7 days for a monthly subscription, 30 for a yearly one. Details — [Balance and renewal](../billing/lifecycle.md#grace-period).
 
-After the grace period, access to the database closes and its data is
-deleted. To keep it, [download a backup](./backups.md#download-a-backup)
-before the grace period ends, or move the database to a dedicated one — that
-doesn't depend on the subscription.
+After the grace period, access to the shared database is closed, and 3 days after closing the database is deleted with its data. Until it's deleted, pay for Pro and access comes back. If you need the data, [download a backup](./backups.md#download-a-backup) before the grace period ends, or move the database to a dedicated one — that doesn't depend on the subscription.
 
 ## Dedicated database
 
@@ -151,8 +137,7 @@ a reserve on the balance or turn on auto top-up, and keep backups on.
 
 ## Changing the configuration
 
-The "⋮" menu on the database overview → **«Изменить конфигурацию»** (Change
-configuration).
+The «⋮» menu on the database overview → «Изменить конфигурацию» (Change configuration).
 
 - The new hourly price applies from the moment of the change. There are no
   extra charges or recalculations for past hours.
@@ -165,8 +150,7 @@ configuration).
 
 ### Moving from a shared database to a dedicated one
 
-The same **«Изменить конфигурацию»** dialog on a shared database moves it to
-a dedicated server along with the data. Payment works as for a new dedicated
+A shared database has a «Перевести на выделенный» (Move to dedicated) button on its «Настройки» (Settings) page: the database moves to a separate server along with the data. Payment works as for a new dedicated
 database: the balance must hold the monthly price, then it's charged by the
 hour. Within a day the database can be moved back.
 
@@ -196,9 +180,7 @@ section 10 of the [database terms](https://layero.ru/databases-terms).
 **Do I need Pro for a dedicated database?** No. A dedicated database is paid
 for separately and is available on any plan.
 
-**What happens to the shared database if I don't renew Pro?** After the
-subscription's grace period, access to it closes and the data will be
-deleted — see [If Pro isn't renewed](#if-pro-isnt-renewed).
+**What happens to the shared database if I don't renew Pro?** After the grace period, access to it is closed, and 3 days later the database is deleted with its data — see [If Pro isn't renewed](#if-pro-isnt-renewed).
 
 **Can I have two shared databases?** No, there's one shared database per
 organization. Make the second and further ones dedicated.
