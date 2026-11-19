@@ -1,123 +1,119 @@
 ---
 sidebar_position: 1
-title: Organizations (personal and team)
-description: How a personal account differs from a team, when to use which, and how to switch between them.
+title: Organizations and teams
+description: A personal organization and a team in Layero, how to invite members, what seats cost, how to switch between organizations and move projects.
 ---
 
-# Organizations
+# Organizations and teams
 
-Layero, like Vercel, organises everything around a **scope** — the active
-organization. Every project, member, domain and integration belongs to a
-specific organization. In the top left corner of the dashboard is the
-**OrganizationSwitcher**:
+**Projects, domains, databases and the balance in Layero belong to an
+organization.** There are two kinds: a personal organization and a team. The
+organization switcher is in the top left corner of the dashboard.
 
-* **Personal Account** — your personal account. Created automatically at
-  signup, with your `username` as the slug. One per user; it cannot be deleted
-  or renamed to another slug.
-* **Teams** — team organizations. Created through **+ Create team** at the
-  bottom of the switcher, or on the Team page.
+## Personal organization
 
-## How personal differs from team
+A personal organization is created at sign-up, everyone has exactly one. It
+can't be deleted.
 
-| | Personal | Team |
-|---|---|---|
-| Who is a member | The owner only | Several people |
-| Invitations | No | Yes |
-| Roles | — | admin / member |
-| GitHub repositories | A personal GitHub account through OAuth | A GitHub Organization through the GitHub App |
-| Can be deleted | No (it lives as long as the user does) | Yes |
-| Can be renamed | The slug is fixed to the username | The slug can be changed |
+- **On Free** only you work in it: members can't be invited.
+- **On Pro** it becomes a team: you can invite members, assign
+  [roles](./roles.md) and set up project access. There's no need to create a
+  separate team for that.
 
-**Important:** a personal Layero account is not the same thing as a personal
-GitHub account.
+## Team
 
-* A personal Layero account can be connected to a personal GitHub
-  (repositories under `github.com/<login>/…`).
-* A Layero team organization connects to a **GitHub Organization** through the
-  [GitHub App](./github-app), so that access to repositories does not depend on
-  one person.
+A team is a separate organization with its own members, subscription,
+balance and card.
 
-## Creating a team
+- The subscription belongs to the team itself. A team runs on its own Pro,
+  not on the plan of one of its members.
+- All team charges come from its balance. The team card tops up only that
+  balance and isn't linked to the card of your personal organization.
+- Only the team's [owners](./roles.md#billing) see and change billing.
 
-1. Click **+ Create team** in the OrganizationSwitcher (or on the Team page →
-   "Create a new team").
-2. Enter the organization slug. For projects created before the move to
-   [`layero.app`](../deploys/environments) it ended up in the site address
-   (`<org>-<project>.layero.app`). For new ones the address consists of the
-   project slug alone, and the organization slug is only visible in the
-   dashboard and the CLI.
-3. The team is created and you are its admin.
-4. Optionally: connect the [GitHub App](./github-app) and invite members.
+A new team is created in the switcher: «Создать организацию» (Create
+organization). Pro is paid right away, a new team has no trial.
 
-## Inviting a member
+## Members
 
-`/account/team` → pick the team organization → the **"Invite by email"**
-section → enter the email and role (admin/member) → create the invite. The CLI
-returns a link you can send to the invitee. When they sign in through
-GitHub/Yandex with that email, the invite applies automatically.
+To invite a member: organization settings → «Участники» (Members) → the
+«Пригласить участников» (Invite members) block. Enter the email and the
+[role](./roles.md) and click «Пригласить» (Invite).
 
-## Roles
+The invitation arrives by email and is valid for 14 days. To accept it, sign
+in to Layero with the email it was sent to. An invitation can be revoked in
+«Участники» (Members) too.
 
-| Role | Can |
-|---|---|
-| admin | Everything: manage members, settings, projects and billing |
-| member | See the team's projects; the role on a specific project is set separately (owner/editor/viewer) |
+## Seats
 
-Organization roles are **separate** from project roles. Being a member of a
-team does not automatically make you an editor of a project — that is done on
-the Project → Members page.
+Every developer and every owner except the first needs a seat. The first
+owner is included in the team's subscription. Guests are free and unlimited.
+
+- A seat is 990 ₽ a month. It's always paid monthly, even with yearly Pro.
+- All seats renew on the same day — the day of the month the team's
+  subscription started.
+- A seat added mid-month is paid right away from the team balance for the
+  rest of the period until the renewal date. A seat already paid for this month isn't charged for again.
+- Only a free seat can be removed. Money for the remaining days isn't
+  refunded.
+- Seats belong to the team, not to a person. When a member leaves, their seat stays free and keeps renewing until an owner removes that seat.
+- Inviting a developer or an owner, or promoting a guest, needs a free seat.
+  A pending invitation to such a role takes a seat too.
+
+Seats are added and removed in «Участники» (Members), in the «Платные места»
+(Paid seats) block.
+
+If a seat renewal isn't paid, a grace period of the same length as for Pro
+starts — see [Balance and renewal](../billing/lifecycle.md). After it, developers beyond the paid seats lose access, starting with the most recently invited: they stay in the team but can't see its
+projects until the renewal is paid. Owners aren't affected.
 
 ## Switching between organizations
 
-The switcher in the top bar remembers your choice in the browser, so reloading
-the page puts you back in the same organization. Every list — projects,
-deploys, repositories to import — shows only what belongs to the organization
-you selected.
+The switcher remembers the selected organization in the browser: after a
+page reload you'll be in the same one. The dashboard shows projects, deploys and repositories to import only for the selected organization.
 
-## Transferring a project to another organization
+## Moving a project to another organization
 
-**Project → Settings → Transfer** sends a transfer request. An admin of the
-receiving organization confirms it on the **Team → "Incoming project
-transfers"** page.
+Project → «Настройки» (Settings) → «Передача проекта» (Project transfer).
+Start typing the name of the receiving organization and the dashboard will suggest matches. The request shows up in the recipient's dashboard, in the
+«Входящие передачи проектов» (Incoming project transfers) block, and arrives
+by email. They accept or decline it there. While the request is pending, you
+can withdraw it with the «Отменить запрос» (Cancel request) button.
 
-The transfer form has a checkbox to keep the project's current owner as an
-editor. Without it they lose access to the project once the transfer goes
-through.
+- If the recipient declines, the sender gets an email and the project
+  settings show the refusal.
+- An unanswered request expires after 14 days. Until then you can't send a
+  second one: a project has only one request at a time.
+- A project belongs to one organization. After the move the sender no longer has access to the project.
+- The project address doesn't change — neither the `layero.app` subdomain
+  nor custom domains. Environment variables, deploys, access settings and
+  analytics move along with the project.
 
-## From the CLI
+If the project builds from a GitHub repository and nobody in the new
+organization has write access to it, the link to the repository breaks.
+Deploys won't go through until it's restored on the project page.
 
-Every CLI command works in the context of a Layero organization — your
-personal one by default.
+## In the CLI
 
-### List organizations
-
-```bash
-layero orgs list
-# borisowvalia        personal  (admin)
-# acme-team           team      (admin)
-```
-
-### Create a project in a specific team
+CLI commands work within one organization.
 
 ```bash
-# the first layero deploy in a directory creates the project; --org says where
-layero deploy --org acme-team
+npx layero@latest orgs list
 ```
 
-If you belong to several organizations and `--org` is not given, the CLI asks
-interactively (or takes the personal one under `--yes` / `--config`).
+Shows every organization you're a member of.
 
-After the first deploy the project is bound to that organization; later
-`layero deploy` runs in the same folder use the same team without `--org`.
+```bash
+npx layero@latest deploy --org acme-team
+```
 
-### Deleting a team
+Creates the project in the `acme-team` team on the first deploy from a
+folder. After that, `deploy` in the same folder works with this project
+without `--org`. If you have several organizations and `--org` isn't set,
+the CLI asks where to create the project. With `--yes` it doesn't ask and
+creates the project in your personal organization.
 
-The CLI does not support deleting a team — that is a destructive operation. Do
-it from the dashboard: Team → Danger zone → Delete team. The team must be empty
-(no active projects).
+## GitHub
 
-## GitHub binding
-
-A personal account binds **only** to a personal GitHub account. A team binds to
-a personal GitHub **or** to a GitHub Organization. This is enforced on the
-backend and in the UI. Details in the [GitHub App](./github-app) page.
+For a team to build repositories of a GitHub Organization without depending
+on one person's access, connect the [GitHub App](./github-app.md).
