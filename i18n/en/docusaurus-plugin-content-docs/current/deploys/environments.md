@@ -54,8 +54,7 @@ The main address and your domains serve one build. Three things change it:
 ### Publishing pushes automatically or by hand
 
 By default a push to the main branch is published at once. To publish by hand: project → «Настройки» (Settings) → «Сборка и
-деплой» (Build and deploy) → the «Production-публикация» (Production
-publishing) block → turn off «Автоматически публиковать пуши в…» (Publish
+деплой» (Build and deploy) → the «Публикация на основной адрес» (Publishing to the main address) block → turn off «Автоматически публиковать пуши в…» (Publish
 pushes to … automatically) and click «Сохранить» (Save).
 
 After that a push to the main branch builds as usual, but the main address
@@ -63,8 +62,7 @@ doesn't change until you publish the build yourself.
 
 ### Picking a build by hand
 
-**In the dashboard:** in the deploy list, the «Сделать этот деплой
-production» (Make this deploy production) button next to the build; on a
+**In the dashboard:** in the deploy list, the «Сделать основной» (Make main) circle next to the build; on a
 deploy's page, «Сделать активным» (Make active).
 
 **In the CLI:**

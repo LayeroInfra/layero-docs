@@ -357,5 +357,38 @@
   "footer.status.unknown": {
     "message": "System status",
     "description": "Footer system status widget"
+  },
+  "notFound.title": {
+    "message": "This page doesn't exist"
+  },
+  "notFound.p1": {
+    "message": "It may have moved, or the address has a typo. Use the search at the top of the page or open one of the sections."
+  },
+  "notFound.p2": {
+    "message": "If a link in the dashboard, the CLI or on our site brought you here, {support} — we'll fix the link."
+  },
+  "notFound.link.quickstart": {
+    "message": "Your first site"
+  },
+  "notFound.link.frameworks": {
+    "message": "Frameworks"
+  },
+  "notFound.link.deploy": {
+    "message": "Deploy from a folder with the CLI"
+  },
+  "notFound.link.domains": {
+    "message": "Custom domain"
+  },
+  "notFound.link.database": {
+    "message": "Databases"
+  },
+  "notFound.link.agents": {
+    "message": "AI agents"
+  },
+  "notFound.supportLink": {
+    "message": "write to support"
+  },
+  "notFound.home": {
+    "message": "To the docs home"
   }
 }

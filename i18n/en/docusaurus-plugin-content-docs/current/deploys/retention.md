@@ -60,7 +60,7 @@ the project can be rebuilt without uploading again:
   are kept while you can roll back to them;
 - archives of other uploads are kept for at least 7 days and then deleted.
 
-The «Redeploy» button on the project overview rebuilds the project from the
+The «Собрать снова» (Build again) button on the project overview rebuilds the project from the
 latest uploaded archive. If no files have been uploaded yet, the button is
 inactive and its hint says why. Then click «Обновить файлы» (Update files)
 or run `layero deploy`.

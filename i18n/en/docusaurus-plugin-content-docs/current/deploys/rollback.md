@@ -14,7 +14,7 @@ It works the same for static sites and for apps with a server.
 ## Rolling back to the previous build
 
 **In the dashboard:** the «Откатить» (Roll back) button on the project page,
-then confirm in the «Откатить production?» (Roll back production?) dialog.
+then confirm in the «Откатить основной адрес?» (Roll back the main address?) dialog.
 
 **In the CLI:**
 
@@ -40,8 +40,7 @@ npx layero@latest rollback --branch staging
 
 ## Publishing any build
 
-**In the dashboard:** in the deploy list, the «Сделать этот деплой
-production» (Make this deploy production) button next to the build; on a
+**In the dashboard:** in the deploy list, the «Сделать основной» (Make main) circle next to the build; on a
 deploy's page, «Сделать активным» (Make active).
 
 **In the CLI:**

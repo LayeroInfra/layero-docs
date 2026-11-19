@@ -43,8 +43,7 @@ A push to any other branch builds a preview at
 the branch on GitHub removes its preview.
 
 To put a branch's build on the main address without merging into `main`,
-click «Сделать этот деплой production» (Make this deploy production) next to
-it in the deploy list, or run `npx layero@latest promote <sha>`.
+click the «Сделать основной» (Make main) circle next to it in the deploy list, or run `npx layero@latest promote <sha>`.
 
 ## The first build
 

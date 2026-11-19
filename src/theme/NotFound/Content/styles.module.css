@@ -1,0 +1,12 @@
+/* Ссылки в тексте 404 — как в статьях (.markdown a в custom.css):
+   по умолчанию ссылка темы того же цвета, что текст, и без подчёркивания. */
+.text a:not(:global(.button)) {
+  text-decoration: underline;
+  text-decoration-color: var(--border-strong);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.15s;
+}
+.text a:not(:global(.button)):hover {
+  text-decoration-color: var(--ink);
+}
