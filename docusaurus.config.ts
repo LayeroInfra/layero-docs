@@ -4,6 +4,7 @@ import {execSync} from 'node:child_process';
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import remarkIntroHero from './src/plugins/remark-intro-hero.mjs';
 
 // `showLastUpdateTime` берёт дату из git-истории файла, и БЕЗ репозитория
 // Docusaurus не предупреждает, а падает: «This Docusaurus site is outside any
@@ -63,6 +64,9 @@ const config: Config = {
           // Без этого Docusaurus не вычисляет дату последней правки из git,
           // и sitemap остаётся без <lastmod> — плагин просто нечего писать.
           showLastUpdateTime: hasGitHistory,
+          // Иллюстрация стартовой страницы — при сборке, исходник intro.md
+          // остаётся чистым Markdown для агентов (src/plugins/remark-intro-hero.mjs).
+          beforeDefaultRemarkPlugins: [remarkIntroHero],
         },
         blog: {
           showReadingTime: true,

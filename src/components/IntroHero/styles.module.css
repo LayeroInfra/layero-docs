@@ -1,0 +1,549 @@
+/* Схема стартовой страницы: откуда код → Layero → что получается.
+   Стиль технических схем (Cloudflare Workers и подобные): монохром, тонкие
+   линии с прямыми углами, точки подключения на краях узлов, без анимации.
+   Только токены из custom.css: обе темы рисуются одной разметкой. */
+
+.hero {
+  margin: 1.75rem 0 2.5rem;
+  /* Раскладка зависит от ширины самой схемы, а не окна: колонка статьи
+     узкая и при широком окне (боковые меню, оглавление). */
+  container-type: inline-size;
+}
+
+.diagram {
+  --port: 7px;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 2.5rem auto 2.5rem minmax(0, 1fr);
+  padding: 2rem 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  background-color: var(--bg);
+  background-image: radial-gradient(var(--border) 1px, transparent 1px);
+  background-size: 16px 16px;
+  background-position: -8px -8px;
+  user-select: none;
+}
+
+/* ── Узлы по краям ───────────────────────────────────── */
+
+.column,
+.center {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.rows {
+  flex: 1;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.row {
+  position: relative;
+  z-index: 1;
+  align-self: center;
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-width: 0;
+  padding: 0.55rem 0.65rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--bg-card);
+}
+
+/* Точка подключения на краю узла — туда приходит линия. */
+.portRight::after,
+.portLeft::before,
+.core::before,
+.core::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  width: var(--port);
+  height: var(--port);
+  margin-top: calc(var(--port) / -2);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 50%;
+  background: var(--bg-card);
+}
+.portRight::after {
+  right: calc(var(--port) / -2 - 0.5px);
+}
+.portLeft::before {
+  left: calc(var(--port) / -2 - 0.5px);
+}
+
+.icon {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--bg-soft);
+  color: var(--graphite);
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.rowTitle {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.84rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+.columnOut .rowTitle {
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.74rem;
+}
+
+.rowSub {
+  font-size: 0.72rem;
+  color: var(--dusty);
+}
+
+/* ── Линии ───────────────────────────────────────────── */
+
+.wires svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.wiresV {
+  display: none !important;
+}
+.wire {
+  fill: none;
+  stroke: var(--border-strong);
+  stroke-width: 1.25;
+  vector-effect: non-scaling-stroke;
+}
+
+/* ── Узел Layero ─────────────────────────────────────── */
+
+.center {
+  justify-content: center;
+}
+
+.coreWrap {
+  --layer: 6px;
+  position: relative;
+  z-index: 1;
+}
+/* Нагрузка — стопкой: под узлом ещё два слоя, как будто через Layero
+   одновременно идёт много сборок. Минимально и созвучно названию. */
+.coreWrap::before,
+.coreWrap::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  border-radius: 0.8rem;
+}
+.coreWrap::before {
+  left: var(--layer);
+  right: var(--layer);
+  bottom: calc(var(--layer) * -1);
+  background: color-mix(in srgb, var(--ink) 55%, var(--bg));
+}
+.coreWrap::after {
+  left: calc(var(--layer) * 2);
+  right: calc(var(--layer) * 2);
+  bottom: calc(var(--layer) * -2);
+  z-index: -1;
+  background: color-mix(in srgb, var(--ink) 22%, var(--bg));
+}
+
+.core {
+  position: relative;
+  width: 9.25rem;
+  padding: 0.7rem 0.75rem 0.65rem;
+  border-radius: 0.8rem;
+  z-index: 1;
+  background: var(--ink);
+  color: var(--bg);
+  box-shadow: 0 16px 32px -12px rgb(0 0 0 / 0.35);
+}
+.core::before,
+.core::after {
+  border-color: var(--ink);
+  background: var(--bg);
+}
+.core::before {
+  left: calc(var(--port) / -2);
+}
+.core::after {
+  right: calc(var(--port) / -2);
+}
+
+.coreHead {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.55rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgb(127 127 127 / 0.25);
+}
+
+.markTile {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  border-radius: 0.5rem;
+  background: var(--bg);
+  color: var(--ink);
+}
+.markTile svg {
+  width: 24px;
+  height: 11px;
+}
+
+.wordmark {
+  display: block;
+  height: 0.85rem;
+  width: auto;
+}
+
+/* Этапы — отдельные одинаковые ячейки со своим значком: этапы видны
+   рамками, без номеров и без выделения какого-то одного. Цвета — от фона
+   узла: в тёмной теме узел светлый, и всё переворачивается само. */
+.steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.steps li {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.28rem 0.45rem;
+  border: 1px solid color-mix(in srgb, var(--bg) 22%, transparent);
+  border-radius: var(--r-sm);
+  background: color-mix(in srgb, var(--bg) 6%, transparent);
+  font-family: var(--ifm-font-family-monospace);
+  font-size: 0.7rem;
+  line-height: 1.35;
+  color: var(--bg);
+}
+.steps svg {
+  flex: none;
+  width: 13px;
+  height: 13px;
+  opacity: 0.75;
+}
+
+/* ── Кнопки ─────────────────────────────────────────── */
+
+.cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+.cta .button {
+  display: inline-flex;
+  align-items: center;
+  height: 2.5rem;
+  padding: 0 1.1rem;
+  border-radius: var(--r-md);
+  font-weight: 500;
+  font-size: 0.95rem;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, opacity 0.15s;
+}
+.cta .primary {
+  background: var(--primary);
+  color: var(--primary-foreground);
+  border: 1px solid var(--primary);
+}
+.cta .primary:hover {
+  opacity: 0.88;
+  color: var(--primary-foreground);
+  text-decoration: none;
+}
+.cta .secondary {
+  background: var(--bg-card);
+  color: var(--ink);
+  border: 1px solid var(--border);
+}
+.cta .secondary:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-soft);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+/* ── Средняя ширина: значок над текстом, узел уже ───── */
+
+@container (max-width: 680px) {
+  .diagram {
+    grid-template-columns: minmax(0, 1fr) 1.75rem auto 1.75rem minmax(0, 1fr);
+    padding: 1.5rem 1rem;
+  }
+  .row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+    padding: 0.5rem;
+  }
+  .rowText {
+    max-width: 100%;
+  }
+  .icon {
+    width: 1.6rem;
+    height: 1.6rem;
+  }
+  .icon svg {
+    width: 14px;
+    height: 14px;
+  }
+  .rowTitle {
+    font-size: 0.78rem;
+  }
+  .columnOut .rowTitle {
+    font-size: 0.7rem;
+  }
+  .core {
+    width: 8.25rem;
+    padding: 0.6rem 0.65rem 0.55rem;
+  }
+  .markTile {
+    width: 1.7rem;
+    height: 1.7rem;
+  }
+  .wordmark {
+    height: 0.75rem;
+  }
+  .steps li {
+    font-size: 0.66rem;
+    gap: 0.35rem;
+    padding: 0.22rem 0.35rem;
+  }
+}
+
+/* ── Телефон: сверху вниз ────────────────────────────── */
+
+@container (max-width: 460px) {
+  .diagram {
+    --tile-gap: 0.5rem;
+    /* Ствол дерева результатов — вертикальная линия слева. */
+    --trunk: 0.5rem;
+    --indent: 1.25rem;
+    --out-w: 75%;
+    grid-template-columns: minmax(0, 1fr);
+    padding: 1.1rem 0.9rem;
+  }
+
+  .wiresH {
+    display: none !important;
+  }
+  .wires {
+    height: 2.25rem;
+  }
+
+  /* Источники → узел: линии от центров плиток сходятся к центру.
+     Центры плиток с зазором g: i·(w+g)+w/2. Шире на g/2 с каждой
+     стороны — и равные доли ширины совпадают с центрами плиток. */
+  .wiresIn .wiresV {
+    display: block !important;
+    width: calc(100% + var(--tile-gap)) !important;
+    margin: 0 calc(var(--tile-gap) / -2);
+  }
+
+  /* Узел → результаты: вниз от узла, влево к стволу и по стволу вниз.
+     Дальше ствол продолжают ветки у каждой карточки. */
+  .wiresOut {
+    position: relative;
+    height: 1.75rem;
+  }
+  .wiresOut::before,
+  .wiresOut::after {
+    content: '';
+    position: absolute;
+    border: 0 solid var(--border-strong);
+  }
+  .wiresOut::before {
+    left: 50%;
+    top: 0;
+    height: 50%;
+    border-left-width: 1.25px;
+  }
+  .wiresOut::after {
+    left: calc((100% - var(--out-w)) / 2 + var(--trunk));
+    right: 50%;
+    top: 50%;
+    bottom: 0;
+    border-top-width: 1.25px;
+    border-left-width: 1.25px;
+  }
+
+  .rows {
+    grid-template-rows: none !important;
+    gap: var(--tile-gap);
+  }
+  .columnIn .rows {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Точки подключения: снизу у источников, сверху и снизу у узла; у
+     результатов — слева, как на десктопе. */
+  .portRight::after,
+  .core::before,
+  .core::after {
+    top: auto;
+    left: 50%;
+    right: auto;
+    margin: 0 0 0 calc(var(--port) / -2);
+  }
+  .portRight::after,
+  .core::after {
+    bottom: calc(var(--port) / -2 - 0.5px);
+  }
+  .core::before {
+    top: calc(var(--port) / -2 - 0.5px);
+  }
+
+  /* Источники — плитки: значок над названием, без второй строки. */
+  .columnIn .row {
+    align-self: stretch;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.65rem 0.3rem 0.6rem;
+    text-align: center;
+  }
+  .columnIn .rowText {
+    align-items: center;
+  }
+  .columnIn .rowTitle {
+    font-size: 0.74rem;
+  }
+  .columnIn .rowSub {
+    display: none;
+  }
+
+  /* Результаты — столбец с отступом под ствол; у каждой карточки своя
+     ветка: от центра предыдущей (у первой — от верха) вниз по стволу и
+     вправо в точку подключения. Карточки одной высоты, поэтому «центр
+     предыдущей» — это половина своей высоты плюс зазор. */
+  /* Группа результатов на ¾ ширины, по центру под узлом. */
+  .columnOut {
+    width: var(--out-w);
+    margin: 0 auto;
+    padding-left: var(--indent);
+  }
+  .columnOut .rows {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .columnOut .row {
+    align-self: stretch;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.6rem;
+  }
+  .columnOut .row::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--trunk) - var(--indent) - 1px);
+    width: calc(var(--indent) - var(--trunk));
+    top: calc(-50% - var(--tile-gap) - 1px);
+    bottom: 50%;
+    border: 0 solid var(--border-strong);
+    border-left-width: 1.25px;
+    border-bottom-width: 1.25px;
+    z-index: -1;
+  }
+  .columnOut .row:first-child::after {
+    top: -1px;
+  }
+  .columnOut .rowTitle {
+    /* На самых узких экранах адрес чуть мельче, но целиком. */
+    font-size: min(0.74rem, 3.1cqi);
+  }
+  .columnOut .rowSub {
+    font-size: 0.7rem;
+  }
+  .icon {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  /* Узел Layero — одна строка: знак и логотип слева, этапы справа и
+     шире — им нужна вся оставшаяся ширина. */
+  .core {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    width: 100%;
+    padding: 0.6rem 0.65rem;
+    border-radius: var(--r-md);
+  }
+  .coreWrap {
+    width: 100%;
+    margin-bottom: calc(var(--layer) * 2);
+  }
+  .coreWrap::before,
+  .coreWrap::after {
+    border-radius: var(--r-md);
+  }
+  /* Линия к результатам выходит из-под нижнего слоя стопки. */
+  .core::after {
+    bottom: calc(var(--layer) * -2 - var(--port) / 2);
+  }
+  .coreHead {
+    flex: 1 1 auto;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  .markTile {
+    width: 1.7rem;
+    height: 1.7rem;
+    border-radius: 0.45rem;
+  }
+  .wordmark {
+    height: 0.7rem;
+  }
+  .steps {
+    flex: 0 0 56%;
+    gap: 0.2rem;
+    padding-left: 0.65rem;
+    border-left: 1px solid rgb(127 127 127 / 0.25);
+  }
+  .steps li {
+    font-size: 0.66rem;
+    padding: 0.18rem 0.45rem;
+  }
+  .steps svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .cta .button {
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+}
