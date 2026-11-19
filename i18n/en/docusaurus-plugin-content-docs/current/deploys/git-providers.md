@@ -8,7 +8,7 @@ description: The five git providers Layero builds from on push. How each one con
 
 Layero builds a site from a repository on five services: **GitHub**,
 **GitVerse**, **GitLab**, **GitFlic** and **SourceCraft**. A connected
-repository is [path (a)](../agents/index.md#a-there-is-a-connected-repository)
+repository is [the first path](../agents/index.md#a-repository-is-connected)
 for an agent and for a person alike: a push to a
 branch gives a preview, a push to the production branch gives production. The
 model is the same for all; what differs is how the connection is made and what

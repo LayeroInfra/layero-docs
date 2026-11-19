@@ -56,7 +56,7 @@ npx layero@latest <cmd> --help
 
 The global `--json` flag switches the CLI to JSON lines on stdout — that is for
 AI agents (Cursor, Claude Code) and CI pipelines. More in
-[Deploying from AI agents](./agents).
+[AI agents](../agents/index.md).
 
 ## `layero init`
 

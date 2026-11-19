@@ -1,150 +1,116 @@
 ---
 sidebar_position: 2
-title: Core concepts
-description: Project, environment, deploy, runtime, handle and the build environment — the vocabulary for talking about Layero consistently.
+title: How it all fits together
+description: Organization, project, environment, build and main address — what Layero is made of and how the parts connect. Static sites and apps with a server, the "Made with Layero" label.
 ---
 
-# Core concepts
+# How it all fits together
 
-Before going into detail, here is the platform's vocabulary: **project**,
-**environment**, **deploy**, **runtime** and **handle**. These five terms
-appear throughout the rest of the documentation.
+**Layero comes down to five concepts: organization, project, environment,
+build and main address.** Below is what each one means and how they connect,
+and at the end how a static site differs from an app with a server.
 
 ## Organization
 
-An **organization** is the scope that groups people, projects and integrations
-under one slug. There are two kinds:
+An organization owns projects, databases and a balance. The Pro subscription
+also belongs to an organization, not to a person.
 
-* **Personal** — created automatically on signup, with your `username` as the
-  slug. One per user, no invitations.
-* **Team** — created by hand ("+ Create team"), accepts email invitations and
-  can connect the [GitHub App](../team/github-app).
+On first sign-in you pick a username, and your personal organization is
+created under that name. To work with colleagues there are team
+organizations — see [Organizations](../team/organizations.md).
 
-Details in [Organizations](../team/organizations).
-
-The organization switcher sits in the top corner of the dashboard. Your
-choice is remembered in the browser, and every list — projects, repositories
-to import, deploys — shows only what belongs to the organization you picked.
+The organization switcher is in the dashboard. Lists of projects,
+repositories and builds show only what belongs to the selected organization.
 
 ## Project
 
-A **project** is the unit of deployment. It belongs to one organization and
-gets a canonical address in the user-site zone:
-`https://<project>.layero.app`. Projects created before the move (26 July
-2026) still carry the organization prefix:
-`https://<organization>-<project>.layero.app`. The exact address is visible in
-the dashboard; see
-[Environments, previews and production](../deploys/environments).
+A project is one site or one app. It gets the address
+`https://<project>.layero.app`; the exact address is shown in the dashboard
+and in the CLI output.
 
-Where the code comes from:
+Code gets into a project in one of these ways:
 
-- `github` — from a GitHub repository; a push triggers a deploy automatically
-  through a webhook (OAuth or GitHub App).
-- `cli` — from a local `layero deploy` (a tarball upload).
+- from a connected repository — every push starts a build;
+- from a folder — with `layero deploy` or an upload in the dashboard;
+- as ready-made files from an AI agent — with the MCP tool `publish_site`.
 
-One project can accept **both** sources at once (mixed mode): GitHub pushes
-and CLI uploads coexist. See [`layero deploy`](../cli/deploy).
+A project with a repository accepts folder uploads too. They land in a
+separate `cli` environment and do not touch the main address until you
+publish them yourself with `--prod`.
 
 ## Environment
 
-An **environment** corresponds to a branch of the repository. A push to any
-branch creates its own environment with its own deploy history and its own
-**preview URL** that lives as long as the branch does.
+An environment is a project address with its own build history. Usually an
+environment matches a branch: a push to a new branch creates an environment,
+and its address serves that branch's preview.
 
-A project has **one production address** — the apex. Which environment serves
-it right now is decided by `production_deploy_id` (below). That is not
-necessarily the default branch — it can be any promoted build.
+A project without a repository has one environment, `cli`: every folder
+upload goes there. More in [Environments and previews](../deploys/environments.md).
 
-See [Environments, previews and production](../deploys/environments).
+## Build
 
-## Deploy
+Every push and every upload starts a build. The platform detects the
+framework, installs dependencies, builds the project and stores the result.
+Build statuses in the dashboard:
 
-A **deploy** is one build from one commit (`commit_sha`). Every deploy has a
-status:
-
-| Status | What it means |
+| Status | Meaning |
 |---|---|
-| `queued` | queued, waiting for a build instance |
-| `building` | the build is running right now |
-| `ready` | artifacts uploaded; can be promoted and served |
-| `failed` | the build failed, see the deploy logs |
+| «В очереди» (Queued) | waiting for a free builder |
+| «Сборка» (Building) | the build is running |
+| «Готов» (Ready) | opens at the environment's address |
+| «Ошибка» (Failed) | the build failed; the log or `npx layero@latest diagnose` shows why |
+| «Отменён» (Cancelled) | the build was stopped |
 
-`environments.active_deploy_id` is the branch's latest ready deploy, updated
-atomically after the build. It is reachable at the branch preview URL.
+What builds the project and how — [Supported frameworks](./frameworks.md),
+[Node.js and Python versions](../deploys/runtime-versions.md) and
+[`layero.json`](../deploys/layero-json.md).
 
-`projects.production_deploy_id` points at the **one** deploy the apex is
-currently serving. It moves via auto-promote on the default branch, or by hand
-through the UI or CLI promote.
+## Main address
 
-**Rollback** swaps `production_deploy_id` and
-`previous_production_deploy_id` in a single atomic step. The apex returns to
-the previous working build instantly; rolling back again returns it. See
-[`layero promote`](../cli/promote) or the "Roll back" button in the UI.
+The main address `<project>.layero.app` and your custom domains serve one and
+the same build. Usually it is the latest successful build of the main branch; for a
+project without a repository, the latest folder upload.
 
-## Runtime: static vs SSR
+Any ready build can be made the main one: it opens at once, with no rebuild.
+A rollback works the same way — the previous build becomes the main one
+again. In the dashboard it is the «Откатить» (Roll back) button; in the CLI,
+[`layero rollback`](../cli/rollback.md) and [`layero promote`](../cli/promote.md).
 
-Layero distinguishes **two execution modes**:
+## Static site and app with a server
 
-- **SPA / static** (the default) — the build produces a folder of HTML/JS/CSS
-  that lives in object storage and is served from the platform's edge servers.
-  Nothing runs on Layero's side. This is the fastest and cheapest mode.
-- **Runtime** — the application runs as a container (Next.js in server mode,
-  Streamlit, Gradio, Flask and so on). The container wakes on the first
-  request and stops when idle. See [Runtime](../runtime/overview).
+- **Static site.** After the build there are files: HTML, JavaScript, CSS.
+  Layero servers deliver them, and no process runs. This is the fastest
+  option: the page is served at once, with no process to start.
+- **App with a server.** Next.js with server rendering, Node.js and Python
+  servers, Streamlit, Gradio, Flask. It runs as a separate process: it wakes
+  up on the first request and goes to sleep when nobody uses it.
+  See [Runtime apps](../runtime/overview.md).
 
-## Username and organization
+## The "Made with Layero" label
 
-On first sign-in you choose a **unique username** — the handle of your
-account. Your personal organization is created from it, with the same slug.
-For projects created before the move to `layero.app` that slug ended up in the
-site address (`https://alice-<project>.layero.app`). New addresses consist of
-the project slug alone, and the organization slug does not affect them.
-
-Beyond the personal one you can create **additional organizations** with their
-own slugs — for working with a team, for example. Each can have several
-members (admin / member) invited by email. Members are managed in the
-[Team](https://app.layero.ru/account/team) section.
-
-The username is set once, during onboarding. More in
-[Onboarding](https://app.layero.ru/onboarding).
-
-## Build environment
-
-- **Node.js** — `nvm use <detected_version>`. The version comes from
-  `.nvmrc`, `.node-version` or `engines.node` in `package.json`. Node 20 by
-  default.
-- **Package manager** — detected from the lockfile: `yarn.lock` → yarn,
-  `pnpm-lock.yaml` → pnpm, otherwise npm.
-- **`node_modules` is removed** before `install`.
-- **Build command** — taken from the project (`build_cmd`), `npm run build` by
-  default. The output directory is determined by the framework (see
-  [Supported frameworks](./frameworks)).
-
-## The Layero label in HTML
-
-After a static site is built, the platform inserts one line before `</body>`
-in every HTML file:
+A static site shows a thin "Сделано на Layero" (Made with Layero) strip at the
+bottom of the page. It does not cover the content and matches the colour of
+the bottom of the page. To show it, the platform adds one line before
+`</body>` in every HTML file:
 
 ```html
 <script defer src="/_layero/footer-<hash>.js" data-layero-footer></script>
 ```
 
-The script itself goes to the `/_layero/` folder. In the visitor's browser it
-draws a thin strip reading «Сделано на Layero» ("Made with Layero") — a
-footer below all the page content. It does not cover the content and picks
-its colour to match the bottom of the page.
+Nothing is written to your repository: the line exists only in the files the
+platform serves.
 
-This is not a build error: nothing is written to the repository, the line
-exists only in the files the platform serves.
+**Where there is no label:**
 
-- **Where there is no label.** HTML without `</body>`, files that are not
-  UTF-8, site verification files for Yandex Webmaster, Google Search Console
-  and Bing, `node_modules` and folders whose names start with a dot. HTML
-  served by a container (SSR, a Node or Python server) is not changed. The
-  frontend of a fullstack project does get the label.
-- **How to remove it.** The label is on by default for every project, the Pro
-  plan included, and is turned off per project: Dashboard → project →
-  **Settings → Layero Label** → "Off". The same place sets automatic or your own
-  colour. An agent turns it off with the MCP tool `project_settings` and
-  `badge: false`. Turning the label off needs the Pro plan
-  ([plans](../billing/plans)). The change takes effect with the next deploy.
+- in HTML without `</body>` and in files not in UTF-8;
+- in ownership verification files for Yandex Webmaster, Google Search Console
+  and Bing;
+- in `node_modules` and in folders whose name starts with a dot;
+- in pages served by an app with a server. The frontend of a fullstack
+  project does get the label.
+
+**How to remove it.** On the Pro plan: dashboard → project → «Настройки»
+(Settings) → «Layero Label» → «Выкл» (Off). You can pick the strip colour
+there too. The change applies from the next build. An agent turns the label
+off with the MCP tool `project_settings` and `badge: false`. If the
+organization goes back to Free, the label comes back — see [Plans](../billing/plans.md).

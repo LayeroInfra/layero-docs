@@ -28,7 +28,7 @@ Pro can be tried free for 14 days — once, with a card linked.
 | Observability & logs | — | ✅ |
 | Page Speed — page load speed | 3 runs a month | 500 runs a month, schedules |
 | Boosted runtime tier | — | ✅ |
-| Remove the Layero badge ([how](../getting-started/concepts.md#the-layero-label-in-html)) | — | ✅ |
+| Remove the Layero badge ([how](../getting-started/concepts.md#the-made-with-layero-label)) | — | ✅ |
 | Team organizations | — | ✅ |
 | Team seats included | — | 1 |
 

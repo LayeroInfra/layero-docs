@@ -256,7 +256,7 @@ JSON mode turns on by itself when the CLI runs inside an AI agent (Claude Code,
 Cursor and others that set their own environment variable), or explicitly with
 `--json`. In CI and outside a terminal the CLI prints plain text and asks
 nothing: `--prod` deploys to production there without a confirmation. More in
-[Deploying from AI agents](./agents); the full event list is in the
+[AI agents](../agents/index.md); the full event list is in the
 [JSON events schema](./json-events).
 
 ## Ignore rules

@@ -149,5 +149,5 @@ How token scopes work is covered in [Deploying from GitHub Actions](./github-act
 
 - [CLI commands](./commands.md)
 - [`layero deploy`: auto-detection, flags, limits](./deploy.md)
-- [Deploying from AI agents (Cursor, Claude Code, Aider)](./agents.md)
+- [AI agents](../agents/index.md) — Claude Code, Cursor, Codex
 - [JSON events: the full event and error-code schema](./json-events.md)

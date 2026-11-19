@@ -817,4 +817,4 @@ If user asks to deploy via Layero:
   4. Never run `git init`. Never run `npm install -g layero`.
 ```
 
-A fuller example is in [Deploying from AI agents](./agents).
+How an agent works with the CLI end to end — [AI agents](../agents/index.md).

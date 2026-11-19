@@ -81,7 +81,7 @@ HEAD_RU = """# Документация Layero
 > и Data API, домены, тарифы. О самом продукте — https://layero.ru/llms.txt
 
 Каждая страница отдаётся и как Markdown: добавьте `.md` к адресу
-(например https://docs.layero.ru/cli/agents.md). Список страниц с описаниями —
+(например https://docs.layero.ru/cli/deploy.md). Список страниц с описаниями —
 https://docs.layero.ru/sitemap.md
 
 Английская версия: https://docs.layero.ru/en/llms.txt
@@ -97,7 +97,7 @@ HEAD_EN = """# Layero documentation
 > product itself, see https://layero.ru/llms.txt
 
 Every page is also served as Markdown: append `.md` to the address
-(for example https://docs.layero.ru/en/cli/agents.md). The list of pages with
+(for example https://docs.layero.ru/en/cli/deploy.md). The list of pages with
 descriptions: https://docs.layero.ru/en/sitemap.md
 
 Russian version: https://docs.layero.ru/llms.txt

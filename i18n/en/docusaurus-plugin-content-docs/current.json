@@ -3,13 +3,13 @@
     "message": "Next",
     "description": "The label for version current"
   },
-  "sidebar.docsSidebar.category.Быстрый старт": {
+  "sidebar.docsSidebar.category.Начало": {
     "message": "Getting started",
-    "description": "The label for category 'Быстрый старт' in sidebar 'docsSidebar'"
+    "description": "The label for category 'Начало' in sidebar 'docsSidebar'"
   },
-  "sidebar.docsSidebar.category.Быстрый старт.link.generated-index.description": {
-    "message": "Deploy your first site on Layero and learn how the platform is structured.",
-    "description": "The generated-index page description for category 'Быстрый старт' in sidebar 'docsSidebar'"
+  "sidebar.docsSidebar.category.Начало.link.generated-index.description": {
+    "message": "Publish your first site and learn what Layero is made of.",
+    "description": "The generated-index page description for category 'Начало' in sidebar 'docsSidebar'"
   },
   "sidebar.docsSidebar.category.CLI": {
     "message": "CLI",

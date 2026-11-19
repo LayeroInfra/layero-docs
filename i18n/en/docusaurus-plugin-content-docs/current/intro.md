@@ -2,62 +2,60 @@
 sidebar_position: 1
 slug: /
 title: What is Layero
+description: Layero builds and publishes sites and apps on servers in Russia — from a repository, from a folder or by an AI agent. Custom domains, branch previews, server apps, Postgres databases.
 ---
 
 # Layero
 
-**Layero** is a deployment platform for frontend applications whose build
-servers and edge run inside Russia. One command to publish, no VPN, and none
-of the slowdowns that come from serving Russian visitors from abroad.
+**Layero builds and publishes your site or app on servers in Russia.** You
+bring the code — from a repository, from a folder or through an AI agent — and
+the platform builds it and serves it at `<project>.layero.app`.
 
-If you are choosing where to host a site for an audience in Russia, that
-location is the point: the edge sits in the same country as the visitors,
-payment is in roubles, and data stays within Russian jurisdiction. In every
-other respect Layero behaves like any frontend host — Next.js, Vite, Astro,
-SvelteKit, Nuxt, Gatsby, CRA, Docusaurus and plain HTML are detected
-automatically.
+## How to publish a site
 
-There are three ways to publish:
-
-- **Repository** — connect a repository on GitHub, GitVerse, GitLab, GitFlic
-  or SourceCraft: on every `git push` Layero fetches the code, builds and
-  publishes it. A branch is a preview, the production branch is production.
+- **From a repository.** Connect a repository on GitHub, GitVerse, GitLab,
+  GitFlic or SourceCraft. A push to the main branch updates the site; a push
+  to any other branch gives a preview at its own address.
   See [Connecting a repository](./deploys/git-providers.md).
-- **CLI** — `npx layero@latest deploy` in the project directory. The CLI
-  packs the sources and uploads them; the build runs on the platform side.
-  Git is not required.
-- **Agent** — Claude Code, Cursor, Codex or any other AI agent publishes and
-  maintains the site itself: through the skill, the CLI in JSON mode and the
-  MCP server. See [How an AI agent works with Layero](./agents/index.md).
+- **From a folder.** `npx layero@latest deploy` in the project folder uploads
+  the code, and we build it on our side. No git needed. Without a terminal,
+  drag the folder into the dashboard: **«Новый проект» → «Загрузить из папки»**
+  (New project → Upload a folder). See [Your first site](./getting-started/quickstart.md).
+- **Through an AI agent.** Claude Code, Cursor, Codex and other agents
+  publish and run the site themselves. See [AI agents](./agents/index.md).
 
-Beyond static output, Layero also runs **runtime applications** — Next.js in
-server mode, Streamlit, Gradio, and any container with a long-lived process.
-The container starts on the first request and stops when idle.
+## What else the platform does
 
-## What it runs on
+- **Apps with a server** — Next.js with server rendering, Node.js and Python
+  servers, Streamlit, Gradio. The app starts on the first request and goes to
+  sleep when nobody uses it. See [Runtime apps](./runtime/overview.md).
+- **Custom domains** with automatic HTTPS — on the Pro plan.
+  See [Custom domains](./deploys/custom-domains.md).
+- **Postgres databases** and the **Data API** — HTTP access to the database
+  straight from the frontend. See [Databases](./database/index.md) and
+  [Data API](./data-api/index.md).
+- **Speed and traffic** — page speed measurement and web analytics.
+  See [Page Speed](./performance/index.md) and [Analytics](./team/analytics.md).
 
-| | |
+## The platform in brief
+
+| What | How |
 |---|---|
-| Hosting | Build and hosting servers in Russia |
-| Serving | Own edge (nginx); the user zone `*.layero.app` resolves straight to the platform load balancer |
-| Certificates | Automatic HTTPS on project addresses; custom domains require DNS verification |
-| Artifact storage | S3-compatible object storage |
-| Build environment | Node.js 20 / 22 / 24 (default 22), Python 3.10–3.13 (default 3.12), git — see [Node.js and Python versions](./deploys/runtime-versions.md) |
+| Where it runs | build and delivery servers in Russia |
+| Project address | `<project>.layero.app` with HTTPS; a custom domain after a DNS check |
+| What it builds with | Node.js 20, 22 or 24 (22 by default), Python 3.10–3.13 (3.12 by default) — see [Node.js and Python versions](./deploys/runtime-versions.md) |
+| Plans | Free and Pro, paid in rubles from the organization's balance — see [Plans](./billing/plans.md) |
 
-## Where to go next
+## Where to start
 
-- [Quickstart](./getting-started/quickstart.md) — publish your first site in
-  30 seconds.
-- [Core concepts](./getting-started/concepts.md) — project, environment,
-  deploy, runtime.
-- [CLI: install and commands](./cli/install.md) — `layero` in the terminal.
-- [How an AI agent works with Layero](./agents/index.md) — the skill, MCP
-  and the CLI for Claude Code, Cursor, Codex.
-- [Supported frameworks](./getting-started/frameworks.md) — what gets detected
-  automatically.
+- [Your first site](./getting-started/quickstart.md) — publish a site from
+  a folder with one command.
+- [How it all fits together](./getting-started/concepts.md) — organization,
+  project, environment, build, main address.
+- [AI agents](./agents/index.md) — the skill, MCP and CLI for Claude Code,
+  Cursor, Codex.
+- [Support](./support.md) — the chat in the dashboard and support@layero.ru.
 
-## Links
-
-- Website: [layero.ru](https://layero.ru)
-- Dashboard: [app.layero.ru](https://app.layero.ru)
-- API: [api.layero.ru](https://api.layero.ru)
+Website — [layero.ru](https://layero.ru), dashboard —
+[app.layero.ru](https://app.layero.ru), news —
+[t.me/layero_ru](https://t.me/layero_ru).

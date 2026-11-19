@@ -1,9 +1,9 @@
 {
-  "label": "Быстрый старт",
+  "label": "Начало",
   "position": 2,
   "link": {
     "type": "generated-index",
     "slug": "/getting-started",
-    "description": "Поднимите первый сайт на Layero и разберитесь, как устроена платформа."
+    "description": "Опубликуйте первый сайт и узнайте, из чего состоит Layero."
   }
 }

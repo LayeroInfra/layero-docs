@@ -1,82 +1,76 @@
 ---
 sidebar_position: 4
 title: The layero skill
-description: What is in the LayeroInfra/layero-agents skill, how to install it via npx skills or the plugins, and what npx layero@latest init writes into AGENTS.md.
+description: What is in the LayeroInfra/layero-agents skill, how to install it and what npx layero@latest init adds to the project's AGENTS.md.
 ---
 
 # The `layero` skill
 
-A skill (Agent Skill) is a `SKILL.md` file with instructions that the agent
-reads when a task concerns Layero. There is one, it lives in the public
-repository [`LayeroInfra/layero-agents`](https://github.com/LayeroInfra/layero-agents)
-and it is the **source of truth**: the MCP server instructions, `llms.txt`,
-these pages and the block the CLI writes into `AGENTS.md` are checked against
-it by a gate. If something elsewhere says otherwise, the error is there, not in
-the skill.
+**A skill is an instruction the agent reads when a task involves Layero.** It
+holds the agent's three paths, CLI commands, events and error codes, and the
+rules — what not to do. The skill lives in the public repository
+[`LayeroInfra/layero-agents`](https://github.com/LayeroInfra/layero-agents).
 
 ## What is inside
 
 ```
 skills/layero/
-├── SKILL.md            ← the three paths (repository / folder / site), when to use
-│                          which, sign-in and token, CLI JSON events, what not to do
+├── SKILL.md            ← three paths, sign-in and token, CLI events, what not to do
 └── references/
-    ├── json-events.md  ← the schema of CLI events and error codes
-    ├── layero-json.md  ← the layero.json file: framework, commands, output folder
-    └── providers.md    ← GitHub, GitVerse, GitLab, GitFlic, SourceCraft
+    ├── json-events.md   ← CLI events and error codes
+    ├── layero-json.md   ← the layero.json file: framework, commands, output folder
+    ├── git-providers.md ← GitHub, GitVerse, GitLab, GitFlic, SourceCraft
+    └── data-api.md      ← databases and the Data API
+skills/layero-content-rules/
+└── SKILL.md            ← checking a site against Layero's anti-phishing rules
 ```
 
-`SKILL.md` is short and answers "what to do"; the details live in
-`references/`, and the agent opens them only when needed.
+`SKILL.md` answers "what to do"; details live in `references/`. The agent opens
+them only when it needs them.
 
-## How it is installed
+The second skill, `layero-content-rules`, is a checklist of
+[Layero's rules](https://layero.ru/rules). The agent goes through it before
+publishing a site with sign-in, payments, giveaways or a support form.
 
-The method depends on the client. The commands come from the
-[install table](./install.md); here is what stands behind them.
+## How to install
 
-**Any agent that follows the `.agents/skills` standard:**
+The commands are in the [install table](./install.md):
 
-```bash
-npx skills add LayeroInfra/layero-agents
-```
+- **Any agent with the Agent Skills standard** — the "Agent Skill" row. The
+  command offers both skills, `layero` and `layero-content-rules` — install
+  both.
+- **Claude Code** — the `layero` plugin: both skills and the MCP server in one
+  command.
+- **Cursor** — the plugin from the same repository: MCP, rules and the skill.
+  Installed in Cursor: **Customize → Plugins → Add**.
 
-The command copies the skill into the project's `.agents/skills/layero/`.
-That is how Claude Code, Cursor, Codex and other clients that read this
-directory pick it up.
-
-**Claude Code — the plugin.** The `layero` plugin includes both the skill and
-the MCP server connection:
-
-```bash
-claude plugin marketplace add LayeroInfra/layero-agents && claude plugin install layero@layero
-```
-
-**Cursor — the `layero-cursor` plugin** from the same repository: MCP, rules
-and the skill.
-
-The plugins are generated from the skill by `build-adapters.py` in the
-`layero-agents` repository; they are never edited by hand.
-
-## `npx layero@latest init` and `AGENTS.md`
+## `layero init` and `AGENTS.md`
 
 ```bash
 npx layero@latest init
 ```
 
-The command detects the framework, creates `.layero/project.json` and appends
-a **short pointer** to the project's `AGENTS.md` (or `CLAUDE.md` /
-`.cursorrules` if they exist): where the skill lives, how to install it, and
-the address `https://layero.ru/llms.txt`. The full instruction text is
-deliberately not there — one fact should have one home, and that is the
-skill. An agent that reads `AGENTS.md` goes to the skill for details, not to
-a stale copy.
+The command is optional — `layero deploy` works without it. It does two
+things:
 
-If the skill is already installed in `.agents/skills/`, the pointer simply
-leads to it.
+- adds a Layero block to `AGENTS.md`, `CLAUDE.md` or `.cursorrules` — to
+  whichever of them the project already has. If there are none, it creates
+  `AGENTS.md`;
+- creates `.layero/project.json` — the link between the folder and the
+  project. The first publish fills it in.
+
+The block is a 60-line digest of the skill: the three paths, commands, the main
+events and error codes, the rules. An agent in a new session reads it first
+and knows how to publish even without the skill installed. For details the
+block points to [docs.layero.ru/agents](./index.md) and the skill.
+
+`init` records no build settings: they live in [`layero.json`](../deploys/layero-json.md)
+or in the project settings. To leave the instruction files alone, add
+`--skip-agent-docs`.
 
 ## How to check the skill works
 
-Ask the agent: "how do I deploy this project to Layero?". The right answer
-starts with the question whether there is a connected repository and contains
-neither `git init` nor `npm i -g`. If the agent suggests creating a GitHub
-repository, the skill was not picked up.
+Ask the agent: "How do I publish this project on Layero?" A correct answer
+starts by asking whether a repository is connected, and contains no
+`git init` and no `npm i -g`. If the agent suggests creating a repository on
+GitHub, the skill was not picked up.

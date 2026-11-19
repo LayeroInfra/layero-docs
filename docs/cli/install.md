@@ -148,5 +148,5 @@ LAYERO_TOKEN="$LAYERO_TOKEN" npx layero@latest deploy --prod --yes --project my-
 
 - [Команды CLI](./commands.md)
 - [`layero deploy`: автодетект, флаги, лимиты](./deploy.md)
-- [Деплой из AI-агентов (Cursor, Claude Code, Aider)](./agents.md)
+- [AI-агенты](../agents/index.md) — Claude Code, Cursor, Codex
 - [JSON-events: полная схема событий и кодов ошибок](./json-events.md)

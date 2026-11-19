@@ -1,64 +1,69 @@
 ---
 sidebar_position: 3
 title: MCP tools
-description: The full list of tools on mcp.layero.ru by group, which of them change the site and need a person's confirmation, and the project and read_only URL parameters.
+description: Every tool of the mcp.layero.ru server by group — which ones change the site and need a person's consent, what works without signing in, how to limit a connection to one project or to read-only.
 ---
 
 # MCP tools
 
-The Layero MCP server: `https://mcp.layero.ru/mcp`, Streamable HTTP
-transport, named `layero` in client configs. How to connect is described on
-[Connect an agent](./install.md); this page is what the server can do, one
-line per tool.
+**The Layero MCP server gives an agent access to projects, builds, domains and
+the database.** The server address is `https://mcp.layero.ru/mcp`, the name in
+client settings is `layero`. How to connect — [Connect an agent](./install.md).
+This page lists what each tool does.
 
 {/* Tool names are checked against the live server by ../mcp/check-tool-names.py:
-    retired names (compose_landing and the like) are not allowed here. */}
+    retired names (compose_landing and others) are not allowed here. */}
 
-## Account
+The ⚠️ mark means the tool can change the site, the project or access: always
+or only with some parameters. For example, `env_vars` changes variables only
+when it writes them.
 
-| Tool | What it does |
-|---|---|
-| `whoami` | Who is connected: user, organisation, token expiry. |
-| `my_projects` | The list of projects with addresses and source (repository or CLI); the `repo` argument keeps the projects of one repository. |
-| `list_sources` | Git providers (GitHub, GitVerse, GitLab, GitFlic, SourceCraft) and the organisation's connections. |
-| `import_repo` ⚠️ | Create a project from a repository: GitHub through the App installation, the others through the organisation's connection. Once linked, it finishes the setup wizard and starts the first build itself. It does not write the framework, build command or output folder into the project (since 2.3.1): the builder detects them from the repository on every build; the result carries `setup` (`applied` / `pending` / `failed`), `first_deploy_id` and an honest `next_action`. `deploy=false` leaves the project in the setup wizard. Provider not connected — the answer is `needs_connection` with the dashboard address; the provider token is connected by the person, not the agent. An app in a monorepo subfolder takes the `root_directory` argument (`apps/web`): one project builds one folder. A repository that is already linked answers `already_linked` with the list of projects (address, folder, branch); a second project from the same repository is only created with a different folder. |
-| `project_create` ⚠️ | An empty project with no repository — an address reserved for a later `publish_site` or `npx layero@latest deploy`. |
-| `project_settings` ⚠️ | Read or change a project's build settings: app folder, install and build commands, output folder, project type. Shows where every effective value comes from and the `layero.json` warnings. The way out when detection was wrong: change the setting, then `retry_deploy` with `redeploy=true`. |
-
-## Site and deploys
+## Account and projects
 
 | Tool | What it does |
 |---|---|
-| `site_status` | Site state: latest deploy, address, repository, branch and app folder. `answered_by` tells the site's own answer from a platform screen: an API server with no `/` route answers its own 404 and counts as up; the `path` argument checks a specific route, and `served_fallback` warns that a static site answered it with the home page. `wait_s` (up to 120 s) waits for a running build; without it `poll_after_s` suggests the polling interval. When there has been no build yet it says so instead of passing a missing build off as a successful one. |
-| `list_environments` | The project's environments — one per branch — with addresses and the state of the latest build. |
-| `list_deploys` | The project's build history: status, source (git or upload), time in the queue and build duration. |
-| `deploy_logs` | Build and application logs. `npm http` lines are hidden by default and counted in `noise_hidden`; `include_noise=true` shows everything. |
-| `diagnose_deploy` | Why a build failed — with a log breakdown and the next step. `build_facts` says what the build used: framework, install and build commands, output folder, Node version, and where each value came from. |
-| `retry_deploy` ⚠️ | Restart a build: a failed one as it is; `redeploy=true` rebuilds the latest commit of a repository project without a push. |
-| `cancel_deploy` ⚠️ | Cancel a running build. |
-| `rollback` ⚠️ | Roll production back to a previous build. |
-| `download_source` | A link to a ZIP of what an uploaded build was made from; valid for 5 minutes, no `.env*` inside. A build from a repository gets the commit link. |
-| `publish_site` ⚠️ | Publish ready static output (a folder with `index.html`) without the CLI; creates the project if it does not exist. `publish_landing` is a deprecated alias of `publish_site`. |
-| `env_vars` ⚠️ | Read, set or delete the project's environment variables. |
+| `whoami` | Who is connected: username, email, number of projects. |
+| `my_projects` | Projects with addresses and the code source — a repository or a folder upload. The `repo` parameter keeps the projects of one repository. |
+| `list_sources` | Repository providers (GitHub, GitVerse, GitLab, GitFlic, SourceCraft) and which of them the organization has connected. |
+| `import_repo` ⚠️ | Create a project from a repository and start the first build. An app in a subfolder — the `root_directory` parameter, for example `apps/web`. Provider not connected — the reply links to the dashboard: a person connects the provider token. Repository already linked — the reply lists its projects. |
+| `project_create` ⚠️ | An empty project without a repository — an address for a future publish. |
+| `project_settings` ⚠️ | Read or change build settings: app folder, install and build commands, output folder, project type, the "Made with Layero" label. Shows where each value comes from. |
+
+## Site and builds
+
+| Tool | What it does |
+|---|---|
+| `site_status` | The site's state: latest build, address, repository and branch. Tells the site's own response from a platform page. The `path` parameter checks a specific address on the site, `wait_s` waits for a running build to finish. |
+| `list_environments` | The project's environments — branches with addresses and the state of the latest build. |
+| `list_deploys` | Build history: status, source, time in the queue and duration. |
+| `deploy_logs` | Build and app logs. Noisy package install lines are hidden by default. |
+| `diagnose_deploy` | Why a build failed: log analysis, the next step and what it was built with — framework, commands, output folder, Node.js version. |
+| `retry_deploy` ⚠️ | Restart a build. With `redeploy=true` it rebuilds the latest commit without a push. |
+| `cancel_deploy` ⚠️ | Stop a running build. |
+| `rollback` ⚠️ | Put the previous build back on the main address. |
+| `download_source` | A link to a ZIP with the sources of an uploaded build; lives 5 minutes, no `.env*` files in the archive. For a build from a repository — a link to the commit. |
+| `publish_site` ⚠️ | Publish ready-made files with `index.html` without the CLI: up to 200 files, up to 8 MB in total and up to 2 MB per file. Creates the project if there is none. `publish_landing` is the old name of the same tool. |
+| `env_vars` ⚠️ | Read, set or delete environment variables. |
 
 ## Domains
 
 | Tool | What it does |
 |---|---|
 | `list_domains` | The project's domains and their state. |
-| `connect_domain` ⚠️ | Connect your own domain: returns the DNS records to create. |
+| `connect_domain` ⚠️ | Connect a custom domain — returns the DNS records to create. |
 | `check_domain` | Check whether the domain works: DNS and certificate. |
 
 ## Site content
 
 | Tool | What it does |
 |---|---|
-| `read_site` | Read a page of the published site as text and markup. |
+| `read_site` | Read a page of the published site — text and markup. |
 | `site_screenshot` | A screenshot of a site page. |
-| `site_issues` | What to fix on the site: broken links, meta tags, accessibility. |
-| `refactor_site` | Propose a markup change — returns a patch, touches no files. |
-| `check_copy` | Proofread Russian text against Layero's editorial rules. |
-| `check_performance` | Measure site speed: Core Web Vitals, Lighthouse. |
+| `site_issues` | What to fix on the site: broken links, meta tags, accessibility — with the address of each problem. |
+| `refactor_site` | Suggest a markup edit. Returns the changes, does not touch files. |
+| `check_copy` | Proofread Russian text: typography and editorial rules. |
+| `check_rules` | Check the site against [Layero's anti-phishing rules](https://layero.ru/rules): collecting other services' passwords and card details, fake warnings, prize lures. |
+| `check_performance` | Measure site speed: Core Web Vitals and Lighthouse. |
 
 ## Analytics
 
@@ -71,63 +76,58 @@ line per tool.
 
 | Tool | What it does |
 |---|---|
-| `data_api_status` | Whether the Data API is enabled for the project's database, and its address. |
-| `data_api_methods` | Methods (tables and functions) and who may call them. |
-| `data_api_grant` ⚠️ | Open or close access to a method for a role. |
-| `data_api_keys` ⚠️ | Issue or revoke Data API keys. |
-| `data_api_origins` ⚠️ | Sites allowed to call from the browser (CORS). |
-| `data_api_buckets` ⚠️ | The database's storage buckets: list and create (with consent). Needs an admin-scope token. |
-| `data_api_auth` | Sign-in of the app's users: methods, providers, callback URL; the sender name of sign-in emails. Provider keys are set by the person — in the dashboard or with `layero data auth provider set`. |
-| `data_api_probe` | A trial call of a method — check that access and the response are as expected. |
+| `data_api_status` | Whether the Data API is on for the project's database, and at what address. |
+| `data_api_methods` | Tables and functions available through the API, and who can use them. |
+| `data_api_grant` ⚠️ | Open or close access to a table or function for a role. |
+| `data_api_keys` ⚠️ | Issue or revoke keys. |
+| `data_api_origins` ⚠️ | Sites allowed to query the database from a browser. |
+| `data_api_buckets` ⚠️ | Buckets for files: list and create. Creating needs a token with the `admin` scope. |
+| `data_api_auth` ⚠️ | App user sign-in: methods, providers, return address, sender name of sign-in emails. Provider keys are set by a person — in the dashboard or with `layero data auth provider set`. |
+| `data_api_probe` | A test request to a table or function: check access and the response. Rolls back writes, changes no data. |
 
 ## Documentation
 
 | Tool | What it does |
 |---|---|
-| `search_docs` | Search docs.layero.ru; touches no account data. |
+| `search_docs` | Search docs.layero.ru. |
+| `report_docs_issue` | Tell us about a docs error that cost the agent time. No account data goes into the report. |
 
-## Which tools need a person's consent
+## What needs a person's consent
 
-Tools marked ⚠️ **change** the site, the project or access — the server
-declares them without `readOnlyHint`, and the client (Claude Code, Cursor,
-Codex) asks for confirmation before the call. The rest only read, and the
-client calls them without asking.
+Tools marked ⚠️ run in the client — Claude Code, Cursor, Codex — only after a
+person confirms. The rest only read, and the client calls them without
+asking. Sometimes the client also asks about `data_api_probe` or
+`report_docs_issue`: they are not marked read-only, though they do not change
+projects.
 
-The rule for an agent: before `rollback`, `publish_site`, a writing
-`env_vars`, `data_api_grant` and `data_api_keys`, tell the person exactly what
-will change and wait for the answer — even when the client does not require
-confirmation.
+Before `rollback`, `publish_site`, a write with `env_vars`, `data_api_grant`
+and `data_api_keys`, the agent tells the person what exactly will change and
+waits for an answer — even if the client does not ask for confirmation.
 
 ## Sign-in
 
-**What works without sign-in.** The documentation is always available:
-`search_docs`, `check_copy` and `refactor_site` do not touch the account and
-answer without a token — connect the server and ask about the platform right
-away.
+`search_docs`, `report_docs_issue`, `check_copy` and `refactor_site` work
+without signing in: connect the server and ask about the platform right away.
 
-Every other tool works with the account: the first such call without a token
-gets `401` with `WWW-Authenticate`, and a client that supports OAuth (Claude
-Code, Cursor, Codex, VS Code) opens the browser itself — all that is left is
-to click "Allow access". The authorization server is `api.layero.ru`, the resource
-metadata is `https://mcp.layero.ru/.well-known/oauth-protected-resource`. For
-CI and environments without a browser — the header
-`Authorization: Bearer $LAYERO_TOKEN`; how to issue a token is on
-[Connect an agent](./install.md#layero_token-for-ci). Deploying without an
-account exists only in the CLI: `npx layero@latest deploy --claim`.
+The other tools need an account. A client with OAuth sign-in opens the
+browser itself on the first such call — you only confirm the sign-in. For CI
+and environments without a browser — the `Authorization: Bearer $LAYERO_TOKEN`
+header; how to issue a token — [Connect an agent](./install.md#layero_token-for-ci).
+Only the CLI can publish without an account: `npx layero@latest deploy --claim`.
 
-## URL parameters: `project` and `read_only`
+## One project or read-only
 
-The server's scope can be narrowed right in the connection address:
+A connection can be limited right in the server address:
 
 ```
 https://mcp.layero.ru/mcp?project=<slug>
 https://mcp.layero.ru/mcp?project=<slug>&read_only=true
 ```
 
-- `project=<slug>` — every tool works with this project only; `my_projects`
-  returns just it, and a call with another project is refused.
-- `read_only=true` — the ⚠️ tools are not declared at all. Handy for an agent
-  that should only diagnose.
+- `project=<slug>` — tools work only with this project: a call for another
+  project is refused.
+- `read_only=true` — everything that changes the site or the project is
+  refused. Handy for an agent that should only investigate a problem.
+  Reporting a docs error still works.
 
-The parameters go into the client config, in the `url` field — no separate
-mechanism is needed.
+Put the address with parameters in the `url` field of the client settings.

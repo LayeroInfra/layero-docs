@@ -56,7 +56,7 @@ description: Полный список команд layero — init, login, proj
 npx layero@latest <cmd> --help
 ```
 
-Глобальный флаг `--json` переключает CLI в режим JSON-lines на stdout — это для AI-агентов (Cursor, Claude Code) и CI-пайплайнов. Подробнее — [Деплой из AI-агентов](./agents.md).
+Глобальный флаг `--json` переключает CLI в режим JSON-lines на stdout — это для AI-агентов (Cursor, Claude Code) и CI-пайплайнов. Подробнее — [AI-агенты](../agents/index.md).
 
 ## `layero init`
 

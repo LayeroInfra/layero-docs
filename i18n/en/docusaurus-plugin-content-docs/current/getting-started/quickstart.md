@@ -1,138 +1,95 @@
 ---
 sidebar_position: 1
-title: Quickstart
-description: Install the CLI, sign in and publish your first site with one command. No git required.
+title: Your first site
+description: Publish a site from a folder with one command — no repository. Sign in with an emailed code or Yandex ID, the build runs on Layero, the address works as soon as the build ends.
 ---
 
-# Quickstart
+# Your first site
 
-Thirty seconds to publish a local frontend through the CLI. **Git and GitHub
-are not required** — Layero uploads the local directory directly. If you want
-automatic deploys on `git push`, that is a day-N upgrade: see
-[Deploying from GitHub](../deploys/github).
+**One command in the project folder, and the site is live at its own
+address.** No repository needed: Layero uploads the folder and builds it on
+its side. All you need is Node.js 20 or newer.
 
-:::note[Is an agent publishing?]
-If Claude Code, Cursor or another AI agent deploys the site, it needs the same
-CLI in JSON mode plus the skill and MCP — see the
-[AI agents](../agents/index.md) section.
-:::
+Is an AI agent publishing the site? It needs the same commands plus the skill
+and MCP — see [AI agents](../agents/index.md).
 
-## 1. Run the CLI
-
-Nothing to install — use `npx`:
+## 1. See how the project will be built
 
 ```bash
 cd my-site
-npx layero@latest init
+npx layero@latest deploy --dry-run
 ```
 
-The command detects your framework (Next / Vite / Astro / SvelteKit / Nuxt /
-Gatsby / CRA / Docusaurus / static HTML) and creates `.layero/project.json`.
+The command uploads nothing and does not ask you to sign in. It shows which
+framework it found, what command will build the project and whether
+publishing will replace the live site. If the app sits in a subfolder, the
+command says so and suggests a flag:
 
-Requires **Node.js ≥ 20**. If you prefer a local install:
-
-```bash
-npm install -D layero
+```
+! Не удалось уверенно определить приложение в этой папке
+  This folder has no app of its own; the app is apps/web (vite). Deploy that folder.
+  → npx layero@latest deploy --root apps/web
 ```
 
-## 2. Sign in
+Detected something wrong? Fix one value in [`layero.json`](../deploys/layero-json.md)
+and run the check again.
 
-```bash
-npx layero@latest login
-```
-
-The command prints a URL like `https://app.layero.ru/cli?code=ABCD-1234` and,
-when run in a normal terminal, opens it in the browser. There you pick a
-provider — **GitHub** or **Yandex ID**; a Layero account is created
-automatically on the first OAuth — and press "Allow access". The CLI picks up
-the token within a couple of seconds and saves it to `~/.layero/config.json`
-(chmod 600).
-
-:::tip[CLI on one machine, browser on another]
-This is a device flow, like `gh auth login` or an Apple TV. The CLI does not
-open a local HTTP server — the exchange goes through `api.layero.ru`. So the
-login works from SSH, a Docker container, the Cursor sandbox and anywhere else
-with an internet connection.
-:::
-
-## 3. Deploy
+## 2. Publish
 
 ```bash
 npx layero@latest deploy
 ```
 
-The CLI will:
+If you have not signed in yet, the CLI shows a link and a code and opens the
+browser. Sign in with a code from an email or with Yandex ID and confirm. You
+can open the link on another device — sign-in works over SSH and from a
+container. If the account has no username yet, the CLI asks for one: Latin
+letters, digits and hyphens.
 
-1. Auto-detect the framework and fill in `build_cmd` / `output_dir` if they are
-   not set yet.
-2. Pack the directory into a tar.gz, honouring `.gitignore` and
-   `.layeroignore` (see [`layero deploy`](../cli/deploy)).
-3. Upload the archive to the platform’s object storage.
-4. Start the build on the platform side.
-5. Stream the logs to your terminal and print the address at the end.
+Then the CLI packs the folder — leaving out files from `.gitignore` and
+`.layeroignore` — uploads it, and the platform builds the site. The build log
+streams to the terminal.
 
-The first deploy creates a project and records it in `./.layero/project.json`,
-so later `layero deploy` runs go to the same project.
+The first publish creates a project and records it in `.layero/project.json`.
+Later publishes from this folder go to the same project.
 
-## 4. Open the site
+## 3. Open the site
 
-When the build finishes the CLI prints the address — open it. The site is live
-straight away; there is no host warm-up to wait for.
+At the end the CLI prints an address like `https://my-site.layero.app`, and the
+site already opens there. Take the address from the CLI output or the
+dashboard: if the name is taken, the address differs from the folder name.
 
-:::tip[What address the project gets]
-User sites live in their own zone, `layero.app`. A new project gets an address
-from a single slug: `https://my-site.layero.app`. Projects created before the
-move (26 July 2026) still carry the organization prefix:
-`https://vasya-my-site.layero.app`.
+## 4. Update the site
 
-The exact address is printed by the CLI and shown in the dashboard — do not
-assemble it from a template. More in
-[Environments, previews and production](../deploys/environments).
-:::
-
-## 5. Changed the code — run `layero deploy` again
+Changed the code? Run the same command:
 
 ```bash
-# you edited something in the editor (or an AI agent did)
 npx layero@latest deploy
-# → the new build is published to the project's production address again
 ```
 
-For a CLI project (one with no repository connected) every `layero deploy`
-**publishes to the apex automatically** — direct uploads auto-promote, and
-neither `--prod` nor `promote` is needed.
+The new build replaces the site at the main address right away.
 
-The flip side is worth stating plainly: a plain deploy is **not** an isolated
-preview — it replaces what visitors see.
+:::warning[Every publish from a folder is visible to visitors at once]
 
-:::danger[`--branch` does nothing in `layero deploy`]
-The flag is accepted and silently ignored: the backend files **every** archive
-upload under the reserved `cli` environment, so that a manual upload can never
-collide with a branch of a connected repository (`projects.py:2865`). Verified
-by experiment: after `layero deploy --branch=probe` no `probe` environment is
-created.
+A project without a repository has no previews: every `layero deploy`
+replaces the live site. To look at changes at a separate address first,
+connect a repository — then every branch gets its own preview. If a new version turns out
+bad, bring back the previous one with `npx layero@latest rollback` or the «Откатить»
+(Roll back) button in the dashboard.
 
-What that means in practice:
-
-- **A project with no repository.** `cli` *is* its default branch, so the
-  deploy auto-promotes to the apex. **Every `layero deploy` replaces the live
-  site, and there is no way to upload a non-promoting build from the CLI.**
-- **A project with a repository connected.** `cli` is not the default branch,
-  so a CLI upload lives at its own `<project>-cli` address and does not move
-  the apex (unless `--prod` is passed).
-
-Branch previews are a git-flow feature: pushing to a branch creates the
-environment through the webhook.
 :::
 
-See [`layero promote`](../cli/promote) and
-[Environments](../deploys/environments) for the production flow of git-backed
-projects.
+## Without a terminal
+
+In the dashboard click **«Новый проект» → «Загрузить из папки»** (New project →
+Upload a folder) and drop the site folder. The platform builds it the same way
+as `layero deploy`.
 
 ## Where to go next
 
-- Using Cursor, Claude Code or another AI agent? —
-  [Deploying from AI agents](../cli/agents).
-- Bring a project up from GitHub: [Deploying from GitHub](../deploys/github).
-- Add environment variables: [Env vars](../deploys/env-vars).
-- Connect your own domain: [Custom domains](../deploys/custom-domains).
+- [Connecting a repository](../deploys/git-providers.md) — a preview for every
+  branch and a build on every push.
+- [Environment variables](../deploys/env-vars.md) — keys and API addresses for
+  the build.
+- [Custom domains](../deploys/custom-domains.md) — on the Pro plan.
+- [CLI commands](../cli/commands.md) — everything `layero` can do.
