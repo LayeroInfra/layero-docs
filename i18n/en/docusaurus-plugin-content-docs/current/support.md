@@ -5,7 +5,7 @@ title: Support
 
 # Support
 
-If something is broken or unclear, write to us.
+**If something is broken or unclear, write to the chat in the dashboard or to support@layero.ru.** The first answer from a specialist comes within three working hours.
 
 ## Hours and response times
 
@@ -34,7 +34,7 @@ The full terms are in the [Technical Support Regulation](https://layero.ru/suppo
 
 ## Through the dashboard widget
 
-The main route is the "💬" button in the bottom right corner of
+The main route is the chat button in the bottom right corner of
 [app.layero.ru](https://app.layero.ru).
 
 The widget interface is in Russian; button names are given below with a

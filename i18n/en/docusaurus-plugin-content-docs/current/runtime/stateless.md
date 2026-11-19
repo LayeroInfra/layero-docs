@@ -1,50 +1,41 @@
 ---
-sidebar_position: 2
-title: The stateless invariant
-description: A runtime container's filesystem is ephemeral. What does NOT work (writing to SQLite, file-based sessions) and how to do it properly.
+sidebar_position: 3
+title: Files and state
+description: An app with a server has a temporary disk. What doesn't work because of that — writes to SQLite, file sessions, uploads to disk — and where to keep data, files and sessions.
 ---
 
-# The stateless invariant
+# Files and state
 
-The filesystem of a runtime container on Layero is **ephemeral**. This is a
-product boundary of the platform rather than temporary technical debt — Vercel,
-Netlify and Cloudflare Workers have the same constraints.
+**Everything an app with a server writes to disk is gone after a restart: after a new build and after a long idle period.**
+Keep data in a database, files in storage, sessions in a cookie or in the
+database.
 
-## What "ephemeral" means
+## Why the disk is temporary
 
-- On a **cold start** the container comes up from a clean image. Everything the
-  previous instance wrote to the local filesystem is gone.
-- The platform may stop the container at any point of idleness (see the
-  [Lifecycle](./lifecycle)) — you cannot count on "the file will survive until
-  tomorrow" even with regular traffic.
-- For fast temporary files there is **`/tmp`** (in-memory, **64 MB**). Its
-  contents live only as long as the current instance.
+- After 48 hours without visitors the app is removed from the server, and the next start uses a clean image — see [Running and idling](./lifecycle.md).
+  What was written to disk isn't kept.
+- Every build runs in a new container with a clean disk. Don't count on a file surviving until tomorrow, even with steady traffic.
 
-## What does NOT work
+## What doesn't work
 
-- **SQLite with writes** — the database only survives as long as the instance.
-- **`node-persist`, `lowdb`, `nedb`** and any other "file databases".
-- **File-based sessions** — `express-session` with FileStore, file sessions in
-  Flask, Streamlit with a local `~/.streamlit/session.json`, and so on.
-- **Writing user uploads to disk** — the file disappears on the next request.
-- **An in-process cache shared between requests** for multi-pod deploys — each
-  pod cannot see the others' cache.
+- **SQLite with writes**: the database lives only until a restart.
+- **File databases** — `node-persist`, `lowdb`, `nedb` and the like.
+- **Sessions in files** — `express-session` with FileStore, Flask file
+  sessions and the like.
+- **User uploads to disk**: the file is gone after a restart.
 
-## What DOES work
+## What works
 
-- **Read-only SQLite** with content baked into the image.
-- **An in-process cache within a single pod** — while the pod lives, the cache
-  lives.
-- **Temporary files in `/tmp`** within a single request.
+- **Read-only SQLite**, if the file is in the repository and ends up in the
+  image.
+- **An in-memory cache in the app**, while it runs.
+- **Temporary files in `/tmp`** — an in-memory folder, up to 64 MB — for the data of a single request.
 
-## How to do it properly
+## Where to keep things
 
-| Task | Solution |
+| What | Where |
 |---|---|
-| Persistent data | An external managed Postgres (YC Managed PostgreSQL, for example). |
-| Cache | External Redis (YC Managed Redis). |
-| Uploaded files | External S3-compatible storage (Yandex Object Storage). |
-| Sessions | A JWT in a cookie, or a Redis store. |
-
-If your application **must** have a local disk, Layero is probably not for
-you. The platform does not offer persistent volumes, now or on the roadmap.
+| Data | a [Layero database](../database/index.md) — the platform passes the connection string in `LAYERO_DATABASE_URL` |
+| Uploaded files | Data API [file storage](../data-api/storage.md) |
+| Sessions | a token in a cookie or a sessions table in the database |
+| Cache across restarts | a table in the database |

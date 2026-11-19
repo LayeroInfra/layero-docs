@@ -86,7 +86,7 @@ Speeding up FCP by half a second helps, but the score grows less than from
 the same gain in TBT.
 
 Besides Performance, Lighthouse scores Accessibility, Best Practices and SEO —
-they are on the report's "Lighthouse" tab but don't count toward the headline
+they are on the report's «Рекомендации» (Recommendations) tab but don't count toward the headline
 score.
 
 ## Metrics
@@ -117,10 +117,8 @@ have answered a click.
 - **Waterfall** — every network request on a timeline, with connection
   phases and long main-thread tasks. This is where you see which file holds up
   everything else.
-- **Page composition** and **third-party services** — weight by file type
-  and domain, plus counters, widgets and other external scripts.
-- **Advice** — detailed best-practice checks: caching, compression,
-  render-blocking resources, privacy.
+- **Resources** — page weight by file type and domain, plus counters, widgets and other external scripts.
+- **Recommendations** — Lighthouse checks and detailed best-practice checks: caching, compression, render-blocking resources, privacy.
 - **HAR** — the full request log, which opens in the browser's developer
   tools.
 
@@ -176,8 +174,7 @@ in the run list, so you can see how speed changed from deploy to deploy.
 ## Limits
 
 - Free gives 3 runs a month, Pro gives 500, manual and scheduled combined;
-  the limit resets on the 1st. Schedules are Pro only.
-- You can only measure addresses of your own project: branch addresses, the
-  project address and domains connected to it.
+  the limit resets at the start of the billing period. Above 500 on Pro, runs are sold in packs of 10 for 10 ₽ — see [Usage and limits](../billing/usage.md#speed-runs). Schedules are Pro only.
+- You can measure your project's addresses and, with «Без проекта» (No project), any public address.
 - The audit measures a single page load without signing in. Actions after the
   load — clicks, navigation, forms — are not part of the run.

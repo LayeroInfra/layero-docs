@@ -17,8 +17,7 @@ the "Services" group.
 :::info[Plan]
 
 Page Speed is available on both plans. **Free** gives 3 runs a month,
-**Pro** gives 500 runs a month and scheduled runs. The limit is shared by the
-organization and resets on the 1st.
+**Pro** gives 500 runs a month and scheduled runs. The limit is shared by the organization and resets together with the other limits at the start of the billing period — see [Usage and limits](../billing/usage.md#billing-period).
 
 :::
 
@@ -55,10 +54,9 @@ profile, so its score is usually lower.
 
 ## How to run a measurement
 
-1. Open **Page Speed** and click **Measure speed**.
-2. Pick a project and a branch. You can change the address: a path
-   (`/pricing?sort=price`) or a domain connected to the project.
-3. Pick a device and click **Measure**.
+1. Open «Page Speed» and click «Замерить скорость» (Measure speed).
+2. Pick a project and a branch. You can change the address: a path (`/pricing?sort=price`) or a domain connected to the project. To measure someone else's site or a site not on Layero, pick «Без проекта» (No project) and paste any public address.
+3. Pick a device and click «Замерить» (Measure).
 
 The report is ready in about two minutes; the progress is shown right in the
 run list. If the same page on the same deploy and device was measured in the
@@ -75,10 +73,7 @@ last 10 minutes, the dashboard shows that run. To measure again, click the re-ru
 - **Waterfall** — every request on a timeline, with the main thread's long
   tasks. You can see which file holds up the rest.
 - **Resources** — page weight by file type and the heaviest files.
-- **Recommendations** — Lighthouse checks (performance, accessibility, best
-  practices, SEO) and Coach checks (performance, best practices, privacy).
-  Lighthouse suggestions show the expected savings; Coach suggestions list the
-  files they're about.
+- **Recommendations** — Lighthouse checks (performance, accessibility, best practices, SEO) and additional performance, best-practice and privacy checks. Lighthouse suggestions show the expected savings; the others list the files they're about.
 
 The report can be copied for an AI assistant with **Copy for AI**, and the
 full request log can be downloaded as HAR.
@@ -136,7 +131,6 @@ AI agents start a run with the `check_performance` MCP tool.
 
 ## Limits
 
-- Only your project's addresses can be measured: the branch address, the
-  project address and domains connected to it.
+- Without a project, only public addresses can be measured: internal and local ones can't.
 - A run covers one page load without signing in. Clicks, navigation and
   forms after the load aren't included.

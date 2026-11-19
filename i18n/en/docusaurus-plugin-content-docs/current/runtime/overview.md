@@ -1,31 +1,29 @@
 ---
 sidebar_position: 1
-title: When you need a runtime
-description: SSR Next.js, any Node server (Express, NestJS, Fastify), any Python WSGI/ASGI app (Django, FastAPI, Flask), Streamlit and Gradio — for applications with a long-lived process.
+title: When you need an app with a server
+description: Next.js with server rendering, Node.js servers (Express, NestJS, Fastify) and Python servers (Django, FastAPI, Flask), Streamlit and Gradio — the app types, how to set the type and what the app needs.
 ---
 
-# When you need a runtime
+# When you need an app with a server
 
-Most frontend projects are static: `npm run build` produces a folder of
-HTML/JS/CSS and putting that in storage is enough. This is Layero's fastest
-and cheapest mode.
+**Most frontend projects are static sites: the build leaves a folder of HTML, JavaScript and CSS, and Layero serves it as is.** This is the fastest and cheapest mode.
 
 But some applications cannot be turned into an SPA — they need a **process on
 the server**:
 
-- **SSR Next.js** without `output: 'export'`;
+- **Next.js with server rendering** — without `output: 'export'`;
 - **a Node server** — Express, NestJS, Fastify or any other that listens on a port;
 - **a Python application** — Django, FastAPI, Flask, any WSGI/ASGI app;
 - **Streamlit / Gradio** — Python applications with a web interface.
 
-For those Layero runs a user **container**.
+Layero runs such projects as apps with a server.
 
-## Supported presets
+## App types
 
-| `project_type` | What it is |
+| Type | What it is |
 |---|---|
-| `spa` | Static output (the default). |
-| `ssr_next` | Next.js with SSR or API routes. |
+| `spa` | A static site (the default). |
+| `ssr_next` | Next.js with server rendering or API routes. |
 | `node_web` | **Any Node server** that listens on HTTP: Express, Fastify, NestJS, Koa, Hono and others. |
 | `python_web` | **Any WSGI/ASGI application**: Django, FastAPI, Flask, Starlette, Litestar and others. |
 | `streamlit` | A Streamlit application (needs `app.py`). |
@@ -34,8 +32,7 @@ For those Layero runs a user **container**.
 `flask` is a legacy name kept for compatibility — it is an alias of
 `python_web`. New projects get `python_web`.
 
-Each preset uses a ready-made Dockerfile template — you do not build your own
-image.
+The platform has a ready image for each type — you don't build your own.
 
 ### Setting the type by hand
 
@@ -51,7 +48,7 @@ server for a static site, there are three ways:
   All keys are on the [`layero.json`](../build/layero-json.md) page.
 - **A CLI flag** — one-off, no file: `npx layero@latest deploy -t node_web`
   (or `-t python_web`, `-t ssr_next`).
-- **The dashboard** — **Project → Runtime type**.
+- **The dashboard** — project → «Настройки» (Settings) → «Сборка и деплой» (Build and deploy): the type follows from the framework you pick.
 
 ### What the app has to do
 
@@ -66,7 +63,7 @@ server for a static site, there are three ways:
   A long-polling bot with no HTTP server cannot pass it.
 
 After the `ready` event the first request may get a 404 placeholder for up to
-a minute while the container starts. A 404 that outlives a minute is a real
+a minute while the app starts. A 404 that outlives a minute is a real
 failure: read `npx layero@latest logs --runtime`.
 
 ### Visitor address
@@ -120,26 +117,15 @@ still runs: set `node_web` or `python_web`
 [by hand](#setting-the-type-by-hand).
 The list drives auto-detection; it is not a restriction.
 
-## Cold start
+## Running and idling
 
-The container **starts on the first request**, serves traffic and **goes to
-sleep when idle**. Which means:
+An app runs while it's being called: without requests it freezes, then goes
+to sleep and wakes up on the first request. What this means for your code,
+what resources the plan gives and which time is paid for — on
+[Running and idling](./lifecycle.md).
 
-- Woken from a warm state, an application answers in **~0.2 s**; a fully cold
-  start takes **4–12 s** depending on the stack (Python is faster, Streamlit
-  slower). These are medians of real measurements; the per-stack table and all
-  the states are in [Lifecycle](./lifecycle).
-- Applications with regular traffic are **kept warm automatically** by the
-  platform.
-- While idle, a project costs nothing in compute — which is what people like
-  serverless for.
+## Files and state
 
-Dedicated keep-warm (guaranteed no cold starts) is a paid setting in the
-plans.
-
-## The stateless invariant
-
-The container's filesystem is **ephemeral** — an important constraint that is
-easy to overlook. Read [The stateless invariant](./stateless) **before**
-migrating an existing SSR application that uses SQLite, file-based sessions or
-a local cache.
+Everything an app writes to disk is gone after a restart. Read
+[Files and state](./stateless.md) **before** moving an app that writes to
+SQLite, keeps sessions in files or caches on disk.
