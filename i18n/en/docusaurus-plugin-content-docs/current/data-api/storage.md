@@ -6,13 +6,6 @@ description: The database's file storage — buckets, policies on storage.object
 
 # Files
 
-:::info[Beta]
-
-Data API is in beta and available on the Pro plan. What to expect from
-these pages is covered in [What Data API Is](./index.md).
-
-:::
-
 Files live at the same address as the Data API: `https://data.layero.ru/<database>/storage/v1`.
 The `storage` schema is built as in Supabase — the `storage.buckets` and
 `storage.objects` tables, the `storage.foldername()` function — so
@@ -126,7 +119,8 @@ because bytes can't be rolled back.
 | What | Value |
 |---|---|
 | File | up to 50 MB on any plan; less if the bucket limit says so |
-| File space per database | Free — 1 GB, Pro — up to 100 GB |
+| File space | Pro — 10 GB on average over the month per organization, above that 10 ₽ per GB with [extra usage](../billing/overage.md), 100 GB at most in total. Free — 1 GB, beta participants only |
+| Signed link | valid for an hour by default |
 | Not available | image transformations, resumable upload, the S3 protocol |
 
-File requests count toward the database's daily request limit — see [What's Missing](./limits.md).
+When space runs out, uploads are refused with `storage_quota_exceeded` (413), and uploaded files are still served. File requests count toward the database's daily request limit — see [What's Missing](./limits.md).

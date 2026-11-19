@@ -13,8 +13,7 @@ names, buttons, and endpoint responses are still changing. A page may lag
 behind the product by a few days; if you notice a discrepancy, write to us in
 the dashboard chat — it helps.
 
-**Data API is available on the Pro plan.** On the free plan the "API",
-"Authentication", and "Files" items on the database page are visible, but
+**Data API is available on the Pro plan.** On the free plan the «Data API», «Авторизация» (Sign-in) and «Файлы» (Files) items on the database page are visible, but
 you can turn them on only after [upgrading to Pro](../billing/plans.md).
 
 :::

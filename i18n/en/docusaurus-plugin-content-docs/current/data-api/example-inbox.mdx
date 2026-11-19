@@ -9,13 +9,6 @@ import TabItem from '@theme/TabItem';
 
 # A database app without a backend: building Layero Inbox
 
-:::info[Beta]
-
-Data API is in beta and available on the Pro plan. What to expect from
-these pages is covered in [What Data API Is](./index.md).
-
-:::
-
 *A step-by-step walkthrough of an app on Layero: Postgres, Data API,
 auth, storage and notifications. About 30 minutes.*
 
@@ -39,7 +32,6 @@ The Layero dashboard and the app UI are in Russian. Each screenshot below is
 followed by an explanation of what's highlighted.
 
 :::
-
 
 ## What you get
 
@@ -84,7 +76,6 @@ and each user can do. The app doesn't need the secret key at all.
 
 Every step below can be done in the Layero dashboard or in the terminal — the
 result is the same. `scripts/setup.sh` does it all at once (step 8).
-
 
 ## Step 1. Create a database and enable the Data API
 
@@ -316,7 +307,7 @@ Data API → Access → Secrets → Add secret.
 <TabItem value="cli" label="CLI">
 
 ```bash
-npx layero@latest data secrets set TELEGRAM_BOT_TOKEN --from-env TELEGRAM_BOT_TOKEN --db inbox
+npx layero@latest data secrets set TELEGRAM_BOT_TOKEN --from-env TELEGRAM_BOT_TOKEN --db inbox --org my-team
 ```
 
 </TabItem>
@@ -413,7 +404,7 @@ await db.auth.signInWithOAuth({ provider: "yandex", options: { redirectTo: APP_U
 The sender name of sign-in emails:
 
 ```bash
-npx layero@latest data auth sender "Layero Inbox" --db inbox
+npx layero@latest data auth sender "Layero Inbox" --db inbox --org my-team
 ```
 
 ## Step 7. Embed the widget through an iframe
@@ -439,7 +430,7 @@ branch environments, automatically.
 <TabItem value="cli" label="CLI">
 
 ```bash
-npx layero@latest data origins list --db inbox
+npx layero@latest data origins list --db inbox --org my-team
 ```
 
 </TabItem>
@@ -502,7 +493,6 @@ team. `200:0` means the request succeeded but RLS hid every row — for that use
 those rows don't exist. `401` means visitors can't touch the tables at all.
 `403` means the role has no privilege for the action.
 
-
 ## Pitfalls
 
 | What happened | Why | Fix |
@@ -517,7 +507,7 @@ those rows don't exist. `401` means visitors can't touch the tables at all.
 
 - Run the access check after every migration.
 - Check what each role sees: Data API → Methods, or
-  `npx layero@latest data methods --db inbox`.
+  `npx layero@latest data methods --db inbox --org my-team`.
 - Set the email sender name: `npx layero@latest data auth sender "Your product"`.
 - With many site owners, move the project to a dedicated database.
 

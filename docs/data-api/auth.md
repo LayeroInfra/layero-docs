@@ -6,13 +6,6 @@ description: Регистрация и вход в приложение на Dat
 
 # Вход пользователей
 
-:::info[Бета-версия]
-
-Data API работает в бета-версии и доступен на тарифе Pro. Чего ждать
-от страниц, написано в [«Что такое Data API»](./index.md).
-
-:::
-
 Вход пользователей совместим с GoTrue, поэтому работает `supabase-js`:
 
 ```js
@@ -21,14 +14,12 @@ await db.auth.signInWithPassword({ email, password });
 const { data: { user } } = await db.auth.getUser();
 ```
 
-Поверхность: `/auth/v1/{token,signup,recover,verify,resend,authorize,callback}`,
-`GET /auth/v1/user`, `PUT /auth/v1/user`, `POST /auth/v1/logout`. Есть вход по
-ссылке из письма (magic link), PKCE и внешние провайдеры: Яндекс, VK ID и Сбер ID.
-Как их подключить — в разделе [«Вход через Яндекс, VK ID и Сбер ID»](./oauth.md).
+Адреса: `/auth/v1/{token,signup,recover,verify,resend,magiclink,otp,authorize,callback,settings}`, `GET` и `PUT /auth/v1/user`, `POST /auth/v1/logout`, второй фактор — `/auth/v1/factors…`, управление пользователями секретным ключом — `/auth/v1/admin/users…`. Есть вход по ссылке из письма (magic link), PKCE и внешние провайдеры: Яндекс, VK ID и Сбер ID.
+Как их подключить — в разделе [«Вход через Яндекс, VK ID и Сбер ID»](./oauth.md).
 
 ## Роли — как в Supabase
 
-В каждой базе есть роли `anon`, `authenticated` и `service_role`, поэтому
+В каждой базе есть роли `anon`, `authenticated` и `service_role`, поэтому
 политики и гранты из миграций Supabase работают как есть:
 
 ```sql
@@ -46,7 +37,7 @@ GRANT SELECT ON public.entries TO authenticated;
 
 - **Новая таблица в `public` открыта ролям сама** — права по умолчанию,
   как у них. Миграция без строк `GRANT` работает как есть, строки решает RLS.
-  Таблица без RLS отдаёт все строки любому с публичным ключом — включайте
+  Таблица без RLS отдаёт все строки любому с публичным ключом — включайте
   RLS сразу, платформа предупредит о такой таблице.
 - **Гость и вошедший — разные роли.** Политика `TO anon` действует только
   на гостей, `TO authenticated` — только на вошедших.
@@ -80,7 +71,6 @@ await admin.auth.admin.createUser({
 Запускайте это на сервере или скриптом, не в браузере: секретный ключ
 обходит RLS.
 
-
 ## Второй фактор
 
 Приложение-аутентификатор (TOTP) работает как у Supabase: `supabase.auth.mfa.enroll`,
@@ -96,8 +86,10 @@ await admin.auth.admin.createUser({
 на сессию базы:
 
 ```
-POST /organizations/<организация>/databases/<id>/api/app-session
+POST https://api.layero.ru/organizations/<слаг организации>/databases/<id базы>/api/app-session
 ```
+
+Запрос делается с токеном входа в панель — так, как его отправляет сама панель.
 
 Ответ — пара токенов, подписанных секретом **этой** базы, и адрес шлюза:
 
@@ -112,7 +104,7 @@ POST /organizations/<организация>/databases/<id>/api/app-session
 ```
 
 Токен кладётся в `authorization: Bearer …` рядом с публичным ключом — дальше
-всё как у обычного входа: роль вошедшего, `auth.uid()`, политики.
+всё как у обычного входа: роль вошедшего, `auth.uid()`, политики.
 
 Прав это не расширяет: доступ по-прежнему решают гранты и RLS, а владелец
 организации не получает «видно всё». Пользователь в `auth.users` заводится или

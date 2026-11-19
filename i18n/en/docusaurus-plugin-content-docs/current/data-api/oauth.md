@@ -6,13 +6,6 @@ description: How to connect sign-in through an external provider — the provide
 
 # Sign-in with Yandex, VK ID and Sber ID
 
-:::info[Beta]
-
-The Data API is in beta and available on the Pro plan. More on the
-[“What the Data API is”](./index.md) page.
-
-:::
-
 A visitor clicks “Sign in with Yandex”, confirms at the provider and comes back
 to your site signed in. It works the same way as in Supabase:
 

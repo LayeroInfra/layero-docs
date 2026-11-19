@@ -6,13 +6,6 @@ description: Sign-up and sign-in for an application on Data API, the authenticat
 
 # User Sign-In
 
-:::info[Beta]
-
-Data API is in beta and available on the Pro plan. What to expect from
-these pages is covered in [What Data API Is](./index.md).
-
-:::
-
 User sign-in is compatible with GoTrue, so `supabase-js` works:
 
 ```js
@@ -21,8 +14,7 @@ await db.auth.signInWithPassword({ email, password });
 const { data: { user } } = await db.auth.getUser();
 ```
 
-Surface: `/auth/v1/{token,signup,recover,verify,resend,authorize,callback}`,
-`GET /auth/v1/user`, `PUT /auth/v1/user`, `POST /auth/v1/logout`. Magic-link
+Addresses: `/auth/v1/{token,signup,recover,verify,resend,magiclink,otp,authorize,callback,settings}`, `GET` and `PUT /auth/v1/user`, `POST /auth/v1/logout`, the second factor — `/auth/v1/factors…`, managing users with the secret key — `/auth/v1/admin/users…`. Magic-link
 sign-in, PKCE, and external providers are available: Yandex, VK ID and Sber ID.
 How to connect them: [“Sign-in with Yandex, VK ID and Sber ID”](./oauth.md).
 
@@ -79,7 +71,6 @@ await admin.auth.admin.createUser({
 Run this on a server or in a script, never in the browser: the secret key
 bypasses RLS.
 
-
 ## Second factor
 
 An authenticator app (TOTP) works as in Supabase: `supabase.auth.mfa.enroll`,
@@ -96,8 +87,10 @@ in Layero, you don't need to set up a separate password. The panel can
 exchange its own session for a database session:
 
 ```
-POST /organizations/<organization>/databases/<id>/api/app-session
+POST https://api.layero.ru/organizations/<organization slug>/databases/<database id>/api/app-session
 ```
+
+The request is made with the dashboard sign-in token, the way the dashboard itself sends it.
 
 The response is a pair of tokens signed with **this** database's secret, plus
 the gateway address:

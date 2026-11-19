@@ -6,13 +6,6 @@ description: Calling database functions over HTTP. The api schema is the only pu
 
 # Functions and RPC
 
-:::info[Beta]
-
-Data API is in beta and available on the Pro plan. What to expect from
-these pages is covered in [What Data API Is](./index.md).
-
-:::
-
 ```
 POST     https://data.layero.ru/<database>/rest/v1/rpc/<function>     PostgREST form
 GET      https://data.layero.ru/<database>/rest/v1/rpc/<function>     STABLE/IMMUTABLE only
@@ -26,7 +19,7 @@ data is decided by the code inside the database.
 
 ```sql
 CREATE FUNCTION api.submit(site_token text, payload jsonb)
-RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER AS $$
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 BEGIN
     INSERT INTO public.entries (site_token, payload) VALUES (site_token, payload);
     RETURN jsonb_build_object('ok', true);
@@ -104,8 +97,7 @@ Mark a read-only function as `STABLE`, and GET will work.
 
 ## `SECURITY DEFINER` and privileges
 
-`SECURITY DEFINER` runs the function body as the database owner — this is
-how a public function can write to a closed table without exposing it. The
+`SECURITY DEFINER` runs the function body as the function's owner — this is how a public function can write to a closed table without exposing it. Give it `SET search_path`, as in the example above: then it looks up tables and functions by short name only in the schemas named, not wherever the caller looks. The
 one rule: **validate the input inside**, because any site visitor will be
 able to call it.
 

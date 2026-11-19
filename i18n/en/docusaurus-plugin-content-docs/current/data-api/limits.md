@@ -6,15 +6,7 @@ description: What's not supported in Data API and where the boundaries are.
 
 # What's Missing
 
-:::info[Beta]
-
-Data API is in beta and available on the Pro plan. What to expect from
-these pages is covered in [What Data API Is](./index.md).
-
-:::
-
-Something unsupported responds with a refusal naming the capability, not a
-silent stub. A silent mismatch costs more than an absence — "it works, but
+**The Data API has no Realtime, Edge Functions or incoming webhooks, and calls, files and users have plan limits.** A request for something missing gets a refusal naming the capability, not a silent stub. A silent mismatch costs more than an absence — "it works, but
 not like that" surfaces at the visitor's end, not the developer's.
 
 ## Capabilities that don't exist
@@ -24,7 +16,6 @@ not like that" surfaces at the visitor's end, not the developer's.
 | **Realtime** — change subscriptions | poll on an interval |
 | **Edge Functions** — running your code on our side | logic lives in database functions; to reach out — [HTTP from SQL](./outbound.md) (`net.http_post`) |
 | **Incoming webhooks** — an address that accepts another service's request | your own server on Layero receives the webhook and calls the function; options are in [HTTP from SQL](./outbound.md#incoming-webhooks--there-are-none) |
-| `/auth/v1/admin/*` | manage users with your own functions in the `api` schema |
 | email change, SMS, enterprise SSO | —; a second factor exists: an authenticator app (TOTP), `supabase.auth.mfa.*` |
 | RS256/JWKS | tokens are signed with HS256 using the database's secret |
 | image transforms, resumable upload, S3 protocol | prepare the file on your side; upload and serving work |
@@ -39,13 +30,15 @@ missing is specifically running your own code on our side.
 | What | Value |
 |---|---|
 | Concurrent queries per database | shared database — 4 (2 on each of the two entry points), shared between the Data API and your server; dedicated — 20 % of the cluster connection ceiling, at least 4. `layero db list` shows the same number (`data_api_concurrent`). Beyond that — a queue, then a `db_too_busy` refusal |
-| Calls per month | Free — 1 M, Pro — 10 M per organization, counted across all databases; on Pro, above that — 20 ₽ per 1 M with [extra usage](../billing/overage.md), otherwise a refusal (429) until the new period |
-| Calls per day | Free — 50,000, Pro — 1,000,000 per database, as protection against spikes; beyond that, a `quota_exceeded` refusal (429) until 00:00 UTC |
+| Calls per month | Free — 1 M (beta), Pro — 10 M per organization, counted across all databases. In force from 1 December on Free and from 17 December on Pro; on Pro, above that — 20 ₽ per 1 M with [extra usage](../billing/overage.md), otherwise a refusal (429) until the new period |
+| Calls per day | Free — 50,000 (beta), Pro — 1,000,000 per database, as protection against spikes; beyond that, a `quota_exceeded` refusal (429) until 00:00 UTC |
 | Sign-in users per database | Free — 10,000, Pro — 100,000; beyond that, new sign-ups are closed, existing users keep working |
 | File in storage | up to 50 MB on any plan |
-| File storage | Free — 1 GB, Pro — 10 GB on average over the month per organization, 100 GB at most in total; on Pro, above that — 10 ₽ per GB |
+| File storage | Free — 1 GB (beta), Pro — 10 GB on average over the month per organization, 100 GB at most in total; on Pro, above that — 10 ₽ per GB |
 | Databases per organization | one shared, as many dedicated as you need; see [database limits](../database/limits.md) |
 | Accepted origins per database | 50 |
+
+The "beta" mark on Free figures means they apply only to beta participants: for everyone else the Data API doesn't turn on on Free.
 
 Every request counts: tables, functions, files, and HTTP from SQL. Calls
 that failed through our fault (5xx) and limit refusals (429) don't count
@@ -58,29 +51,21 @@ platform is overloaded": neighboring databases keep working fine.
 
 ## Client
 
-Our own package is `@layero/data`. It's thin: calling database functions through the gateway, with no wrapper over tables.
-
-```bash
-npm i @layero/data
-```
+For tables, functions, user sign-in and files, use `@supabase/supabase-js`:
+the gateway's contract is compatible with it.
 
 ```js
-import { createClient } from "@layero/data";
+import { createClient } from "@supabase/supabase-js";
 
-const db = createClient({
-  url: import.meta.env.VITE_LAYERO_DATA_URL,   // https://data.layero.ru/<database>
-  key: import.meta.env.VITE_LAYERO_DATA_KEY,   // pk_live_…
-});
+const db = createClient(
+  import.meta.env.VITE_LAYERO_DATA_URL,   // https://data.layero.ru/<database>
+  import.meta.env.VITE_LAYERO_DATA_KEY,   // pk_live_…
+);
 
-const menu = await db.rpc("menu");
+const { data } = await db.rpc("menu");
 ```
 
-⚠️ Version 0.x: the HTTP contract is still changing, pinning a version in
-production is mandatory.
-
-For tables, filters, and user sign-in, use `@supabase/supabase-js` — the
-contract is compatible, and it can do everything `@layero/data` can't yet.
-You can also do without any package — a request fits in a few lines:
+You can also do without packages — a function call fits in a few lines:
 
 ```js
 const call = (fn, args) =>
@@ -91,3 +76,8 @@ const call = (fn, args) =>
     body: JSON.stringify(args),
   }).then((r) => r.json());
 ```
+
+The `@layero/data` package (version 0.1.0) can only call functions with
+`rpc` and hasn't been updated for a long time. Its `call` method goes to an
+address that no longer exists, and `setToken` doesn't give the signed-in
+user's role. For new projects, use supabase-js.

@@ -6,13 +6,6 @@ description: Вызов функций базы по HTTP. Схема api — е
 
 # Функции и RPC
 
-:::info[Бета-версия]
-
-Data API работает в бета-версии и доступен на тарифе Pro. Чего ждать
-от страниц, написано в [«Что такое Data API»](./index.md).
-
-:::
-
 ```
 POST     https://data.layero.ru/<база>/rest/v1/rpc/<функция>     форма PostgREST
 GET      https://data.layero.ru/<база>/rest/v1/rpc/<функция>     только STABLE/IMMUTABLE
@@ -25,7 +18,7 @@ POST     https://data.layero.ru/<база>/rpc/<функция>             св
 
 ```sql
 CREATE FUNCTION api.submit(site_token text, payload jsonb)
-RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER AS $$
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 BEGIN
     INSERT INTO public.entries (site_token, payload) VALUES (site_token, payload);
     RETURN jsonb_build_object('ok', true);
@@ -46,7 +39,7 @@ await db.rpc("submit", { site_token: "abc", payload: { name: "Аня" } });
 Функции триггеров методами не бывают.
 
 Вызвать по API можно только функцию, выданную ролям Data API явно. Функция,
-которую зовут лишь через `PUBLIC` (умолчание Postgres), закрыта, и отказ скажет,
+которую зовут лишь через `PUBLIC` (умолчание Postgres), закрыта, и отказ скажет,
 какой `GRANT` выдать: так внутренняя механика приложения не становится вызываемой
 из интернета по факту существования.
 
@@ -100,8 +93,7 @@ END $$;
 
 ## `SECURITY DEFINER` и права
 
-`SECURITY DEFINER` выполняет тело от владельца базы — так публичная функция
-пишет в закрытую таблицу, не открывая её. Правило одно: **проверяйте вход
+`SECURITY DEFINER` выполняет тело от владельца функции — так публичная функция пишет в закрытую таблицу, не открывая её. Задавайте ей `SET search_path`, как в примере выше: тогда таблицы и функции по короткому имени она ищет только в названных схемах, а не там, где их ищет вызвавший. Правило одно: **проверяйте вход
 внутри**, потому что вызвать её сможет любой посетитель сайта.
 
 Право на вызов выдаётся отдельно: свежесозданная функция в схеме `api`

@@ -6,13 +6,6 @@ description: How to let a client's site send data to your database without handi
 
 # Accepting Requests from Another Domain
 
-:::info[Beta]
-
-Data API is in beta and available on the Pro plan. What to expect from
-these pages is covered in [What Data API Is](./index.md).
-
-:::
-
 The browser won't let a page reach `data.layero.ru` unless its domain is allowed
 by the database. Allowed domains come from two lists, and for widgets on other
 people's sites there is a third mode — "any site".
@@ -75,10 +68,12 @@ your connected project's domain and gets the page data via `postMessage`.
 ## Format
 
 `https://domain` or `https://domain:port` — exactly as the browser sends it — or
-`*` for any site. Paths and patterns like `https://*.example` are not accepted:
+`*` for any site. An `http://` address is accepted too, and a domain without a scheme is completed to `https://`. Paths and patterns like `https://*.example` are not accepted:
 a path never arrives in `Origin`. `localhost` and `127.0.0.1` on any port are
 allowed by default — for requests and as a post-sign-in redirect, as in
 Supabase. You can turn that off under "Access".
 
 List changes apply within seconds: a refusal based on a stale cache is
 re-checked against a fresh list rather than served from the cache.
+
+The gateway lets the browser's preflight request (`OPTIONS`) through for any site, and the `origin_not_allowed` refusal (403) comes on the request itself. So while debugging you may see the preflight pass and the request get a 403 — check the list.

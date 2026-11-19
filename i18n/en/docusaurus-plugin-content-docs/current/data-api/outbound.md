@@ -6,13 +6,6 @@ description: Telegram notifications and webhooks straight from a database functi
 
 # HTTP from SQL
 
-:::info[Beta]
-
-Data API is in beta and available on the Pro plan. What to expect from
-these pages is covered in [What Data API Is](./index.md).
-
-:::
-
 A Telegram notification, a webhook to your server, a call to a third-party API
 is an ordinary database function that calls `net.http_post`. The functions are
 the same as in the `pg_net` extension in Supabase, so code from there moves over
@@ -82,6 +75,8 @@ string and migrations as well, hang the notification on a trigger: it can't be
 bypassed.
 
 ```sql
+CREATE SCHEMA IF NOT EXISTS private;
+
 CREATE FUNCTION private.notify_new_report() RETURNS trigger
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 BEGIN
@@ -120,7 +115,7 @@ PERFORM net.http_post(
 3. Any server response is final, as in `pg_net`: 3xx, 4xx and 5xx are stored
    with their code, and your code decides by `status_code`. Layero does not
    follow redirects. Only network failures and timeouts, where there is no
-   response at all, are retried with a growing delay, up to 5 attempts. Setup
+   response at all, are retried: up to 5 attempts with pauses of 2, 4, 8 and 16 minutes. So after a network failure a notification may arrive several minutes late. Setup
    errors (missing secret, bad address) are not retried: a person fixes those,
    not time.
 4. The outcome goes to `net._http_response` under the same id: status code,
@@ -135,7 +130,7 @@ SELECT id, status_code, error_msg, left(content, 200)
   FROM net._http_response ORDER BY id DESC LIMIT 10;
 ```
 
-The timeout is `timeout_milliseconds`, but no more than 15 seconds. Requests
+The timeout is `timeout_milliseconds`: 5000 ms by default, no more than 15 seconds. Requests
 count toward the database's daily request limit.
 
 ## Differences from `pg_net` in Supabase
