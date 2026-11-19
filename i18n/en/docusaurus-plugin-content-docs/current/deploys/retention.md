@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 8
 title: Build retention
 description: How many ready builds Layero keeps for rollback, what happens to old branches, how to go back to an old version and how to download the sources of an upload.
 ---
@@ -87,7 +87,7 @@ item is in the «⋯» menu of the build in the list.
 The download link is valid for 5 minutes, up to 30 downloads an hour.
 
 From the terminal — `npx layero@latest source`, details in
-[CLI commands](../cli/commands.md#layero-source). Through the API:
+[CLI commands](../cli/commands.md#builds-rollback-and-diagnostics). Through the API:
 `GET /projects/{project_id}/deploys/{deploy_id}/source` returns
 `{url, filename, expires_in}`, and with `?redirect=1` it redirects straight
 to the file.

@@ -1,12 +1,13 @@
 ---
-sidebar_position: 4
-title: Deploying from GitHub Actions
+slug: /cli/github-actions
+sidebar_position: 5
+title: From GitHub Actions
 description: The official GitHub Action for deploying to Layero — CI tokens, building the artifact in your pipeline, pull-request previews, step outputs and the errors you are likely to hit.
 ---
 
-# Deploying from GitHub Actions
+# From GitHub Actions
 
-The official Action is [`LayeroInfra/deploy-action`](https://github.com/LayeroInfra/deploy-action).
+**The official Action [`LayeroInfra/deploy-action`](https://github.com/LayeroInfra/deploy-action) publishes a project from a GitHub pipeline.** It runs the same `layero deploy`, just with a CI token.
 
 ```yaml
 name: Deploy
@@ -27,7 +28,7 @@ jobs:
 
 ## First — do you need the Action at all
 
-If the repository is simply [linked to a project](../deploys/github), a push
+If the repository is simply [connected to a project](./github.md), a push
 already triggers a build through the webhook and the Action is not needed: you
 would be adding a second copy of the same work.
 
@@ -53,30 +54,28 @@ Then you build it yourself and ship the **finished artifact**:
 
 ## The token
 
-An ordinary login session lasts a week — no good for CI, where builds would
-start failing with a 401 exactly seven days later. Pipelines get a separate
-**long-lived token** instead.
+A `layero login` sign-in lasts a week, so it's no good for CI: seven days later builds would start failing with a 401. Pipelines get a separate **long-lived token**.
 
-1. Open [app.layero.ru/settings/cli](https://app.layero.ru/settings/cli),
-   section "CI tokens".
+1. Open the «Токены CLI и CI» (CLI and CI tokens) page — [app.layero.ru/settings/cli](https://app.layero.ru/settings/cli). Or issue a token from the terminal: `npx layero@latest token create ci`.
 2. Give it a name (for example `GitHub Actions`) and press create.
-3. **Copy the value immediately** — it is shown once. Only a hash is stored;
-   the token cannot be recovered.
+3. **Copy the value immediately** — it is shown once and can't be recovered.
 4. In the repository: Settings → Secrets and variables → Actions → New
    repository secret, named `LAYERO_TOKEN`.
 
 You can revoke the token on the same page — builds using it start getting 401
 right away.
 
-:::warning[The token carries account-level rights]
-It can do everything an ordinary login can. Create a separate token per
-repository: then a compromise of one is contained without breaking the rest.
+:::warning[The token deploys everything, but nothing irreversible]
+The token works with any of your projects — it has no per-project split. Create a separate token per repository: then a compromise of one is contained without breaking the rest.
+
+By default the token has read and deploy rights. Irreversible actions are closed to it: deleting a project or the account, renaming an organization, inviting and removing members, unlinking a card and changing the plan. A leaked token can deploy someone else's code, but can't wipe a project or touch money.
+
+Database commands (`layero db create`, `connect`, `disconnect`, `sql`, `delete`) and `layero deploy --db` also need `admin` rights. If you need them in CI, issue a token with them: `npx layero@latest token create ci --scope read,deploy,admin`.
+
+Rights limit only the CI token (it starts with `layero_ci_`). A `layero login` sign-in is an ordinary account sign-in and can do everything the browser can.
 :::
 
-The CLI reads the token from the `LAYERO_TOKEN` variable **before** the local
-`~/.layero/config.json`. That is deliberate: otherwise, on a developer machine
-with an active login, the variable would silently lose and the deploy would go
-to the wrong account.
+If `LAYERO_TOKEN` is set, the CLI takes the token from it, not the sign-in from `~/.layero/config.json`. So on a developer's machine the publish goes to the token's account, not the one you're signed in as.
 
 ## Parameters
 
@@ -100,11 +99,7 @@ If the workflow is meant to keep updating the same project, pass **`project`**
 `name` only sets the name **at the moment the project is created on the first
 deploy**. And every run is a "first deploy" whenever the repository has no
 `.layero/project.json` — which it usually does not. On a name collision the
-slug gets a suffix, so nothing fails loudly: the build is green, the address is
-simply new each time.
-
-We walked into this in our own examples repository: 11 projects for 4 examples
-in a single day.
+address gets a suffix, so nothing fails loudly: the build is green, the address is simply new each time.
 :::
 
 ## Step outputs
@@ -172,29 +167,21 @@ live demo.
 `prebuilt` is meant for **static output** — a directory with a ready
 `index.html` in it. A Next.js build in server mode is not such a directory.
 
-For SSR applications do not pass `prebuilt` at all: ship the sources and Layero
-will bring the app up as a [runtime](../runtime/). A static Next.js export
+For apps with a server don't pass `prebuilt` at all: ship the sources and Layero will run an [app with a server](../runtime/overview.md). A static Next.js export
 (`output: 'export'`) goes the other way — ship it with `prebuilt: out`.
 
 ### `auth_required` immediately at start
 
-The token is missing or empty. Check that the secret is named exactly
-`LAYERO_TOKEN` and is passed into the step.
+The token is missing or empty. Check that the secret is named exactly `LAYERO_TOKEN` and is passed into the step. In CI the command doesn't wait for a browser sign-in and stops with this error at once.
 
-The CLI used to try opening a browser login here and hung for 15 minutes until
-the code expired. Since version 0.8.4 it fails immediately in CI — silent
-waiting on a runner was worse than an honest error.
-
-### `address_required` / `impersonation`
+### `address_required`
 
 The project name looks like somebody else's brand or like a platform service
 address. Pick a different one — prefixed with your organization, for example.
 
 ### `project_not_found`
 
-`project` points at a project that does not exist. Either drop the parameter
-(the project will be created on the first deploy) or list what you have:
-`npx layero@latest projects list`.
+`project` points at a project that does not exist. Check the id or slug in `npx layero@latest projects list`. Don't drop the parameter: without it every run creates a new project — see the `name` warning above.
 
 ## Other CI systems
 
@@ -205,5 +192,4 @@ nothing but the environment variable:
 LAYERO_TOKEN=... npx layero@latest deploy --prod --yes
 ```
 
-`--yes` skips confirmations. In CI the CLI asks nothing anyway, but with
-`--yes` the command behaves the same in CI and in a terminal.
+In CI the CLI asks nothing anyway, and `--yes` makes the command behave the same in CI and in a terminal.

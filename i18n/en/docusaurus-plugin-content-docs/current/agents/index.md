@@ -64,7 +64,7 @@ files with `index.html` can also be published without the CLI — with the MCP
 tool `publish_site`.
 
 How the CLI talks to an agent — events, error codes, the site address — is on
-the [CLI JSON events](../cli/json-events.md) page.
+the [CLI JSON events](./json-events.md) page.
 
 **If the project was detected wrong.** The first publish goes without
 `layero.json`. If the build failed or a server was published as a static
@@ -144,4 +144,4 @@ publishes without an account only if the person asked for it or agreed.
 - [MCP tools](./mcp-tools.md) — what `mcp.layero.ru` can do.
 - [The layero skill](./skill.md) — what is in the skill and what
   `layero init` writes to the project.
-- [CLI JSON events](../cli/json-events.md) — events and error codes.
+- [CLI JSON events](./json-events.md) — events and error codes.

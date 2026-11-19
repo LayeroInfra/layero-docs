@@ -1,9 +1,9 @@
 {
-  "label": "CLI",
-  "position": 4,
+  "label": "Справочник CLI",
+  "position": 9.5,
   "link": {
     "type": "generated-index",
     "slug": "/cli",
-    "description": "npm-пакет `layero` — деплой и управление проектами из терминала."
+    "description": "Установка и вход, все команды CLI `layero`, общие флаги и переменные."
   }
 }

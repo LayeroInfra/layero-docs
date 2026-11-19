@@ -240,7 +240,7 @@ LAYERO_TOKEN=<токен> npx layero@latest db sql crm "select 1" --json
 | `gb_not_supported` | `db create --gb`: объём так не выбирается |
 | `dedicated_needs_panel` | `db create --dedicated`, `--cpu` или `--ram`: выделенная база заказывается в панели |
 
-Полный список событий и кодов — [JSON-события CLI](../cli/json-events.md).
+Полный список событий и кодов — [JSON-события CLI](../agents/json-events.md).
 
 ## Data API из терминала
 

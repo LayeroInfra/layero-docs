@@ -121,6 +121,7 @@ const config: Config = {
           {from: '/cli/agents', to: '/agents/'},
           {from: '/billing/usage/overage', to: '/billing/overage/'},
           {from: '/category/тарифы-и-оплата', to: '/billing'},
+          {from: '/cli/promote', to: '/cli/rollback'},
         ],
       },
     ],

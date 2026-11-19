@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 6
 title: Environments and previews
 description: The project's main address and branch previews, how a build becomes the main one, how many previews run at once, rollback and the «Сайт скоро появится» page.
 ---
@@ -76,12 +76,12 @@ npx layero@latest promote a3f9c2b           # make it the main one
 
 Without an argument, `promote` takes the latest ready build of the `cli`
 environment, not of the main branch. Details —
-[`layero promote`](../cli/promote.md).
+[`layero promote`](./rollback.md).
 
 ### Rollback
 
 The «Откатить» (Roll back) button in the dashboard or
-[`layero rollback`](../cli/rollback.md) gives the main address its previous
+[`layero rollback`](./rollback.md) gives the main address its previous
 build back. No new build is needed: the previous one opens almost at once.
 Any other build that is still kept can be made the main one by hand, see [Build retention](./retention.md).
 

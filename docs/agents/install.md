@@ -85,7 +85,7 @@ npx layero@latest token create ci
 Как используют токен:
 
 - **CLI** читает переменную сам. Флаг `--yes` отключает вопросы, `--json`
-  включает построчные события. Готовый пример — [GitHub Actions](../cli/github-actions.md).
+  включает построчные события. Готовый пример — [GitHub Actions](../deploys/github-actions.md).
 - **MCP** принимает тот же токен в заголовке
   `Authorization: Bearer $LAYERO_TOKEN`. В Codex добавьте к команде из
   таблицы флаг `--bearer-token-env-var LAYERO_TOKEN`.

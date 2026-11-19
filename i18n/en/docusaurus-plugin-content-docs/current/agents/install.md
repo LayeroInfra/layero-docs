@@ -90,7 +90,7 @@ repository. Revoke it in the same dashboard section or with
 Then:
 
 - **The CLI** reads the variable itself. `--yes` turns off questions, `--json`
-  turns on line-by-line events. A ready example — [GitHub Actions](../cli/github-actions.md).
+  turns on line-by-line events. A ready example — [GitHub Actions](../deploys/github-actions.md).
 - **MCP** accepts the same token in the `Authorization: Bearer $LAYERO_TOKEN`
   header. In Codex, add the `--bearer-token-env-var LAYERO_TOKEN` flag to the
   command from the table.

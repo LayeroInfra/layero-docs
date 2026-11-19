@@ -53,4 +53,4 @@ Until there's a successful build, the project's address shows the «Сайт
 the address works at once.
 
 You can do without a repository too: publish a folder with
-[`layero deploy`](../cli/deploy.md).
+[`layero deploy`](./deploy.md).

@@ -1,153 +1,97 @@
 ---
 sidebar_position: 1
-title: Install and sign in
-description: How to install the Layero CLI (npx, project-local or global), sign in through the device flow, and where the token is kept.
+title: Installing and signing in
+description: How to run the Layero CLI with npx layero@latest, sign in through the browser with an emailed code or Yandex ID, where the sign-in is stored and which token CI needs.
 ---
 
-# Install and sign in
+# Installing and signing in
 
-## Install
-
-The Layero CLI ships as the npm package [`layero`](https://www.npmjs.com/package/layero). Prefer `npx layero@latest` — **with the version tag, and without `-g`**:
+**The Layero CLI is the npm package [`layero`](https://www.npmjs.com/package/layero).
+You don't need to install it: run it with `npx layero@latest`.** It needs
+Node.js 20 or newer.
 
 ```bash
-# Recommended: no install, always the latest release
 npx layero@latest deploy
-
-# Project-local — this PINS the version; you update it yourself
-npm install -D layero && npx layero deploy
-
-# Global (often fails in Cursor / Claude Code over /usr/local permissions)
-npm install -g layero@latest
 ```
 
-Requires **Node.js ≥ 20**.
+Write `@latest`: without a version, `npx` takes a copy that's already
+installed and doesn't check for a newer one — you can run an old version for
+years. If you did add the package to a project (`npm install -D layero`),
+update it yourself: `npm install -D layero@latest`.
 
-:::tip[Always write `@latest` — otherwise the version gets pinned]
-`npx layero` without a version runs the copy you **already have**: the local one
-from `node_modules`, or the global one. It does not contact the registry, so you
-can keep running whatever you installed once, for years. That is how we found a
-laptop on `layero@0.8.11` while 0.8.20 was published — and before 0.8.22 the CLI
-could not even warn about it (its registry request was broken).
-
-`npx layero@latest` fetches the current release every time. A project-local
-install you update yourself: `npm i -D layero@latest`.
-:::
-
-## Sign in
+## Signing in
 
 ```bash
 npx layero@latest login
 ```
 
-The CLI:
+1. The CLI prints a link like `https://app.layero.ru/cli?code=5NFW-K2NG` and
+   opens it in the browser. The `--no-browser` flag only prints the link.
+2. In the browser, sign in with a code from an email or with Yandex ID. No
+   account yet — it's created on the first sign-in. The page names the
+   account it gives access to; if it's the wrong one, there's a «войти
+   другим» (sign in as someone else) link right there.
+3. Click «Разрешить доступ» (Allow access). The CLI saves the sign-in to
+   `~/.layero/config.json`.
 
-1. Makes one HTTP request to `api.layero.ru` and receives a short code like `5NFW-K2NG`.
-2. Prints the URL `https://app.layero.ru/cli?code=5NFW-K2NG` (and tries to open it in a browser when running in an interactive terminal).
-3. Polls quietly every 2 seconds until you approve or the 15-minute TTL expires.
+You can open the link on another device: sign-in works over SSH and from a
+container. The code is valid for 15 minutes — if you miss it, run `login`
+again.
 
-In the browser you pick a sign-in method — an **emailed code** or **Yandex ID**. If you have no Layero account yet, it is created automatically on first sign-in. The page names the account it is about to authorise; if it is the wrong one, there is a "sign in as someone else" link right there. After you allow access, the CLI receives a JWT and stores it in `~/.layero/config.json` (chmod 600).
+After the first sign-in the CLI may ask for a username: lowercase Latin letters, digits and hyphens, 2 to 32 characters. It's the address of your personal organization. If the CLI runs under an agent or in CI, there's nobody to ask: set the name with `npx layero@latest username <name>`.
 
-:::info[The browser and the CLI may be on different machines]
-This is a device flow (like `gh auth login`, `aws sso login`, AppleTV). The CLI opens no local server on 127.0.0.1 — the exchange goes **through the backend**. So signing in works even when the CLI runs on a remote machine (SSH, Docker, headless CI) while your browser is on a laptop.
-:::
-
-Check which account you are signed in as:
+Which account you're signed in as:
 
 ```bash
 npx layero@latest whoami
 ```
 
-### If the code expired
+A sign-in lasts 7 days. To sign out, run `npx layero@latest logout`: it
+removes the sign-in from this machine. You can see and close active sessions
+in the dashboard, in the user card, the «Сессии» (Sessions) block.
 
-Each `user_code` lives **15 minutes**. If you did not confirm in time, the CLI exits with `auth_expired` or `auth_timeout`. Just run `npx layero@latest login` again.
+## A token for CI and agents
 
-### You have no Layero account
-
-There is no separate sign-up. The first sign-in — by an emailed code or with Yandex ID — creates your Layero account and personal organisation automatically. After signing in you may be asked to pick a username once — it becomes the slug of your personal organisation. For projects created before the move to `layero.app` (26 July 2026) it also ended up in the site address — `<username>-<project>.layero.app`. New addresses consist of the project slug alone.
-
-## Initialise a project
-
-Inside the site directory, run:
+CI has no browser, and a sign-in lasts a week. Issue a long-lived token:
 
 ```bash
-npx layero@latest init
+npx layero@latest token create ci
 ```
 
-The command:
-
-- Looks at the folder and prints how it sees it (Next / Vite / Astro / SvelteKit / Nuxt / Gatsby / CRA / Docusaurus / static…), and when the app is not recognised — a hint on what to do
-- Creates `.layero/project.json` with `analytics_enabled` and `env_vars` — the detection guess is not written there
-- Appends a "Deploying with Layero" block to `AGENTS.md` / `CLAUDE.md` / `.cursorrules` (when they exist) — so that AI agents in later chat sessions know how to deploy without being told.
-
-Idempotent: running it again updates the existing block rather than duplicating it.
-
-## Where the config lives
-
-| File | Purpose |
-|---|---|
-| `~/.layero/config.json` | Auth token and API URL. Created by `layero login`. |
-| `./.layero/project.json` | Binds the cwd to a project. Created by `layero init` or the first `layero deploy`. The CLI does not write `framework_hint`, `build_cmd`, `output_dir` there — add them yourself to pin your choice. |
-
-`~/.layero/config.json` looks roughly like this:
-
-```json
-{
-  "apiUrl": "https://api.layero.ru",
-  "token": "eyJhbGciOi...",
-  "user": { "id": 42, "username": "alice", "email": "alice@example.com" }
-}
-```
-
-`./.layero/project.json` after `init`:
-
-```json
-{
-  "analytics_enabled": false,
-  "env_vars": {}
-}
-```
-
-You can add `framework_hint`, `build_cmd`, `output_dir` by hand — a new
-project gets them as your choice. The CLI never fills them in itself: a
-detection guess saved as a setting would override detection from the files on
-every build.
-
-After the first `deploy` it gains `project_id`, `slug`, `organization_slug` and `apex_hostname` — the CLI writes those itself, leave them alone.
-
-## Clearing the token
+`ci` is the token's name. By default it has read and deploy rights. The token
+is shown once — save it in your CI secrets as `LAYERO_TOKEN`. The CLI picks
+it up from the variable by itself:
 
 ```bash
-npx layero@latest logout
-```
-
-Removes the token from `~/.layero/config.json`. It revokes nothing server-side — the JWT stays valid until its TTL expires (7 days). To revoke the session on the server, use `Settings → Active sessions` in the dashboard.
-
-## CI / non-interactive
-
-CI has no browser, and a login token lives 7 days — CI built on it breaks
-within a week. Issue a long-lived token on your machine and store it in the
-CI secrets as `LAYERO_TOKEN`:
-
-```bash
-npx layero@latest token create ci     # scopes: read and deploy
-```
-
-The token is shown **once**. You can revoke it in the panel at
-[app.layero.ru/settings/cli](https://app.layero.ru/settings/cli). In CI the
-environment variable is enough — the CLI picks the token up from it:
-
-```bash
-# Don't print the token: anything in the build log is visible to everyone
-# with access to the runs, and stays there after the secret is rotated.
 LAYERO_TOKEN="$LAYERO_TOKEN" npx layero@latest deploy --prod --yes --project my-site
 ```
 
-How token scopes work is covered in [Deploying from GitHub Actions](./github-actions.md).
+Don't print the token: everything in the build log is visible to everyone
+with access to the runs. List tokens with `npx layero@latest token list`, revoke with `npx layero@latest token revoke` or on the «Токены CLI и CI» (CLI and CI tokens) page in
+the [dashboard](https://app.layero.ru/settings/cli). How rights work —
+[From GitHub Actions](../deploys/github-actions.md#the-token).
 
-## Next
+## CLI files
 
-- [CLI commands](./commands.md)
-- [`layero deploy`: auto-detection, flags, limits](./deploy.md)
+| File | What's in it |
+|---|---|
+| `~/.layero/config.json` | the sign-in and the API address. Created by `login` |
+| `.layero/project.json` | the folder's link to a project. Created by the first `deploy` or by `init` |
+
+The CLI fills in `.layero/project.json`: after the first publish it holds the
+project's id and address, and you don't need to edit them. The CLI doesn't
+write build settings there — they live in
+[`layero.json`](../build/layero-json.md) or in the project settings.
+
+## `layero init`
+
+An optional command for working with AI agents: it adds a block on how to
+publish to Layero to `AGENTS.md`, `CLAUDE.md` or `.cursorrules` and creates
+`.layero/project.json`. Details — [The layero skill](../agents/skill.md#layero-init-and-agentsmd).
+
+## What's next
+
+- [All commands](./commands.md)
+- [From a folder with the CLI](../deploys/deploy.md) — `layero deploy`, flags and limits
 - [AI agents](../agents/index.md) — Claude Code, Cursor, Codex
-- [JSON events: the full event and error-code schema](./json-events.md)
+- [CLI JSON events](../agents/json-events.md) — for agents and CI

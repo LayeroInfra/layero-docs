@@ -11,14 +11,6 @@
     "message": "Publish your first site and learn what Layero is made of.",
     "description": "The generated-index page description for category 'Начало' in sidebar 'docsSidebar'"
   },
-  "sidebar.docsSidebar.category.CLI": {
-    "message": "CLI",
-    "description": "The label for category 'CLI' in sidebar 'docsSidebar'"
-  },
-  "sidebar.docsSidebar.category.CLI.link.generated-index.description": {
-    "message": "The `layero` npm package — deploy and manage projects from the terminal.",
-    "description": "The generated-index page description for category 'CLI' in sidebar 'docsSidebar'"
-  },
   "sidebar.docsSidebar.category.Runtime-приложения": {
     "message": "Runtime apps",
     "description": "The label for category 'Runtime-приложения' in sidebar 'docsSidebar'"
@@ -90,5 +82,13 @@
   "sidebar.docsSidebar.category.Адреса.link.generated-index.description": {
     "message": "Custom domains, HTTP headers, the 404 page and redirects.",
     "description": "The generated-index page description for category 'Адреса' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Справочник CLI": {
+    "message": "CLI reference",
+    "description": "The label for category 'Справочник CLI' in sidebar 'docsSidebar'"
+  },
+  "sidebar.docsSidebar.category.Справочник CLI.link.generated-index.description": {
+    "message": "Installing and signing in, every `layero` CLI command, common flags and variables.",
+    "description": "The generated-index page description for category 'Справочник CLI' in sidebar 'docsSidebar'"
   }
 }

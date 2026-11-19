@@ -1,5 +1,5 @@
 ---
-sidebar_position: 5
+sidebar_position: 8
 title: Хранение сборок
 description: Сколько готовых сборок Layero хранит для отката, что происходит со старыми ветками, как вернуться к старой версии и как скачать исходники загрузки.
 ---
@@ -83,7 +83,7 @@ description: Сколько готовых сборок Layero хранит дл
 Ссылка на файл действует 5 минут, скачивать можно до 30 раз в час.
 
 Из терминала — `npx layero@latest source`, подробно — в
-[командах CLI](../cli/commands.md#layero-source). Через API:
+[командах CLI](../cli/commands.md#сборки-откат-и-диагностика). Через API:
 `GET /projects/{project_id}/deploys/{deploy_id}/source` возвращает
 `{url, filename, expires_in}`, а с `?redirect=1` сразу перенаправляет на
 файл.

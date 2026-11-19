@@ -85,4 +85,4 @@ npx layero@latest deploy
 - [Переменные окружения](../build/env-vars.md) — ключи и адреса API для
   сборки.
 - [Свои домены](../addresses/custom-domains.md) — на тарифе Pro.
-- [Команды CLI](../cli/commands.md) — всё, что умеет `layero`.
+- [Все команды CLI](../cli/commands.md) — всё, что умеет `layero`.

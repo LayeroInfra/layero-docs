@@ -1,10 +1,11 @@
 ---
-sidebar_position: 6
-title: JSON events schema
+slug: /cli/json-events
+sidebar_position: 4.5
+title: CLI JSON events
 description: The full list of events and error codes the Layero CLI emits on stdout in JSON mode. The canonical reference for AI agents and CI.
 ---
 
-# JSON events schema
+# CLI JSON events
 
 The CLI switches to JSON-lines mode by itself when it sees an AI agent's
 environment variable: `CLAUDECODE`, `CLAUDE_CODE_SESSION`, `CURSOR_AGENT`,
@@ -200,13 +201,11 @@ The backend accepted the job.
 
 ### `stage`
 
-The build moved to a new stage. Arrives before the first `build_log` line of
-that stage (since 0.11.0 it follows the log lines themselves, not the deploy's
-current stage).
+The build moved to a new stage. Arrives before the first `build_log` line of that stage.
 
 | field | type |
 |---|---|
-| `name` | `clone`/`install`/`build`/`upload`/`activate` |
+| `name` | `clone`/`detect`/`install`/`build`/`verify`/`upload`/`activate` |
 
 ### `build_log`
 
@@ -220,7 +219,7 @@ hidden in JSON mode; a single marker line arrives instead. Full log:
 | field | type |
 |---|---|
 | `line` | string |
-| `stream` | `stdout`/`stderr` |
+| `stream` | `stdout`/`stderr`, `meta` for the service note |
 
 ### `ready`
 
@@ -230,7 +229,7 @@ hidden in JSON mode; a single marker line arrives instead. Full log:
 |---|---|---|
 | `url` | string | **The live public address of the site** — not the dashboard. For a plain `layero deploy` of a CLI project this is the project's production address (CLI uploads auto-promote to the apex). For a project with a repository, where a CLI upload is not promoted, it is the address of the `cli` environment (`--branch` on `deploy` is refused, see `branch_unsupported`). It is reachable straight away; this is the link to open and to show the user. |
 | `dashboard_url` | string? | The project management page (`https://app.layero.ru/projects/<id>`). This is **not** the site — never hand it over as the link to the finished site. |
-| `preview_url` | string? | **Legacy, no longer emitted.** A separate per-deploy preview host in the `*.preview.layero.ru` zone. It existed to give out a link while the apex warmed up on the CDN. `layero.app` has no separate preview zone and no user sites remain on `layero.ru`, so the field is never populated. |
+| `preview_url` | string? | An outdated field, not filled in for ordinary projects. Open `url`. |
 | `edge_ready` | bool? | `true` — the address already answers with the site itself: before `ready` the CLI (since 0.11.0) polls `url` while the platform's own page answers instead (header `X-Layero-Screen`), for up to 90 s. So a container app no longer shows the "nothing here yet" placeholder after `ready`. `false` — the app did not answer within that time: see `npx layero@latest logs --runtime`. |
 | `screen` | string? | with `edge_ready: false` — which platform page answered (`starting`, `unavailable`, …) |
 | `edge_eta_seconds` | number? | **Legacy, no longer emitted.** An estimate of the remaining CDN warm-up. There is nothing to propagate — user sites do not sit behind a CDN. |
@@ -482,7 +481,8 @@ reading, and without this link the site disappears with its deadline.
 |---|---|---|
 | `project_id` | string | |
 | `slug` | string | |
-| `url` | string | the live site address — the same as in `ready` |
+| `url` | string | the live site address — the same as in `ready` |
+| `preview_url` | string | the temporary site's address in the `preview.layero.app` zone — the link to share |
 | `claim_url` | string | the link a human uses to take the project into their account. Only a person signed in to the dashboard can accept a claim — neither the CLI nor an agent does it |
 | `expires_at` | string | ISO-8601 — when the site and the token stop working |
 
@@ -689,6 +689,62 @@ freed immediately.
 | `next_action` | string — the concrete command or URL that resolves it |
 | `message` | string — human-readable description |
 
+## Events of other commands
+
+Every event has `ts` and `event`; they aren't repeated below. A `?` after a name means the field may be missing.
+
+### Builds and diagnostics
+
+| Event | Command | Fields |
+|---|---|---|
+| `deploy` | `deploys list` | one event per build: `id`, `environment_id`, `status`, `commit_sha`, `commit_message` and others |
+| `diagnosis` | `diagnose` | `deploy_id`, `status`, `stage`, `verdict`, `build_log_excerpt` — log lines around the error, `build_error_found`, `runtime_log_excerpt`, `runtime_error_found`, `runtime_state`, `next_actions`, `truncated` |
+| `build_logs` | `logs` | `status`, `lines` |
+| `runtime_logs` | `logs --runtime` | `status`, `lines` |
+| `preview_evicted` | `deploy` | `evicted` — the paused previews (`branch`, `hostname`), `limit` — how many previews the project serves at once. Arrives before `ready` |
+
+### Variables and domains
+
+| Event | Command | Fields |
+|---|---|---|
+| `env_set` | `env set` | `project`, `keys`, `total` |
+| `env_unset` | `env unset` | `project`, `keys` |
+| `domains` | `domains list` | `project`, `domains` |
+| `domain_added` | `domains add` | `domain`, `domain_id`, `ssl_status`, `records` — DNS records to add, `next_action` |
+| `domain_verified` | `domains verify` | `domain`, `verified`, `ssl_status`, `checks`, `next_check_at?`, `error?` |
+| `domain_primary` | `domains primary` | `domain` |
+| `domain_removed` | `domains remove` | `domain` |
+
+### Account and tokens
+
+| Event | Command | Fields |
+|---|---|---|
+| `username_set` | `username` | `username`, `organization` |
+| `tokens` | `token list` | `tokens` |
+| `token_created` | `token create` | `id`, `name`, `token` (the value, sent once), `scopes` |
+| `token_revoked` | `token revoke` | `id` |
+
+### Analytics and speed
+
+| Event | Command | Fields |
+|---|---|---|
+| `analytics_status` | `analytics status` | `connected`, `counter_id?`, `status`, `injection_mode`, `tracked_branch?` |
+| `analytics_connect_started` | `analytics connect` | `oauth_url` — a person opens the link, `next_action` |
+| `analytics_stats` | `analytics stats` | `period`, `state`, `totals`, `trend`, `sources`, `devices`, `pages` |
+| `analytics_disconnected` | `analytics disconnect` | `project` |
+| `perf_check_started` | `perf check` | `run_id`, `status`, `next_action` |
+| `perf_check` | `perf check --wait`, `perf show` | `run_id`, `score`, `previous_score`, `delta`, `verdict`, `message`, `timings`, `significant_delta` |
+
+### Databases
+
+| Event | Command | Fields |
+|---|---|---|
+| `databases` | `db list` | `org`, `databases` |
+| `database_connected` | `db connect` | `org`, `database`, `project` |
+| `database_disconnected` | `db disconnect` | `org`, `database`, `project` |
+| `query_result` | `db sql` | `database`, `columns`, `rows`, `row_count`, `status`, `truncated`, `statements?` — the result of each statement of a script |
+| `data_env` | `data env` | `project`, `vars` — variables for the frontend, `reason?`, `next_action?` |
+
 ## Error codes
 
 Checked against the CLI sources: these are all the codes it actually emits.
@@ -705,7 +761,7 @@ Do not write handling for codes that are not on this list.
 | `oauth_unavailable` | The sign-in provider is unreachable | Ours to fix — retry later |
 | `project_unknown` | Run outside a project directory and without `--project` | Run from the project directory or pass `--project <id\|slug>` |
 | `project_not_found` | `--project` points at a project that does not exist | `layero projects list` |
-| `cli_deploys_disabled` | An admin turned CLI deploys off for the project | Enable it in Project Settings, or deploy into another project |
+| `cli_deploys_disabled` | folder uploads to this project are turned off | publish through the connected repository or into another project; to turn uploads back on, contact support |
 | `invalid_type` | `--type` with an unknown value | Drop the flag (auto-detection) or pass a valid preset — listed in the message |
 | `invalid_choice` | An interactive prompt got an invalid choice in non-TTY mode | Pass the value as an explicit flag |
 | `prebuilt_no_dir` | The `--prebuilt` directory does not exist | Pass it explicitly: `--prebuilt ./dist` |
@@ -721,7 +777,7 @@ Do not write handling for codes that are not on this list.
 | `source_in_repository` | The deploy was built from a repository — the platform does not store its sources. The commit link is in `next_action`. Exit `4` | Open the commit in the repository |
 | `file_exists` | `layero source`: a file with that name already exists. Exit `4` | `--out <path>` or `--force` |
 | `rate_limited` | Too many source downloads in an hour | Try again in an hour |
-| `rollback_unsupported` | The deploy has no servable artifact: either a runtime project, or static whose artifact was purged by retention | Rebuild the commit with `layero deploy` |
+| `rollback_unsupported` | the build has no stored output: it was deleted by retention | rebuild that commit or upload that version again |
 | `rollback_noop` | The rollback target is already live — e.g. a second `layero rollback` in a row. Nothing changed, exit code `4` | Pick a build: `layero promote <sha>`; list them with `layero deploys list` |
 | `env_not_found` | No such variable | `layero env list` |
 | `nothing_to_set` | `layero env set` called without a `KEY=value` pair | `layero env set KEY=value` |

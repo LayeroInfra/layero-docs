@@ -74,7 +74,7 @@ project without a repository, the latest folder upload.
 Any ready build can be made the main one: it opens at once, with no rebuild.
 A rollback works the same way — the previous build becomes the main one
 again. In the dashboard it is the «Откатить» (Roll back) button; in the CLI,
-[`layero rollback`](../cli/rollback.md) and [`layero promote`](../cli/promote.md).
+[`layero rollback`](../deploys/rollback.md) and [`layero promote`](../deploys/rollback.md).
 
 ## Static site and app with a server
 

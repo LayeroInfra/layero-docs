@@ -1,306 +1,134 @@
 ---
 sidebar_position: 2
-title: Commands
-description: The full list of layero commands — init, login, projects, deploy, rollback, deploys list, link, token.
+title: All commands
+description: Reference of Layero CLI commands — publishing, projects and environments, rollback, logs and diagnostics, variables, domains, databases and the Data API, analytics, speed, hooks, tokens. Common flags and CLI environment variables.
 ---
 
-# CLI commands
+# All commands
+
+**Every command runs as `npx layero@latest <command>`.** Detailed help for
+any of them — `npx layero@latest <command> --help`. Most commands take
+`--project <id or slug>`: without it, the project linked to the current
+folder is used.
+
+## Sign-in and account
 
 | Command | What it does |
 |---|---|
-| `layero init` | A block for AI agents in `AGENTS.md` / `CLAUDE.md` / `.cursorrules` and a `.layero/project.json` scaffold. Optional: `deploy` links the folder by itself. |
-| `layero login` | Sign in through the browser (an emailed code or Yandex ID) — a device flow. |
-| `layero logout` | Remove the saved token. |
-| `layero whoami` | Show the current account. |
-| `layero orgs list` | List your Layero organizations (personal + teams). |
-| `layero projects list` | List your projects. |
-| `layero projects create --repo <provider>:<owner/repo>` | Create a project from a repository of a connected provider — push to a branch = preview, push to main = production. |
-| `layero projects delete <slug> --yes` | Delete a project. Irreversible; needs a token with scope `admin`. |
-| `layero sources list` | Git providers the platform supports and the organization's connections. |
-| `layero sources connect <provider> --token-stdin` | Connect a provider with a personal access token (read from stdin, so it stays out of shell history). |
-| `layero sources repos <connection_id>` | Repositories visible to a connection. |
-| `layero envs list` | Environments (branches) of a project with their addresses. |
-| `layero link <id_or_slug>` | Link the current directory to an existing project. |
-| `layero deploy` | Pack the current directory and deploy: the platform builds and publishes it. For a project without a repository every deploy replaces the live site. |
-| `layero deploy --dry-run` | Print the build plan and exit: uploads nothing, no login needed. |
-| `layero deploy --prod` | A project with a connected repository: publish the upload at the live address (with confirmation). |
-| `layero deploy --org <slug>` | Create the new project in the given team instead of your personal organization. |
-| `layero deploy --json` | A machine-readable event stream — for agents and CI. |
-| `layero deploy --claim` | Deploy without an account: a temporary site for 1 hour (static sites and SPAs only) and a link for a human to take the site over. |
-| `layero claim status` / `claim accept <code>` | State of a claimable project's claim; open the page where a human accepts it. |
-| `layero deploys list` | Show recent deploys of the current project. |
-| `layero promote` | Point the production apex at a specific ready deploy. |
-| `layero promote <sha>` | Point the apex at a specific deploy by `commit_sha` — the working way to roll back, see [Rollback](./rollback). |
-| `layero hooks list/create/delete` | Deploy hooks — URL tokens that start a build on POST (CMS, cron, external CI). |
-| `layero db list` | The organization's databases: name, slug, placement, Postgres version, Data API, storage used, paid-until date. |
-| `layero db create <name>` | Create a shared database from the plan. The connection string is printed once. |
-| `layero db connect <database>` | Connect a project to the database — the connection string goes into its environment variables. |
-| `layero db disconnect <database>` | Disconnect a project from the database: the variable goes away with the next deploy. |
-| `layero db sql <database> "SQL"` | Run a query or a script in the database; `--file migration.sql` or stdin reads the script from a file. |
-| `layero db delete <database> --yes` | Delete the database with all its data and backups — irreversible. The name and the API address become free again. |
-| `layero data env` | The [Data API](/data-api) URL and public key for the frontend. |
-| `layero data secrets` | Database secrets for [HTTP from SQL](/data-api/outbound): substituted into `net.http_post` as `{{secrets.NAME}}`. |
-| `layero data buckets list` / `create <name>` | Storage buckets: `--public`, `--max 5MB`, `--types image/jpeg,image/png`. No secret key needed. |
-| `layero data auth sender "Name"` | The sender name of sign-in emails (codes, links, password reset). |
-| `layero data auth status` | Sign-in methods, providers and the callback URL for the provider console. |
-| `layero data auth provider set yandex --client-id …` | Connect Yandex, VK ID or Sber ID; the secret comes from stdin or `--secret-from-env`. Also `on`, `off`, `remove`. |
-| `layero data auth redirects list\|add\|remove <provider\|email> [url]` | Where people may be sent back after sign-in. |
-| `layero data auth methods --password on --link off` | Turn sign-in methods and registration on or off. |
-| `layero token set <jwt>` | Set the token by hand (for CI). |
+| `login` | sign in through the browser; `--no-browser` only prints the link |
+| `logout` | remove the sign-in from this machine |
+| `whoami` | which account you're signed in as |
+| `username <name>` | set the username — your personal organization's address. For agents and CI |
+| `orgs list` | organizations you're a member of |
+| `token create <name>` | issue a long-lived token for CI and agents, `--scope read,deploy,admin` |
+| `token list` | issued tokens: name, rights, last use |
+| `token revoke <id>` | revoke a token, takes effect at once |
+| `token set <token>` | save on this machine a token issued elsewhere |
 
-The full flag list for a command:
+How to sign in and where it's stored — [Installing and signing in](./install.md).
 
-```bash
-npx layero@latest <cmd> --help
-```
+## Publishing
 
-The global `--json` flag switches the CLI to JSON lines on stdout — that is for
-AI agents (Cursor, Claude Code) and CI pipelines. More in
-[AI agents](../agents/index.md).
-
-## `layero init`
-
-Run it once inside the site directory:
-
-```bash
-cd my-site
-npx layero@latest init
-```
-
-What it does:
-
-1. Looks at the folder with the same detection as `deploy --dry-run` and
-   prints the `detected` event — with `hint` and `next_action` when the app is
-   not recognised (a monorepo subfolder, frontend and backend side by side, a
-   custom build script).
-2. Creates `.layero/project.json` with `analytics_enabled` and `env_vars`. It
-   does **not** record the detection guess (`framework_hint` / `build_cmd` /
-   `output_dir`): the CLI reads the fields of this file as your choice. If the
-   file already exists it is left alone.
-3. Appends a "Deploying with Layero" block to `AGENTS.md`, `CLAUDE.md` and/or
-   `.cursorrules` (whichever exist; if none do, it creates `AGENTS.md`). The
-   block names the framework only when detection is sure of it.
-
-The block is fenced with `<!-- layero:start -->` / `<!-- layero:end -->`
-markers, so a repeat `init` updates it in place instead of duplicating it.
-
-Flags:
-
-- `--skip-agent-docs` — leave `AGENTS.md` / `CLAUDE.md` / `.cursorrules`
-  untouched.
-- `-y`, `--yes` — non-interactive (all defaults applied silently).
-
-## `layero orgs list`
-
-Shows the Layero organizations you belong to:
-
-```
-borisowvalia        personal  (admin)
-acme-team           team      (admin)
-client-x            team      (member)
-```
-
-* **personal** — your personal account, created at signup.
-* **team** — a team, created by hand (in the dashboard or via
-  `layero deploy --org=...`).
-
-Under the older naming scheme the organization slug was a prefix of the
-hostname (`<org>-<project>.layero.app`). For projects created after the move
-the address consists of the project slug alone — see
-[Environments and previews](../deploys/environments).
-
-## `layero projects list`
-
-Shows every project you have access to.
-
-## `layero link`
-
-Link the current directory to an existing project:
-
-```bash
-npx layero@latest link 123          # by id
-npx layero@latest link alice-blog   # by slug
-```
-
-It creates `./.layero/project.json` pointing at the project. Useful when you
-cloned somebody else's repository and want to deploy into your own project, or
-moved from another folder.
-
-## `layero deploy`
-
-Pack the current directory and start a deploy. Details in
-[`layero deploy`](./deploy).
-
-## `layero deploys list`
-
-Show the project's recent deploys (the default branch unless told otherwise):
-
-```bash
-npx layero@latest deploys list                       # the current default branch
-npx layero@latest deploys list --branch=staging      # another branch
-npx layero@latest deploys list --limit 50            # more history
-```
-
-Each line carries the status (`ready`/`building`/`failed`), the commit SHA, a
-timestamp and the deploy **source**:
-
-| Badge | What it means |
+| Command | What it does |
 |---|---|
-| `(push)` | Came from a GitHub webhook after a push |
-| `(cli)` | Uploaded through `layero deploy` |
-| `(manual)` | Started by hand from the dashboard (Redeploy) |
+| `deploy` | pack the folder and publish it; `--dry-run` shows the plan — [details](../deploys/deploy.md) |
+| `init` | add a Layero block to `AGENTS.md`, `CLAUDE.md` or `.cursorrules` — [details](../agents/skill.md#layero-init-and-agentsmd) |
+| `link <id or slug>` | link the current folder to an existing project |
+| `claim status [code]` | state of a temporary site created with `deploy --claim` |
+| `claim accept [code]` | open the page where a person takes the site into their account |
 
+## Projects and environments
 
-## `layero projects create`
+| Command | What it does |
+|---|---|
+| `projects list` | your projects |
+| `projects create --repo <provider>:<owner>/<repository>` | create a project from a connected repository: a push to a branch gives a preview, a push to the main branch the main address |
+| `projects delete <id or slug>` | delete a project — **irreversible** |
+| `envs list` | the project's environments and their addresses |
+| `sources list` | Git providers and the organization's connections |
+| `sources connect <provider>` | connect a provider with a personal token |
+| `sources repos <connection id>` | repositories the connection's token can see |
 
-A project from a repository without the dashboard — path (a) for agents and
-the terminal:
+`projects delete`, `domains remove` and other irreversible commands work with
+a `login` sign-in. A token needs `admin` rights for them.
 
-```bash
-layero sources list                                           # providers and connections
-echo "$GITVERSE_TOKEN" | layero sources connect gitverse --token-stdin
-layero sources repos <connection_id>
-layero projects create --repo gitverse:acme/site --branch main --json
-```
+## Builds, rollback and diagnostics
 
-GitHub is connected by installing the Layero GitHub App in the dashboard; the
-other providers take a personal access token. The command checks the
-repository against the connection, creates the project and installs the
-webhook. If the provider refuses the webhook (token permissions; SourceCraft
-has no outgoing webhooks at all), the CLI says so with `webhook_unavailable`
-and the URL to register by hand — the repository is connected either way, only
-push-triggered builds wait for the webhook.
+| Command | What it does |
+|---|---|
+| `deploys list` | recent builds of the main branch; `--branch` for another |
+| `rollback` | bring back the previous build; `--deploy` for a specific one |
+| `promote [build]` | make a build the main one; without an argument takes the latest build of the `cli` environment |
+| `logs` | the build log; `--runtime` for the running app's log, `--tail <n>` for how many lines |
+| `diagnose` | explain why a build is in its state: the cause, the log around the error, the app's state |
+| `source [build]` | download an upload's sources as a ZIP; `--url` gives just the link |
 
-Once linked, the command finishes the setup wizard itself and starts the
-first build. It does not write the framework, build command or output
-directory into the project: the builder detects them from the repository on
-every build, so a framework change in the repository is picked up by itself,
-and `layero.json` overrides them. Only a decision is written: the app folder
-of a monorepo and the package manager from `layero.json`. Events `setup_applied` and `deploy_started`; from there, `layero deploys
-list --project <slug>`. With `--no-deploy` the project stays in the wizard
-(event `setup_pending` with the dashboard URL) and nothing builds until setup
-is completed there. If detection or setup fails, the project is still created
-(exit 0): event `setup_failed` with the reason and the wizard URL.
+Rollback and picking a build — [a separate article](../deploys/rollback.md).
 
-```bash
-layero projects create --repo github:acme/site --json              # link, set up, build
-layero projects create --repo github:acme/site --no-deploy --json  # link only
-```
+In `deploys list` every build shows its source: `cli` — a folder upload,
+`push` — a push to the repository or a hook, `manual` — started with the
+«Собрать заново» (Build again) button in the dashboard.
 
-## `layero projects delete`
+## Project settings
 
-```bash
-layero projects delete <slug> --yes
-```
+| Command | What it does |
+|---|---|
+| `env list` | environment variable names and value lengths |
+| `env set KEY=value …` | set variables, leaves the rest alone |
+| `env unset KEY …` | delete variables |
+| `domains list` | the project's domains |
+| `domains add <domain>` | connect a domain and show the DNS records |
+| `domains verify <domain>` | check DNS now instead of waiting for the background check |
+| `domains primary <domain>` | make the domain primary: the `layero.app` address redirects to it |
+| `domains remove <domain>` | disconnect a domain — **irreversible** |
+| `hooks list` | the project's deploy hooks |
+| `hooks create <name>` | create a hook: an address a POST to which starts a build. For CMSs, cron and external CI |
+| `hooks delete <id>` | revoke a hook; the address stops working at once |
 
-Irreversible: the address and slug are freed immediately, resources are
-cleaned up in the background. The route needs a token with scope `admin` —
-the default token (`read` + `deploy`) gets `forbidden`, and that is right: an
-agent holding a deploy token must not be able to wipe a project. In a terminal
-without `--yes` the command asks you to type the slug; outside a terminal
-without `--yes` it refuses with `confirmation_required`.
+Details: [environment variables](../build/env-vars.md),
+[custom domain](../addresses/custom-domains.md).
 
-## `layero envs list`
+## Analytics and speed
 
-The project's environments with their addresses. An environment and a branch
-are the same thing: a CLI project has one (`cli`), a project with a repository
-has one per branch; production is marked. In `--json` — the `environments`
-event.
+| Command | What it does |
+|---|---|
+| `analytics status` | whether Yandex Metrica is connected |
+| `analytics connect` | connect Metrica: the command prints a link, a person grants access |
+| `analytics stats` | traffic: totals, trend, sources, devices, pages |
+| `analytics disconnect` | disconnect Metrica |
+| `perf check` | measure the main branch's speed; `--wait` waits for the result |
+| `perf show` | the latest measurement and the comparison with the previous build |
 
-## `layero claim`
+## Databases and the Data API
 
-For a project created without an account (`layero deploy --claim`):
-`layero claim status` shows whether the claim is alive, `layero claim accept`
-opens the dashboard page where a human takes the site into their account. A
-claim cannot be accepted from the terminal — only by a person in the
-dashboard.
+| Command | What it does |
+|---|---|
+| `db list`, `db create`, `db connect`, `db disconnect`, `db sql`, `db delete` | the organization's databases — [details](../database/cli.md) |
+| `data enable` | turn on the Data API for a database |
+| `data env` | `VITE_` and `NEXT_PUBLIC_` variables for the frontend; `--write` puts them into `.env.local` |
+| `data methods` | tables and functions available through the API and the access level of each |
+| `data grant <object>` | set the access level: shows the SQL and applies it after confirmation |
+| `data keys` | keys: list, issue, revoke |
+| `data origins` | sites allowed to call the database from the browser |
+| `data probe <method> <path>` | a test request through the API: real rights and policies, writes are rolled back |
+| `data auth` | sign-in of the app's users: methods, providers, return addresses |
+| `data buckets` | file buckets: list and create |
+| `data secrets` | secrets for HTTP requests from SQL; values are never shown |
 
-## `layero hooks`
+Details — in the [Data API](../data-api/index.md) section.
 
-A deploy hook is a URL that starts a build when it receives a `POST`. It is
-for cases where the build is triggered by something other than a person:
-publishing in a headless CMS, a cron job, an external CI pipeline.
+## Common flags
 
-```bash
-layero hooks create strapi-content        # preview hook, default branch
-layero hooks create publish --prod        # production hook
-layero hooks list
-layero hooks delete <id>                  # revoked immediately
-```
+| Flag | What it does |
+|---|---|
+| `--json` | print JSON events, one per line — [list of events](../agents/json-events.md) |
+| `--debug` | print the full stack trace on an error |
+| `--help` | help for the command |
+| `--version` | the CLI version |
 
-The command prints a URL of the form `https://api.layero.ru/hooks/<token>`.
-Verified on a live project: `POST` returns `202` with a `deploy_id` and starts
-a build, while `GET` returns `405` — so a crawler or an accidental visit in a
-browser cannot fire one.
+## CLI environment variables
 
-:::warning[The hook URL is a credential]
-Anyone holding it can start a build. To rotate, delete the hook and create a
-new one; there is no separate "regenerate token".
-:::
-
-## `layero promote`
-
-Point the project's production apex at a specific ready deploy. Details in
-[`layero promote`](./promote).
-
-```bash
-npx layero@latest promote                        # latest ready upload from the CLI (the cli branch)
-npx layero@latest promote --branch=main          # latest ready build of main
-npx layero@latest promote --branch=staging       # latest ready of the staging branch
-npx layero@latest promote a3f9c2b                # a specific deploy by commit_sha (positional)
-npx layero@latest promote --yes                  # no confirmation (CI)
-```
-
-`layero deploy --promote` is the short path — "build it and ship it to
-production straight away", equivalent to
-`layero deploy … && layero promote <last-sha>`.
-
-
-## `layero source`
-
-Download a ZIP of what a deploy was built from: the sources uploaded by
-`layero deploy`, or the files of a site published from chat. `.env*` files
-are left out. Project members who can deploy can download it. Retention
-details — [Rollback points and source retention](../deploys/retention.md).
-
-```bash
-npx layero@latest source                  # the deploy served on the project address
-npx layero@latest source a3f9c2b          # a specific deploy by commit_sha or id
-npx layero@latest source --out site.zip   # your own file name; --force to overwrite
-npx layero@latest source --url            # just a 5-minute link, e.g. for curl
-```
-
-A deploy built from a repository has no sources on the platform: the command
-exits with `source_in_repository` and the commit link.
-
-## `layero db`
-
-The organization's databases from the terminal — so you don't have to switch
-to the browser mid-task, and so an agent in CI can do the same.
-
-```bash
-npx layero@latest db list                            # which databases exist
-npx layero@latest db create crm                      # create one
-npx layero@latest db connect crm                     # connect the current project
-npx layero@latest db sql crm "select count(*) from entries"
-npx layero@latest db sql crm --file migrations/0001.sql  # a script from a file
-npx layero@latest db delete crm --yes                # delete irreversibly
-```
-
-A new project can get its database on the very first deploy:
-`npx layero@latest deploy --db crm`. The first build already receives the Data API
-URL and key, no second deploy needed. `--address` sets a new project's address:
-`npx layero@latest deploy --name inbox --address inbox` puts the site at
-`inbox.layero.app`.
-
-With a single organization the CLI uses it; with several, your personal one.
-For a team organization pass `--org <slug>`. A database is addressed by name, slug or id.
-
-:::warning[The connection string is printed once]
-The CLI won't print it a second time. If you lose it, you can view or reset the
-password in the dashboard: the database card menu → **Connect**. It's safer to
-save the `db create` output right away.
-:::
-
-Commands, output, JSON events and the limits of `db sql` are covered in
-[Databases from the CLI](../database/cli.md).
+| Variable | What it does |
+|---|---|
+| `LAYERO_TOKEN` | a token for CI and agents. Wins over the sign-in saved by `login` |
+| `LAYERO_JSON=1` | the same as `--json` |

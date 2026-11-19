@@ -266,7 +266,7 @@ Refusals come as an `error` event with a code and a ready-made next step in
 | `dedicated_needs_panel` | `db create --dedicated`, `--cpu`, or `--ram`: a dedicated database is ordered in the dashboard |
 
 The full list of events and codes is in
-[JSON events schema](../cli/json-events.md).
+[CLI JSON events](../agents/json-events.md).
 
 ## Data API from the terminal
 
