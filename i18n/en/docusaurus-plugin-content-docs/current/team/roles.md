@@ -73,4 +73,4 @@ A guest can only get «Нет доступа» (No access) or «Просмотр
 it right away.
 
 Where to set it: «Участники» (Members) → member menu → «Доступ к проектам»
-(Project access).
+(Project access). In a terminal — `npx layero@latest team access <email>`, examples are in [In the CLI](./organizations.md#in-the-cli).

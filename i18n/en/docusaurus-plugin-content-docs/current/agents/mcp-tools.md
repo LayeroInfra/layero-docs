@@ -29,6 +29,13 @@ when it writes them.
 | `project_create` ⚠️ | An empty project without a repository — an address for a future publish. |
 | `project_settings` ⚠️ | Read or change build settings: app folder, install and build commands, output folder, project type, the "Made with Layero" label. Shows where each value comes from. |
 
+## Team members
+
+| Tool | What it does |
+|---|---|
+| `team_members` | Who is in the team: role (owner, developer, guest) and project access. Only owners see paid seats and invitations. |
+| `team_invite` ⚠️ | Invite a person by email with the role `developer`, `guest` or `owner`. A developer or an owner needs a free paid seat; without one, the answer says how to add a seat or invite as a guest. Roles, project access and seats are changed in the dashboard or with `npx layero@latest team`. |
+
 ## Site and builds
 
 | Tool | What it does |

@@ -1,7 +1,7 @@
 ---
 sidebar_position: 2
 title: All commands
-description: Reference of Layero CLI commands — publishing, projects and environments, rollback, logs and diagnostics, variables, domains, databases and the Data API, analytics, speed, hooks, tokens. Common flags and CLI environment variables.
+description: Reference of Layero CLI commands — publishing, projects and environments, rollback, logs and diagnostics, variables, domains, databases and the Data API, analytics, speed, hooks, tokens, team members. Common flags and CLI environment variables.
 ---
 
 # All commands
@@ -26,6 +26,19 @@ folder is used.
 | `token set <token>` | save on this machine a token issued elsewhere |
 
 How to sign in and where it's stored — [Installing and signing in](./install.md).
+
+## Team members
+
+| Command | What it does |
+|---|---|
+| `team list` | members, their roles and project access; for an owner, also pending invitations and paid seats |
+| `team invite <email>` | invite by email; the role is `--role owner`, `developer` (default) or `guest`. An owner or a developer needs a free seat |
+| `team role <email> <role>` | change the role: `owner`, `developer` or `guest` |
+| `team remove <email>` | remove a member or revoke an invitation. The seat stays with the team and keeps renewing until it's removed with `team seats --remove` |
+| `team access <email>` | show project access. `--all <level>` — the level for all projects, `--project <project>=<level>` — an exception, the flag can be repeated. Levels: `none`, `view`, `edit` |
+| `team seats` | show paid seats; `--add <N>` — add seats (the rest of the month is charged to the team balance right away), `--remove <N>` — remove free ones |
+
+Without `--org <slug>`, `team` commands work with your personal organization. What roles and access levels allow — [Roles and permissions](../team/roles.md), what seats cost — [Seats](../team/organizations.md#seats).
 
 ## Publishing
 

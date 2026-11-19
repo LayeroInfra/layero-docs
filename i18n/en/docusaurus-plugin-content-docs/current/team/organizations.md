@@ -61,7 +61,7 @@ owner is included in the team's subscription. Guests are free and unlimited.
   A pending invitation to such a role takes a seat too.
 
 Seats are added and removed in «Участники» (Members), in the «Платные места»
-(Paid seats) block.
+(Paid seats) block, or with `npx layero@latest team seats` — see [In the CLI](#in-the-cli).
 
 If a seat renewal isn't paid, a grace period of the same length as for Pro
 starts — see [Balance and renewal](../billing/lifecycle.md). After it, developers beyond the paid seats lose access, starting with the most recently invited: they stay in the team but can't see its
@@ -112,6 +112,31 @@ folder. After that, `deploy` in the same folder works with this project
 without `--org`. If you have several organizations and `--org` isn't set,
 the CLI asks where to create the project. With `--yes` it doesn't ask and
 creates the project in your personal organization.
+
+Members are managed with the `team` commands:
+
+```bash
+npx layero@latest team list --org acme-team
+```
+
+Shows the members, their roles and project access. An owner also sees
+pending invitations and paid seats.
+
+```bash
+npx layero@latest team seats --add 1 --org acme-team
+npx layero@latest team invite anna@example.com --role developer --org acme-team
+```
+
+Adds a seat — the rest of the month is charged to the team balance right
+away — and invites a developer. Without a free seat you can't invite a
+developer or an owner; a guest (`--role guest`) can be invited.
+
+```bash
+npx layero@latest team access anna@example.com --all view --project shop=edit --org acme-team
+```
+
+Anna sees every project of the team and can deploy, change domains and
+variables in `shop`. All commands are in the [CLI reference](../cli/commands.md#team-members).
 
 ## GitHub
 

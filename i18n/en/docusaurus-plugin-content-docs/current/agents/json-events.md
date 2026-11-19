@@ -566,7 +566,7 @@ The result of `layero orgs list`.
 
 | field | type |
 |---|---|
-| `organizations` | array — `id`, `slug`, `kind` (`personal` \| `team`), `role` (`admin` \| `member`) |
+| `organizations` | array — `id`, `slug`, `kind` (`personal` \| `team`), `role` — the API role: `admin` (owner), `editor` (developer), `viewer` (guest); an organization not yet moved to the new roles has `member` |
 
 ### `init_done`
 
@@ -724,6 +724,17 @@ Every event has `ts` and `event`; they aren't repeated below. A `?` after a name
 | `token_created` | `token create` | `id`, `name`, `token` (the value, sent once), `scopes` |
 | `token_revoked` | `token revoke` | `id` |
 
+### Team members
+
+| Event | Command | Fields |
+|---|---|---|
+| `team` | `team list` | `organization`; `members` — `email`, `username`, `role` (`owner` \| `developer` \| `guest`), `access` (`default_level`, `all` — `true` for an owner, `exceptions`); `invites` — `email`, `role`, `expires_at`; `seats` — `paid`, `occupied`, `unit_kopecks` — seat price in kopecks, `next_date` — the seat renewal date, `add_one_kopecks` — what one new seat costs right now. For a non-owner `invites` is empty and `seats` is `null` |
+| `team_invited` | `team invite` | `organization`, `email`, `role` |
+| `team_role_changed` | `team role` | `organization`, `email`, `role` |
+| `team_member_removed` | `team remove` | `organization`, `email`, `invite` — `true` if an invitation was revoked |
+| `team_access` | `team access` | `organization`, `email`, `default_level` (`none` \| `view` \| `edit`), `exceptions` — `project`, `level` |
+| `team_seats` | `team seats` | `organization`, `paid`, `occupied`, `unit_kopecks`, `next_date`, `added`, `removed` |
+
 ### Analytics and speed
 
 | Event | Command | Fields |
@@ -762,8 +773,8 @@ Do not write handling for codes that are not on this list.
 | `project_unknown` | Run outside a project directory and without `--project` | Run from the project directory or pass `--project <id\|slug>` |
 | `project_not_found` | `--project` points at a project that does not exist | `layero projects list` |
 | `cli_deploys_disabled` | folder uploads to this project are turned off | publish through the connected repository or into another project; to turn uploads back on, contact support |
-| `invalid_type` | `--type` with an unknown value | Drop the flag (auto-detection) or pass a valid preset — listed in the message |
-| `invalid_choice` | An interactive prompt got an invalid choice in non-TTY mode | Pass the value as an explicit flag |
+| `invalid_type` | `--type` with an unknown value; for `layero team seats` — the number of seats isn't a whole number or is less than 1 | Drop the flag (auto-detection) or pass a valid preset — listed in the message |
+| `invalid_choice` | An interactive prompt got an invalid choice in non-TTY mode; for `layero team` — a role or access level not from the list | Pass the value as an explicit flag |
 | `prebuilt_no_dir` | The `--prebuilt` directory does not exist | Pass it explicitly: `--prebuilt ./dist` |
 | `prebuilt_no_index` | The `--prebuilt` directory has no `index.html` | Point it at the folder containing the built `index.html` |
 | `deploy_not_started` | The build never started | Re-run `layero deploy`; if it repeats, `npx layero@latest diagnose` |
@@ -785,6 +796,9 @@ Do not write handling for codes that are not on this list.
 | `domain_not_found` | The project has no such domain | `layero domains list` |
 | `domain_rejected` | The platform refused the domain | The reason is in the message |
 | `forbidden` | The token lacks the scope this operation needs | Issue a token with the required scope |
+| `member_not_found` | `layero team role`, `access` or `remove`: the team has no member with this email (for `remove` — no invitation either) | `layero team list --org <slug>` |
+| `seat_required` | Inviting a developer or an owner with `layero team invite`, and there's no free paid seat | `layero team seats --add 1 --org <slug>` or invite as a guest: `--role guest`, free |
+| `balance_short` | `layero team seats --add`: the team balance doesn't cover a seat | Top up the team balance — the link is in `next_action` — and retry |
 | `database_unknown` | The organization has no database with that name, slug or id. For `layero data enable --repair` — no `--db` given: re-applying revokes the API roles' privileges on schema `public`, so the database is never guessed | `layero db list`; create one — `layero db create <name>`. For `--repair` — `layero data enable --db <database> --repair` |
 | `branch_without_env` | The branch has no environment yet | Deploy that branch first |
 | `analytics_not_connected` | Analytics is not connected | `layero analytics connect` |
@@ -852,7 +866,7 @@ error code.
 | `0` | success | — |
 | `1` | other | `plan_limit`, `forbidden`, `confirmation_required`, `repeated_failure`, `cli_deploys_disabled`, `username_required` and anything not in the classes below |
 | `2` | sign-in needed | `auth_required`, `auth_expired`, `auth_timeout`, `sandbox_claimed` |
-| `3` | not found | `sandbox_expired`, `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `source_not_kept`, `no_runs`, `data_key_unknown` |
+| `3` | not found | `sandbox_expired`, `project_unknown`, `project_not_found`, `org_unknown`, `member_not_found`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `source_not_kept`, `no_runs`, `data_key_unknown` |
 | `4` | invalid input | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `claim_static_only`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect`, `address_required`, `source_in_repository`, `file_exists` |
 | `5` | remote failure | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `deploy_watch_lost`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, `storage_refused`, any `deploy_<status>` and `http_5xx` |
 
