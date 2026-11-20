@@ -59,26 +59,20 @@ Node 18+ (рекомендуется 20/22/24).
   теги — `blog/tags.yml`. Маркер «свернуть превью» — `{/* truncate */}`
   (MDX-комментарий, не HTML).
 
-## Деплой (план)
+## Деплой
 
-Целевой домен: **`docs.layero.ru`**. По аналогии с `layero.ru` (см.
-[frontend/landing/README.md](../frontend/landing/README.md)):
+Push в `main` (при изменении `docs/`, `blog/`, `i18n/`, `src/`, `static/`,
+`scripts/`, конфигов сборки или `deploy.sh`) запускает workflow
+**Deploy docs** (`.github/workflows/deploy-docs.yml`). Он собирает обе
+локали, проверяет внешние ссылки и вызывает `deploy.sh`: тот готовит
+`llms.txt` и Markdown-копии страниц и заливает изменённые файлы в бакет
+`layero-docs` в Selectel ru-6. Последний шаг сверяет `build-id.txt` на
+docs.layero.ru с SHA коммита.
 
-1. **Object Storage**
-   - Создать бакет `layero-docs` в YC (website-mode, public-read).
-   - Содержимое = `npm run build` → каталог `build/`.
-2. **CDN**
-   - Создать CDN-ресурс с origin = бакет, cname = `docs.layero.ru`.
-   - Включить TLS (Let's Encrypt через YC), gzip/brotli.
-   - В `auto-register-cdn` (см. infra) добавить hostname `docs.layero.ru`
-     в `secondary_hostnames` (wildcard в YC не поддерживается, каждый
-     hostname через PATCH).
-3. **DNS**
-   - В зоне `layero.ru` добавить CNAME `docs` → cname CDN-ресурса.
-4. **CI/CD**
-   - Скопировать `frontend/landing/deploy.sh` как стартовый шаблон
-     (`yc storage cp` + `yc cdn cache purge`).
-   - Сервис-аккаунт: переиспользовать `layero-cdn-sa`
-     (роли `storage.editor` + `cdn.editor`) либо завести `layero-docs-sa`.
+```bash
+gh run list -R LayeroInfra/layero-docs --workflow 'Deploy docs' -L 3
+curl -sI https://docs.layero.ru/build-id.txt
+```
 
-После деплоя кеш CDN обновится за 30–60s.
+`deploy.sh` руками для прода не запускать. Подробности — раздел «Деплой»
+в [AGENTS.md](AGENTS.md).
