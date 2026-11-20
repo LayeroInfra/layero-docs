@@ -84,7 +84,7 @@
     "description": "The label for category Команды и интеграции in sidebar docsSidebar"
   },
   "sidebar.docsSidebar.category.Команды и интеграции.link.generated-index.description": {
-    "message": "Organisations, the GitHub App, and member access.",
+    "message": "Organizations and teams, member roles and permissions, the GitHub App.",
     "description": "The generated-index page description for category Команды и интеграции in sidebar docsSidebar"
   }
 }

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 title: GitHub App интеграция
 description: Зачем нужен GitHub App, как установить на personal или organization, в чём отличие от OAuth, как отключить.
 ---

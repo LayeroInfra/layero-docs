@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 title: The GitHub App integration
 description: Why the GitHub App exists, how to install it on a personal account or an organization, how it differs from OAuth, and how to disconnect it.
 ---
