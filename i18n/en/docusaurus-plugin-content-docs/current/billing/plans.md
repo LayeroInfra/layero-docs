@@ -34,7 +34,7 @@ see [When the trial ends](./lifecycle.md#when-the-trial-ends).
 | Shared database | — | one, 0.5 GB |
 | Data API, beta | — | ✅ |
 | Team organizations | — | ✅ |
-| Seats for colleagues | — | 1 |
+| Seats for colleagues | — | 990 ₽ a month per seat |
 
 Limits on traffic, site requests, app time, the Data API and speed runs, and
 prices beyond the limits, are on [Usage and limits](./usage.md). A dedicated
@@ -60,9 +60,7 @@ curl -sI https://<project-address> | grep -i x-robots-tag
 
 ## Seats for colleagues
 
-Pro includes one seat for a colleague: the organization owner doesn't take
-a seat. Each extra seat is 490 ₽ a month. Seats are only needed to work
-together in an [organization](../team/organizations.md).
+Every developer and every owner except the first needs a seat: the first owner is included in Pro. A seat is 990 ₽ a month, guests are free. How seats are paid for and renewed — see [Seats](../team/organizations.md#seats).
 
 ## How to pay
 
