@@ -560,7 +560,7 @@ CLI упаковал директорию в tar.gz.
 
 | поле | тип |
 |---|---|
-| `organizations` | array — `id`, `slug`, `kind` (`personal` \| `team`), `role` — роль в API: `admin` (владелец), `editor` (разработчик), `viewer` (гость), у организации, ещё не переведённой на новые роли, — `member` |
+| `organizations` | array — `id`, `slug`, `kind` (`personal` \| `team`), `role` (`admin` \| `member`) |
 
 ### `init_done`
 
@@ -715,17 +715,6 @@ CLI упаковал директорию в tar.gz.
 | `token_created` | `token create` | `id`, `name`, `token` (значение, приходит один раз), `scopes` |
 | `token_revoked` | `token revoke` | `id` |
 
-### Участники команды
-
-| Событие | Команда | Поля |
-|---|---|---|
-| `team` | `team list` | `organization`; `members` — `email`, `username`, `role` (`owner` \| `developer` \| `guest`), `access` (`default_level`, `all` — `true` у владельца, `exceptions`); `invites` — `email`, `role`, `expires_at`; `seats` — `paid`, `occupied`, `unit_kopecks` — цена места в копейках, `next_date` — дата продления мест, `add_one_kopecks` — сколько спишется сейчас за одно новое место. Не владельцу `invites` приходит пустым, `seats` — `null` |
-| `team_invited` | `team invite` | `organization`, `email`, `role` |
-| `team_role_changed` | `team role` | `organization`, `email`, `role` |
-| `team_member_removed` | `team remove` | `organization`, `email`, `invite` — `true`, если отозвано приглашение |
-| `team_access` | `team access` | `organization`, `email`, `default_level` (`none` \| `view` \| `edit`), `exceptions` — `project`, `level` |
-| `team_seats` | `team seats` | `organization`, `paid`, `occupied`, `unit_kopecks`, `next_date`, `added`, `removed` |
-
 ### Аналитика и скорость
 
 | Событие | Команда | Поля |
@@ -764,8 +753,8 @@ CLI упаковал директорию в tar.gz.
 | `project_unknown` | Команда вызвана вне каталога проекта и без `--project` | Запустить из каталога проекта или передать `--project <id\|slug>` |
 | `project_not_found` | `--project` указывает на несуществующий проект | `layero projects list` |
 | `cli_deploys_disabled` | загрузки из папки в этот проект выключены | публиковать через подключённый репозиторий или в другой проект; включить загрузки — через поддержку |
-| `invalid_type` | `--type` с неизвестным значением; у `layero team seats` — число мест не целое или меньше 1 | Убрать флаг (платформа определит фреймворк сама) или передать допустимое значение из списка в сообщении об ошибке |
-| `invalid_choice` | Интерактивный prompt получил невалидный выбор в non-TTY; у `layero team` — роль или уровень доступа не из списка | Передать значение явным флагом |
+| `invalid_type` | `--type` с неизвестным значением | Убрать флаг (платформа определит фреймворк сама) или передать допустимое значение из списка в сообщении об ошибке |
+| `invalid_choice` | Интерактивный prompt получил невалидный выбор в non-TTY | Передать значение явным флагом |
 | `prebuilt_no_dir` | Каталог из `--prebuilt` не найден | Указать явно: `--prebuilt ./dist` |
 | `prebuilt_no_index` | В каталоге `--prebuilt` нет `index.html` | Указать папку со собранным `index.html` |
 | `deploy_not_started` | Сборка не стартовала | Запустить `layero deploy` ещё раз; не помогло — `npx layero@latest diagnose` |
@@ -788,9 +777,6 @@ CLI упаковал директорию в tar.gz.
 | `domain_rejected` | Платформа отклонила домен | Причина — в сообщении |
 | `forbidden` | Операции не хватает scope у токена CI (`layero_ci_*`) | Выпустить токен с нужным scope |
 | `org_unknown` | У аккаунта несколько организаций, а команда не знает, в какой работать | Передать `--org <slug>`; список — `layero orgs list` |
-| `member_not_found` | `layero team role`, `access` или `remove`: участника с такой почтой нет в команде (у `remove` — и среди приглашений) | `layero team list --org <slug>` |
-| `seat_required` | Приглашение разработчика или владельца через `layero team invite`, а свободных платных мест нет | `layero team seats --add 1 --org <slug>` или пригласить гостем: `--role guest`, бесплатно |
-| `balance_short` | `layero team seats --add`: на балансе команды не хватает на место | Пополнить баланс команды — ссылка в `next_action` — и повторить |
 | `database_unknown` | В организации нет базы с таким именем, слагом или id. У `layero data enable --repair` — база не указана через `--db`: переприменение снимает у ролей API права на схему `public`, и базу не угадываем | `layero db list`; завести — `layero db create <имя>`. Для `--repair` — `layero data enable --db <база> --repair` |
 | `sql_missing` | `layero db sql` вызван без запроса | Передать запрос следом за именем базы: `layero db sql моя-база "select 1"` |
 | `gb_not_supported` | `layero db create --gb` — объём базы так не выбирается. Флаг остался ради этого отказа: раньше он молча ничего не делал | У базы из тарифа объём задан тарифом, у выделенного инстанса — диском ступени |
@@ -859,7 +845,7 @@ CLI упаковал директорию в tar.gz.
 | `0` | успех | — |
 | `1` | прочее | `plan_limit`, `forbidden`, `confirmation_required`, `repeated_failure`, `cli_deploys_disabled`, `username_required` и всё, что не попало в классы ниже |
 | `2` | нужен вход | `auth_required`, `auth_expired`, `auth_timeout`, `sandbox_claimed` |
-| `3` | не найдено | `sandbox_expired`, `project_unknown`, `project_not_found`, `org_unknown`, `member_not_found`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `source_not_kept`, `no_runs`, `data_key_unknown` |
+| `3` | не найдено | `sandbox_expired`, `project_unknown`, `project_not_found`, `org_unknown`, `database_unknown`, `env_not_found`, `domain_not_found`, `hook_not_found`, `connection_not_found`, `account_not_found`, `repo_not_found`, `claim_unknown`, `branch_without_env`, `no_deploy`, `no_deploys`, `source_not_kept`, `no_runs`, `data_key_unknown` |
 | `4` | неверный ввод | `invalid_type`, `invalid_choice`, `prebuilt_no_dir`, `prebuilt_no_index`, `bad_format`, `nothing_to_set`, `rollback_noop`, `sql_missing`, `branch_unsupported`, `claim_with_project`, `claim_static_only`, `provider_unknown`, `repo_format`, `token_missing`, `username_rejected`, `gb_not_supported`, `dedicated_needs_panel`, `data_key_kind`, `data_key_expiry`, `data_key_ambiguous`, `data_levels_missing`, `data_level_unknown`, `data_probe_method`, `data_probe_path`, `data_probe_query`, `data_probe_body`, `data_probe_as`, `data_probe_user_required`, `data_probe_user_invalid`, `data_probe_schema`, `data_probe_expect`, `address_required`, `source_in_repository`, `file_exists` |
 | `5` | удалённая ошибка | `deploy_failed`, `deploy_cancelled`, `deploy_not_started`, `deploy_watch_lost`, `internal`, `oauth_unavailable`, `claimable_unavailable`, `data_probe_gateway_failed`, `storage_refused`, любой `deploy_<status>` и `http_5xx` |
 

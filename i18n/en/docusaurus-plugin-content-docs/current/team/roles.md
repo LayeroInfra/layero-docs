@@ -6,6 +6,8 @@ description: What an owner, a developer and a guest can do in a Layero team, how
 
 # Roles and permissions
 
+The new roles and seat pricing are rolling out gradually. Organizations that have not switched yet still use the previous rules in the dashboard.
+
 **A team has three roles: owner, developer and guest.** An owner manages
 everything, including billing and members. A developer works with the
 projects they have access to. A guest only views.
@@ -78,13 +80,11 @@ A guest can only get «Нет доступа» (No access) or «Просмотр
 (Developer) role. Whoever creates a project gets «Редактирование» (Edit) in
 it right away.
 
-Where to set it: «Участники» (Members) → member menu → «Доступ к проектам»
-(Project access). In a terminal — `npx layero@latest team access <email>`, examples are in [In the CLI](./organizations.md#in-the-cli).
+To change access, open the project access field in the member’s row on the «Участники» (Members) page.
 
 ### Access to one project
 
-Project → «Настройки» (Settings) → «Доступ» (Access) → the «Команда» (Team)
-card. It shows who in the team sees this project and can change it:
+Project → «Настройки» (Settings) → «Команда» (Team). It shows who in the team sees this project and can change it:
 
 - owners always have «Редактирование» (Edit);
 - everyone else has the same level as on all projects in the team's
